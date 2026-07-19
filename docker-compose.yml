@@ -1,0 +1,16 @@
+services:
+  sys-memorial:
+    image: nginx:alpine
+    container_name: sys-memorial
+    restart: always
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+    #ports:
+    #  - "8085:80" # VPS 对外暴露的端口（保留此端口方便你直接通过 IP:8085 测试访问）
+    networks:
+      - npm_default # 将容器加入到你的 npm_default 网络中
+
+networks:
+  npm_default:
+    external: true # 声明这是一个外部已经存在的网络
+

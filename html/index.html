@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>私立中山紀念堂</title>
+
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="alternate icon" href="favicon.ico" type="image/x-icon" sizes="any">
+
+    <link rel="preload" href="icon-mobile.png" as="image">    
+    <link rel="apple-touch-icon" href="icon-mobile.png">
+    
+    <link rel="stylesheet" href="style.css?v=1042">
+
+    <link rel="manifest" href="manifest.json">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="國父紀念堂">
+    
+    <!-- iOS 啟動圖 (精確匹配各型號解析度) -->
+    <link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="splash-1290x2796.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="splash-1179x2556.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)" href="splash-1284x2778.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" href="splash-1170x2532.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" href="splash-1125x2436.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" href="splash-1242x2688.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" href="splash-828x1792.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" href="splash-1242x2208.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="splash-750x1334.png">
+</head>
+<body>
+
+    <div id="memorial-banner" class="memorial-banner hidden">
+        請向國父遺像行三鞠躬禮
+    </div>
+
+    <div id="sit-down-banner" class="status-banner">
+        請坐下
+    </div>
+
+    <div class="top-hover-trigger">
+        <div class="dropdown-nav-bar">
+            <div class="nav-left">
+                <a href="https://www.yatsen.gov.tw/" target="_blank" class="nav-link">🏛️ 國立國父紀念館</a>
+            </div>
+            
+            <div id="nav-festival-banner" class="nav-festival-banner"></div>
+
+            <div class="nav-right">
+                <span id="minguo-date-display">⏳ 正在讀取曆法...</span>
+            </div>
+        </div>
+        <div class="mobile-arrow-hint" id="mobile-arrow-btn">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="frame-container" id="portrait-btn">
+            <div class="wood-frame">
+                <img src="portrait.jpg" alt="國父遺像" class="portrait-img">
+            </div>
+        </div>
+
+        <div class="attendance-box">
+            <span class="attendance-label">總參典人次：</span>
+            <span class="attendance-count" id="attendanceCount">0</span><span class="attendance-unit">人次</span>
+        </div>
+
+        <div class="testament-box">
+            <div class="testament-text" id="testament-content">
+             余致力國民革命，凡四十年，其目的在求中國之自由平等。積四十年之經驗，深知欲達到此目的，必須喚起民眾及聯合世界上以平等待我之民族，共同奮鬥。現在革命尚未成功，凡我同志，務須依照余所著建國方略、建國大綱、三民主義及第一次全國代表大會宣言，繼續努力，以求貫徹。最近主張開國民會議及廢除不平等條約，尤須於最短期間，促其實現。是所至囑！
+            </div>
+        </div>
+    </div>
+
+    <audio id="bg-music" src="anthem.m4a"></audio>
+
+    <script src="script.js?v=1025"></script>
+
+    <div class="stealth-footer">
+        <a href="announcement.html">公告</a>
+        <span>|</span>
+        <a href="biography.html">國父生平</a>
+        <span>|</span>
+        <a href="thanks.html">特別鳴謝</a>
+        <span>|</span>
+        <a href="about.html">關於與聲明</a>
+    </div>
+
+</body>
+</html>

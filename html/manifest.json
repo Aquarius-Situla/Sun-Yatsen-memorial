@@ -1,0 +1,23 @@
+{
+  "short_name": "國父紀念堂",
+  "name": "私立中山紀念堂",
+  "icons": [
+    {
+      "src": "icon-desktop.png",
+      "sizes": "144x144 192x192 256x256 512x512 1254x1254",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-mobile.png",
+      "sizes": "144x144 192x192 256x256 512x512 1254x1254",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "start_url": "/index.html",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "display": "standalone",
+  "orientation": "portrait"
+}
