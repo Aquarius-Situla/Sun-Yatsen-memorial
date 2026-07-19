@@ -21,6 +21,9 @@
 
 本项目之源代码与素材采行“双轨制”授权原则，以确保技术共享与版权尊重：
 
+* **开源项目地址 (GitHub)**
+  本项目的开源源代码已托管于 GitHub：[Aquarius-Situla/Sun-Yatsen-memorial](https://github.com/Aquarius-Situla/Sun-Yatsen-memorial)，欢迎访问、交流或提出建议。
+
 * **源代码授权 (MIT License)**
   本项目之底层前端源代码（包含 HTML 结构、CSS 样式排版与 JavaScript 互动逻辑）基于 [MIT License](https://opensource.org/licenses/MIT) 开源。任何人皆可自由获取、使用、复制、修改、合并或发布本源代码，惟须于软件副本或重要部分中保留原作者之版权声明与本授权条款。
 
