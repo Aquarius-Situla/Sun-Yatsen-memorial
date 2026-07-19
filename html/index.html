@@ -23,7 +23,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="國父紀念堂">
     
-    <!-- iOS 啟動圖 (精確匹配各型號解析度) -->
+    <!-- iOS 啟動圖 (統一中性淺灰色背景) -->
     <link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="splash-1290x2796.png">
     <link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="splash-1179x2556.png">
     <link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)" href="splash-1284x2778.png">
@@ -33,6 +33,22 @@
     <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" href="splash-828x1792.png">
     <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" href="splash-1242x2208.png">
     <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="splash-750x1334.png">
+
+    <script>
+        // 動態預加載當前設備對應的 iOS 啟動圖，防止添加到主畫面時動畫丟失
+        (function() {
+            var links = document.querySelectorAll('link[rel="apple-touch-startup-image"]');
+            for (var i = 0; i < links.length; i++) {
+                if (window.matchMedia(links[i].getAttribute('media')).matches) {
+                    var preload = document.createElement('link');
+                    preload.rel = 'preload';
+                    preload.as = 'image';
+                    preload.href = links[i].getAttribute('href');
+                    document.head.appendChild(preload);
+                }
+            }
+        })();
+    </script>
 </head>
 <body>
 

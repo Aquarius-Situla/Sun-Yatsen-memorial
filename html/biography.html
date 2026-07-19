@@ -185,6 +185,29 @@
             margin-left: -4px;
         }
 
+        .show-all-btn {
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid #555555;
+            background-color: transparent;
+            cursor: pointer;
+            color: #aaaaaa;
+            font-size: 13px;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;
+            transition: all 0.3s ease;
+        }
+        .show-all-btn:active {
+            color: #f1c40f;
+            border-color: #f1c40f;
+        }
+        @media (hover: hover) and (pointer: fine) {
+            .show-all-btn:hover {
+                color: #f1c40f;
+                border-color: #f1c40f;
+                box-shadow: 0 0 10px rgba(241, 196, 15, 0.2);
+            }
+        }
+
         /* 桌面端适配 */
         @media (min-width: 769px) {
             .icon-ios { display: none; }
@@ -272,6 +295,21 @@
                     box-shadow: 0 0 10px rgba(184,134,11,0.2);
                 }
             }
+            .show-all-btn {
+                color: #6b4c35;
+                border-color: #c4a876;
+            }
+            .show-all-btn:active {
+                color: #b8860b;
+                border-color: #b8860b;
+            }
+            @media (hover: hover) and (pointer: fine) {
+                .show-all-btn:hover {
+                    color: #b8860b;
+                    border-color: #b8860b;
+                    box-shadow: 0 0 10px rgba(184,134,11,0.2);
+                }
+            }
             .top-back-btn {
                 color: #8a7060;
             }
@@ -353,7 +391,7 @@
             <div class="chart-title" id="chart2-title">三民主義核心結構</div>
             <canvas id="sanminChart"></canvas>
             <div style="text-align: center; margin-top: 15px;">
-                <button id="show-all-btn" style="padding: 6px 16px; border-radius: 20px; border: 1px solid #d4c4a0; background-color: transparent; cursor: pointer; color: inherit; font-size: 13px; font-family: inherit; transition: all 0.3s ease;">顯示全部</button>
+                <button id="show-all-btn" class="show-all-btn">顯示全部</button>
             </div>
         </div>
     </div>
