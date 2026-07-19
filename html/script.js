@@ -41,7 +41,7 @@ const mobileArrowBtn = document.getElementById('mobile-arrow-btn');
 const dropdownNavBar = document.querySelector('.dropdown-nav-bar');
 const navFestivalBanner = document.getElementById('nav-festival-banner'); 
 
-const WORKER_API = "https://yatsenmemorial.workers.29510901.xyz";
+const WORKER_API = window.ENV.WORKER_API;
 
 let isPlaying = false; 
 let bannerTimeout = null; 
