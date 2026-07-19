@@ -153,6 +153,46 @@
             .icon-ios { display: block; }
             .icon-macos { display: none; }
         }
+
+        /* ===== Light mode overrides ===== */
+        @media (prefers-color-scheme: light) {
+            html, body {
+                background-color: #f5f0e8;
+                color: #2c1810;
+            }
+            .markdown-container {
+                background-color: #ede8dc;
+                border-color: #c4a876;
+                box-shadow: 0 10px 30px rgba(80,50,10,0.12);
+            }
+            .lang-toggle-btn {
+                background-color: #ede8dc;
+                color: #6b4c35;
+                border-color: #c4a876;
+            }
+            .lang-toggle-btn:active {
+                color: #b8860b;
+                border-color: #b8860b;
+            }
+            @media (hover: hover) and (pointer: fine) {
+                .lang-toggle-btn:hover {
+                    color: #b8860b;
+                    border-color: #b8860b;
+                    box-shadow: 0 0 10px rgba(184,134,11,0.2);
+                }
+            }
+            .top-back-btn {
+                color: #8a7060;
+            }
+            .top-back-btn:active {
+                color: #2c1810;
+            }
+            @media (hover: hover) and (pointer: fine) {
+                .top-back-btn:hover {
+                    color: #2c1810;
+                }
+            }
+        }
     </style>
 </head>
 <body>
@@ -241,6 +281,78 @@
                 }
             });
         });
+
+        const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: light)');
+        function updateMarkdownTheme() {
+            const isLight = colorSchemeQuery.matches;
+            const template = mdViewer.querySelector('template');
+            if (template) {
+                const link = template.content.querySelector('link');
+                if (link) {
+                    link.href = isLight
+                        ? 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown.css'
+                        : 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css';
+                }
+                const style = template.content.querySelector('style');
+                if (style) {
+                    style.textContent = getMarkdownStyles(isLight);
+                }
+            }
+            const currentSrc = mdViewer.getAttribute('src');
+            mdViewer.removeAttribute('src');
+            requestAnimationFrame(() => mdViewer.setAttribute('src', currentSrc));
+        }
+        function getMarkdownStyles(isLight) {
+            if (isLight) {
+                return `.markdown-body {
+                    color: #2c1810 !important;
+                    background-color: transparent !important;
+                    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif !important;
+                    line-height: 1.8;
+                    padding: 0 15px !important;
+                    overflow-wrap: break-word !important;
+                    word-wrap: break-word !important;
+                    word-break: break-all !important;
+                }
+                .markdown-body h1, .markdown-body h2 {
+                    color: #2c1810 !important;
+                    border-bottom-color: #c4a876 !important;
+                    padding-bottom: 10px;
+                }
+                .markdown-body a {
+                    color: #b8860b !important;
+                    text-decoration: none;
+                }
+                .markdown-body a:hover { text-decoration: underline; }
+                .markdown-body ul { margin-bottom: 20px !important; }
+                .markdown-body li { margin-bottom: 8px !important; }`;
+            } else {
+                return `.markdown-body {
+                    color: #e5e7eb !important;
+                    background-color: transparent !important;
+                    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif !important;
+                    line-height: 1.8;
+                    padding: 0 15px !important;
+                    overflow-wrap: break-word !important;
+                    word-wrap: break-word !important;
+                    word-break: break-all !important;
+                }
+                .markdown-body h1, .markdown-body h2 {
+                    color: #ffffff !important;
+                    border-bottom-color: #333333 !important;
+                    padding-bottom: 10px;
+                }
+                .markdown-body a {
+                    color: #f1c40f !important;
+                    text-decoration: none;
+                }
+                .markdown-body a:hover { text-decoration: underline; }
+                .markdown-body ul { margin-bottom: 20px !important; }
+                .markdown-body li { margin-bottom: 8px !important; }`;
+            }
+        }
+        colorSchemeQuery.addEventListener('change', updateMarkdownTheme);
+        if (colorSchemeQuery.matches) updateMarkdownTheme();
 
         const topBackBtn = document.querySelector('.top-back-btn');
         if (topBackBtn) {

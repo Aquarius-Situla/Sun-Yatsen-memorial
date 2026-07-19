@@ -27,7 +27,7 @@ will-change: transform;
 backface-visibility: hidden;
 }/* ========================================================================== /
 / 計數器與遺囑 /
-/ ========================================================================== */.attendance-box {margin: 0 auto 25px auto;font-family: "BiauKai", "Kaiti TC", "Kaiti SC", "標楷體", "KaiTi", "DFKai-SB", serif !important;background: rgba(35, 16, 7, 0.4);padding: 5px 18px;border-radius: 20px;border: 1px solid rgba(138, 100, 15, 0.25);text-align: center;}.attendance-label {color: #aaaaaa;font-size: 0.95rem;}.attendance-count {color: #f1c40f;font-size: 1.25rem;font-weight: bold;margin: 0 3px;}.attendance-unit {color: #aaaaaa;font-size: 0.95rem;}.testament-box {margin-top: 15px;width: 100%;position: relative;}.testament-text {writing-mode: vertical-rl;text-orient: mixed;font-family: "BiauKai", "Kaiti TC", "Kaiti SC", "標楷體", "KaiTi", "DFKai-SB", serif !important;height: min(340px, 35vh);height: min(340px, 35dvh);font-size: clamp(0.9rem, 2.2vh, 1.15rem);font-size: clamp(0.9rem, 2.2dvh, 1.15rem);text-align: start;word-break: break-all;color: #dcdee0;line-height: 1.8;letter-spacing: 4px;padding: 0 15px;border-left: 1px rgba(255, 255, 255, 0.12) dashed;border-right: 1px rgba(255, 255, 255, 0.12) dashed;position: relative;width: max-content !important;left: 50%;transform: translateX(-50%);transition: all 0.3s ease;}/* 桌面端適配 */@media (min-width: 1025px) {.testament-text {height: min(280px, 30vh) !important;height: min(280px, 30dvh) !important;font-size: clamp(14px, 2.5vh, 18px) !important;line-height: 2.1 !important;letter-spacing: 6px !important;padding: 0 40px !important;margin-bottom: 10px !important;}}/* ========================================================================== /
+/ ========================================================================== */.attendance-box {margin: 0 auto 25px auto;font-family: "BiauKai", "Kaiti TC", "Kaiti SC", "標楷體", "KaiTi", "DFKai-SB", serif !important;background: rgba(35, 16, 7, 0.4);padding: 5px 18px;border-radius: 20px;border: 1px solid rgba(138, 100, 15, 0.4);text-align: center;}.attendance-label {color: #aaaaaa;font-size: 0.95rem;}.attendance-count {color: #f1c40f;font-size: 1.25rem;font-weight: bold;margin: 0 3px;}.attendance-unit {color: #aaaaaa;font-size: 0.95rem;}.testament-box {margin-top: 15px;width: 100%;position: relative;}.testament-text {writing-mode: vertical-rl;text-orient: mixed;font-family: "BiauKai", "Kaiti TC", "Kaiti SC", "標楷體", "KaiTi", "DFKai-SB", serif !important;height: min(340px, 35vh);height: min(340px, 35dvh);font-size: clamp(0.9rem, 2.2vh, 1.15rem);font-size: clamp(0.9rem, 2.2dvh, 1.15rem);text-align: start;word-break: break-all;color: #dcdee0;line-height: 1.8;letter-spacing: 4px;padding: 0 15px;border-left: 1px rgba(255, 255, 255, 0.18) dashed;border-right: 1px rgba(255, 255, 255, 0.18) dashed;position: relative;width: max-content !important;left: 50%;transform: translateX(-50%);transition: all 0.3s ease;}/* 桌面端適配 */@media (min-width: 1025px) {.testament-text {height: min(280px, 30vh) !important;height: min(280px, 30dvh) !important;font-size: clamp(14px, 2.5vh, 18px) !important;line-height: 2.1 !important;letter-spacing: 6px !important;padding: 0 40px !important;margin-bottom: 10px !important;}}/* ========================================================================== /
 / 通知橫幅與導航 /
 / ========================================================================== */.memorial-banner,.status-banner {position: fixed;top: 0;left: 0;width: 100%;background-color: #231007;color: #f1c40f;border-bottom: 2px solid #8a640f;padding: 14px 0;text-align: center;font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif !important;font-size: 1.05rem;font-weight: bold;letter-spacing: 5px;box-shadow: 0 4px 15px rgba(0,0,0,0.6);transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;}.memorial-banner {z-index: 10000;transform: translateY(0);opacity: 1;}.memorial-banner.hidden {transform: translateY(-100%);opacity: 0;}.status-banner {z-index: 10005;pointer-events: none;transform: translateY(-100%);opacity: 0;}.status-banner.show {transform: translateY(0);opacity: 1;}.top-hover-trigger {position: fixed;top: 0;left: 0;width: 100%;height: 15px;z-index: 20000;}.dropdown-nav-bar {position: absolute;top: 0;left: 0;width: 100%;background: linear-gradient(to bottom, #1c0e07, #110804);border-bottom: 2px solid #b8860b;padding: 12px 30px;display: flex;justify-content: space-between;align-items: center;box-sizing: border-box;box-shadow: 0 5px 25px rgba(0,0,0,0.9);transform: translateY(-100%);transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);}.nav-festival-banner {position: absolute;left: 50%;transform: translateX(-50%);color: #f1c40f;font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;font-weight: bold;font-size: clamp(12px, 3vw, 15px);text-align: center;letter-spacing: 2px;margin: 0;white-space: nowrap;text-shadow: 0 0 8px rgba(241, 196, 15, 0.4);pointer-events: none;}.nav-festival-banner:empty {display: none !important;}
 .nav-festival-banner[role="link"] {
@@ -233,7 +233,7 @@ body.has-festival #minguo-date-display {
 }
 }/* ========================================================================== /
 / 底部导航 /
-/ ========================================================================== */.stealth-footer {position: fixed;bottom: calc(28px + env(safe-area-inset-bottom, 0px));left: 50%;transform: translateX(-50%);display: flex;gap: clamp(8px, 2vw, 15px);align-items: center;z-index: 10000;}.stealth-footer a {color: #262626;text-decoration: none;font-size: clamp(10px, 2.5vw, 13px);letter-spacing: 2px;font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;transition: color 0.4s ease, text-shadow 0.4s ease;white-space: nowrap;-webkit-tap-highlight-color: transparent;}.stealth-footer span {color: #1a1a1a;font-size: clamp(8px, 2vw, 11px);}@media (hover: hover) and (pointer: fine) {.stealth-footer a:hover {color: #f1c40f;text-shadow: 0 0 8px rgba(241, 196, 15, 0.4);}}.stealth-footer a:active {color: #f1c40f;text-shadow: 0 0 8px rgba(241, 196, 15, 0.4);}
+/ ========================================================================== */.stealth-footer {position: fixed;bottom: calc(28px + env(safe-area-inset-bottom, 0px));left: 50%;transform: translateX(-50%);display: flex;gap: clamp(8px, 2vw, 15px);align-items: center;z-index: 10000;}.stealth-footer a {color: #383838;text-decoration: none;font-size: clamp(10px, 2.5vw, 13px);letter-spacing: 2px;font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;transition: color 0.4s ease, text-shadow 0.4s ease;white-space: nowrap;-webkit-tap-highlight-color: transparent;}.stealth-footer span {color: #2a2a2a;font-size: clamp(8px, 2vw, 11px);}@media (hover: hover) and (pointer: fine) {.stealth-footer a:hover {color: #f1c40f;text-shadow: 0 0 8px rgba(241, 196, 15, 0.4);}}.stealth-footer a:active {color: #f1c40f;text-shadow: 0 0 8px rgba(241, 196, 15, 0.4);}
 
 /* ==========================================================================
  / 陀螺儀動態光照 (Gyroscope Lighting) — 僅觸控設備
@@ -243,6 +243,149 @@ body.has-festival #minguo-date-display {
 @media (hover: none), (pointer: coarse) {
     .wood-frame {
         transition: none;
+    }
+}
+
+/* ==========================================================================
+ / 淺色模式 (Light Mode) — 跟隨系統自動切換
+ / 配色主題：羊皮紙米白 × 深棕 × 沉金，符合歷史紀念館氛圍
+ / ========================================================================== */
+@media (prefers-color-scheme: light) {
+
+    html, body {
+        background-color: #f5f0e8;
+    }
+
+    body {
+        color: #2c1810;
+    }
+
+    /* 畫框與遺像 — 淺色模式下換成白天感的中性暖木色 */
+    .frame-container {
+        /* 輕柔的暖棕投影，使畫框自然懸浮於米白背景 */
+        filter: drop-shadow(0 10px 22px rgba(80, 45, 10, 0.18));
+    }
+
+    .wood-frame {
+        /* 深胡桃木色：比原版亮、比上版暗，加強紋理可見度避免塑料感 */
+        background:
+            repeating-linear-gradient(
+                90deg,
+                rgba(60, 30, 10, 0.12) 0px,
+                rgba(60, 30, 10, 0.12) 3px,
+                rgba(90, 50, 18, 0.09) 3px,
+                rgba(90, 50, 18, 0.09) 6px
+            ),
+            linear-gradient(135deg, #4a2c12 0%, #633c22 50%, #3e2510 100%);
+        background-blend-mode: multiply;
+        border-color: #321a08;
+        box-shadow:
+            0 clamp(10px, 3vw, 20px) clamp(16px, 5vw, 35px) rgba(50, 25, 5, 0.5),
+            inset 0 0 0 clamp(1px, 0.5vw, 2px) #7a4e28,
+            inset 0 0 0 clamp(2px, 0.6vw, 3px) #251408,
+            inset var(--sh-x, 8px) var(--sh-y, 8px) clamp(15px, 4vw, 25px) rgba(0, 0, 0, var(--sh-alpha, 0.45)),
+            inset var(--hl-x, -6px) var(--hl-y, -6px) clamp(15px, 4vw, 25px) rgba(220, 170, 90, var(--hl-alpha, 0.09)),
+            inset 0 0 clamp(8px, 2.5vw, 15px) rgba(0, 0, 0, 0.4);
+    }
+
+    /* 金色墊板邊線配合框色調 */
+    .wood-frame img {
+        background-color: #b8880e !important;
+        border-color: #251408 !important;
+        box-shadow: 0 3px 10px rgba(40, 20, 0, 0.5) !important;
+    }
+
+    /* 遺像本身：配合暖木框的邊線顏色 */
+    .portrait-img {
+        border-color: #5a3412 !important;
+        box-shadow: 0 0 10px rgba(80, 45, 0, 0.25) !important;
+    }
+
+    /* 計數器與遺囑 */
+    .attendance-box {
+        background: rgba(196, 168, 118, 0.25);
+        border-color: rgba(138, 100, 15, 0.35);
+    }
+    .attendance-label,
+    .attendance-unit {
+        color: #6b4c35;
+    }
+    .attendance-count {
+        color: #8a6400;
+    }
+
+    .testament-text {
+        color: #2c1810;
+        border-left-color: rgba(100, 70, 30, 0.3);
+        border-right-color: rgba(100, 70, 30, 0.3);
+    }
+
+    /* 通知橫幅 */
+    .memorial-banner,
+    .status-banner {
+        background-color: #e8dcc8;
+        color: #7a5200;
+        border-bottom-color: #b8860b;
+        box-shadow: 0 4px 15px rgba(100, 70, 0, 0.15);
+    }
+
+    /* 下拉導航欄 */
+    .dropdown-nav-bar {
+        background: linear-gradient(to bottom, #ede8dc, #e0d8c8);
+        border-bottom-color: #b8860b;
+        box-shadow: 0 5px 25px rgba(80, 50, 10, 0.15);
+    }
+
+    .nav-link {
+        color: #7a5200;
+    }
+    @media (hover: hover) and (pointer: fine) {
+        .nav-link:hover {
+            color: #2c1810;
+            text-shadow: 0 0 8px rgba(44, 24, 16, 0.3);
+        }
+    }
+    .nav-link:active {
+        color: #2c1810;
+        text-shadow: 0 0 8px rgba(44, 24, 16, 0.3);
+    }
+
+    .nav-festival-banner {
+        color: #8a6400;
+        text-shadow: 0 0 8px rgba(138, 100, 0, 0.3);
+    }
+    .nav-festival-banner[role="link"]:hover {
+        text-shadow: 0 0 14px rgba(138, 100, 0, 0.6);
+    }
+
+    #minguo-date-display {
+        color: #5a3e2a;
+    }
+
+    /* 移動端箭頭提示 */
+    .mobile-arrow-hint {
+        background: rgba(232, 220, 200, 0.9) !important;
+        border-color: rgba(100, 70, 30, 0.25) !important;
+        color: rgba(100, 70, 30, 0.55) !important;
+        box-shadow: 0 3px 6px rgba(80, 50, 10, 0.2) !important;
+    }
+
+    /* 底部導航 */
+    .stealth-footer a {
+        color: #c8b898;
+    }
+    .stealth-footer span {
+        color: #d4c4a0;
+    }
+    @media (hover: hover) and (pointer: fine) {
+        .stealth-footer a:hover {
+            color: #8a6400;
+            text-shadow: 0 0 8px rgba(138, 100, 0, 0.3);
+        }
+    }
+    .stealth-footer a:active {
+        color: #8a6400;
+        text-shadow: 0 0 8px rgba(138, 100, 0, 0.3);
     }
 }
 

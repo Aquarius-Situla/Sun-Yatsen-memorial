@@ -222,6 +222,68 @@
             .icon-ios { display: block; }
             .icon-macos { display: none; }
         }
+
+        /* ===== Light mode overrides ===== */
+        @media (prefers-color-scheme: light) {
+            html, body {
+                background-color: #f5f0e8;
+                color: #2c1810;
+            }
+            .markdown-container,
+            .charts-container {
+                background-color: #ede8dc;
+                border-color: #c4a876;
+                box-shadow: 0 10px 30px rgba(80,50,10,0.12);
+            }
+            .tab-btn {
+                background-color: #ede8dc;
+                color: #7a5500;
+                border-color: #c4a876;
+            }
+            .tab-btn.active {
+                background-color: #f5e8c8;
+                color: #7a4f00;
+                border-color: #b8860b;
+                box-shadow: 0 0 10px rgba(184,134,11,0.2);
+            }
+            @media (hover: hover) and (pointer: fine) {
+                .tab-btn:hover:not(.active) {
+                    color: #2c1810;
+                    border-color: #8a6400;
+                }
+            }
+            .chart-title {
+                color: #7a4f00;
+                border-bottom-color: #c4a876;
+            }
+            .lang-toggle-btn {
+                background-color: #ede8dc;
+                color: #6b4c35;
+                border-color: #c4a876;
+            }
+            .lang-toggle-btn:active {
+                color: #b8860b;
+                border-color: #b8860b;
+            }
+            @media (hover: hover) and (pointer: fine) {
+                .lang-toggle-btn:hover {
+                    color: #b8860b;
+                    border-color: #b8860b;
+                    box-shadow: 0 0 10px rgba(184,134,11,0.2);
+                }
+            }
+            .top-back-btn {
+                color: #8a7060;
+            }
+            .top-back-btn:active {
+                color: #2c1810;
+            }
+            @media (hover: hover) and (pointer: fine) {
+                .top-back-btn:hover {
+                    color: #2c1810;
+                }
+            }
+        }
     </style>
 </head>
 <body>
@@ -290,6 +352,9 @@
         <div class="chart-box">
             <div class="chart-title" id="chart2-title">三民主義核心結構</div>
             <canvas id="sanminChart"></canvas>
+            <div style="text-align: center; margin-top: 15px;">
+                <button id="show-all-btn" style="padding: 6px 16px; border-radius: 20px; border: 1px solid #d4c4a0; background-color: transparent; cursor: pointer; color: inherit; font-size: 13px; font-family: inherit; transition: all 0.3s ease;">顯示全部</button>
+            </div>
         </div>
     </div>
 
@@ -302,17 +367,39 @@
         const chartsSection = document.getElementById('charts-section');
         const chart1Title = document.getElementById('chart1-title');
         const chart2Title = document.getElementById('chart2-title');
+        const showAllBtn = document.getElementById('show-all-btn');
         
         let isTraditional = true;
         let currentTab = 'biography';
         let influenceChartInstance = null;
         let sanminChartInstance = null;
+        let isAllShown = false;
+
+        if (showAllBtn) {
+            showAllBtn.addEventListener('click', () => {
+                if (sanminChartInstance) {
+                    isAllShown = !isAllShown;
+                    sanminChartInstance.data.datasets.forEach((ds, i) => {
+                        if (!isAllShown) {
+                            sanminChartInstance.setDatasetVisibility(i, i === 2); // 仅显示辛亥革命
+                        } else {
+                            sanminChartInstance.setDatasetVisibility(i, true);
+                        }
+                    });
+                    sanminChartInstance.update();
+                    showAllBtn.textContent = isAllShown 
+                        ? (isTraditional ? '隱藏全部' : '隐藏全部')
+                        : (isTraditional ? '顯示全部' : '显示全部');
+                }
+            });
+        }
 
         function renderCharts() {
             if (influenceChartInstance) influenceChartInstance.destroy();
             if (sanminChartInstance) sanminChartInstance.destroy();
 
-            Chart.defaults.color = '#aaaaaa';
+            const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            Chart.defaults.color = isDarkMode ? '#aaaaaa' : '#6b4c35';
             Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif';
 
             const ctx1 = document.getElementById('influenceChart').getContext('2d');
@@ -330,7 +417,7 @@
                         borderWidth: 2,
                         tension: 0.4,
                         fill: true,
-                        pointBackgroundColor: '#111111',
+                        pointBackgroundColor: isDarkMode ? '#111111' : '#f5f0e8',
                         pointBorderColor: '#f1c40f',
                         pointHoverBackgroundColor: '#f1c40f',
                         pointHoverBorderColor: '#ffffff'
@@ -341,32 +428,143 @@
                     plugins: { legend: { display: false } },
                     scales: {
                         y: { display: false, min: 0, max: 110 },
-                        x: { grid: { color: '#333333' } }
+                        x: { grid: { color: isDarkMode ? '#333333' : '#d4c4a0' } }
                     }
                 }
             });
 
             const ctx2 = document.getElementById('sanminChart').getContext('2d');
+            
+            const tooltipDetails = isTraditional ? {
+                '民族主義': ['驅除韃虜，恢復中華', '(反對帝國主義與專制統治)'],
+                '民權主義': ['創立民國', '(建立主權在民的民主共和國)'],
+                '民生主義': ['平均地權，節制資本', '(解決土地與資本問題，實現財富均衡)']
+            } : {
+                '民族主义': ['驱除鞑虏，恢复中华', '(反对帝国主义与专制统治)'],
+                '民权主义': ['创立民国', '(建立主权在民的民主共和国)'],
+                '民生主义': ['平均地权，节制资本', '(解决土地与资本问题，实现财富均衡)']
+            };
+
             sanminChartInstance = new Chart(ctx2, {
-                type: 'doughnut',
+                type: 'radar',
                 data: {
                     labels: isTraditional 
                         ? ['民族主義', '民權主義', '民生主義']
                         : ['民族主义', '民权主义', '民生主义'],
-                    datasets: [{
-                        data: [33, 33, 34],
-                        backgroundColor: ['#b8860b', '#8a640f', '#5c430a'],
-                        borderColor: '#1a1a1a',
-                        borderWidth: 2,
-                        hoverOffset: 4
-                    }]
+                    datasets: [
+                        {
+                            label: isTraditional ? '興中會成立' : '兴中会成立',
+                            data: [75, 45, 15],
+                            backgroundColor: 'rgba(155, 89, 182, 0.3)',
+                            borderColor: '#9b59b6',
+                            pointBackgroundColor: '#9b59b6',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#9b59b6',
+                            borderWidth: 2,
+                            hidden: true
+                        },
+                        {
+                            label: isTraditional ? '同盟會成立' : '同盟会成立',
+                            data: [85, 65, 45],
+                            backgroundColor: 'rgba(52, 152, 219, 0.3)',
+                            borderColor: '#3498db',
+                            pointBackgroundColor: '#3498db',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#3498db',
+                            borderWidth: 2,
+                            hidden: true
+                        },
+                        {
+                            label: isTraditional ? '辛亥革命' : '辛亥革命',
+                            data: [100, 70, 50],
+                            backgroundColor: 'rgba(243, 156, 18, 0.3)',
+                            borderColor: '#f39c12',
+                            pointBackgroundColor: '#f39c12',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#f39c12',
+                            borderWidth: 2
+                        },
+                        {
+                            label: isTraditional ? '建立民國' : '建立民国',
+                            data: [90, 100, 60],
+                            backgroundColor: 'rgba(46, 204, 113, 0.3)',
+                            borderColor: '#2ecc71',
+                            pointBackgroundColor: '#2ecc71',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#2ecc71',
+                            borderWidth: 2,
+                            hidden: true
+                        },
+                        {
+                            label: isTraditional ? '護法運動' : '护法运动',
+                            data: [80, 90, 60],
+                            backgroundColor: 'rgba(26, 188, 156, 0.3)',
+                            borderColor: '#1abc9c',
+                            pointBackgroundColor: '#1abc9c',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#1abc9c',
+                            borderWidth: 2,
+                            hidden: true
+                        },
+                        {
+                            label: isTraditional ? '國民黨改組' : '国民党改组',
+                            data: [100, 95, 100],
+                            backgroundColor: 'rgba(231, 76, 60, 0.3)',
+                            borderColor: '#e74c3c',
+                            pointBackgroundColor: '#e74c3c',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#e74c3c',
+                            borderWidth: 2,
+                            hidden: true
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        legend: { position: 'bottom' }
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutQuart'
                     },
-                    cutout: '70%'
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 110,
+                            angleLines: { color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' },
+                            grid: { color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' },
+                            pointLabels: {
+                                font: { size: 14, weight: 'bold' },
+                                color: isDarkMode ? '#e5e7eb' : '#6b4c35',
+                                backdropColor: 'transparent'
+                            },
+                            ticks: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { 
+                            position: 'bottom',
+                            labels: { color: isDarkMode ? '#aaa' : '#6b4c35', padding: 15 }
+                        },
+                        tooltip: {
+                            backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.95)',
+                            titleColor: isDarkMode ? '#fff' : '#000',
+                            bodyColor: isDarkMode ? '#ddd' : '#333',
+                            borderColor: isDarkMode ? '#444' : '#ddd',
+                            borderWidth: 1,
+                            padding: 10,
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 12 },
+                            callbacks: {
+                                beforeBody: function(context) {
+                                    const label = context[0].label;
+                                    const details = tooltipDetails[label];
+                                    return ['', details[0], details[1], ''];
+                                },
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw;
+                                }
+                            }
+                        }
+                    }
                 }
             });
             
@@ -406,6 +604,7 @@
                 tabBtns[1].textContent = '思想與歷程';
                 chart1Title.textContent = '革命歷程影響力走勢';
                 chart2Title.textContent = '三民主義核心結構';
+                if (showAllBtn) showAllBtn.textContent = isAllShown ? '隱藏全部' : '顯示全部';
             } else {
                 langBtn.textContent = '切換至正體字';
                 document.documentElement.lang = 'zh-CN';
@@ -413,6 +612,7 @@
                 tabBtns[1].textContent = '思想与历程';
                 chart1Title.textContent = '革命历程影响力走势';
                 chart2Title.textContent = '三民主义核心结构';
+                if (showAllBtn) showAllBtn.textContent = isAllShown ? '隐藏全部' : '显示全部';
             }
             updateContent();
         });
@@ -450,6 +650,80 @@
                 }, 300);
             });
         }
+
+        // Re-render charts when color scheme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (currentTab === 'theories') renderCharts();
+        });
+
+        // ===== zero-md light/dark theme handler =====
+        const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: light)');
+        function updateMarkdownTheme() {
+            const isLight = colorSchemeQuery.matches;
+            const template = mdViewer.querySelector('template');
+            if (template) {
+                const link = template.content.querySelector('link');
+                if (link) {
+                    link.href = isLight
+                        ? 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown.css'
+                        : 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css';
+                }
+                const style = template.content.querySelector('style');
+                if (style) {
+                    style.textContent = getMarkdownStyles(isLight);
+                }
+            }
+            if (currentTab === 'biography') {
+                const currentSrc = mdViewer.getAttribute('src');
+                mdViewer.removeAttribute('src');
+                requestAnimationFrame(() => mdViewer.setAttribute('src', currentSrc));
+            }
+        }
+        function getMarkdownStyles(isLight) {
+            if (isLight) {
+                return `.markdown-body {
+                    color: #2c1810 !important;
+                    background-color: transparent !important;
+                    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif !important;
+                    line-height: 1.8;
+                    padding: 0 15px !important;
+                    overflow-wrap: break-word !important;
+                    word-wrap: break-word !important;
+                    word-break: break-all !important;
+                }
+                .markdown-body h1, .markdown-body h2 {
+                    color: #2c1810 !important;
+                    border-bottom-color: #c4a876 !important;
+                    padding-bottom: 10px;
+                }
+                .markdown-body a { color: #b8860b !important; text-decoration: none; }
+                .markdown-body a:hover { text-decoration: underline; }
+                .markdown-body ul { margin-bottom: 20px !important; }
+                .markdown-body li { margin-bottom: 8px !important; }`;
+            } else {
+                return `.markdown-body {
+                    color: #e5e7eb !important;
+                    background-color: transparent !important;
+                    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif !important;
+                    line-height: 1.8;
+                    padding: 0 15px !important;
+                    overflow-wrap: break-word !important;
+                    word-wrap: break-word !important;
+                    word-break: break-all !important;
+                }
+                .markdown-body h1, .markdown-body h2 {
+                    color: #ffffff !important;
+                    border-bottom-color: #333333 !important;
+                    padding-bottom: 10px;
+                }
+                .markdown-body a { color: #f1c40f !important; text-decoration: none; }
+                .markdown-body a:hover { text-decoration: underline; }
+                .markdown-body ul { margin-bottom: 20px !important; }
+                .markdown-body li { margin-bottom: 8px !important; }`;
+            }
+        }
+        colorSchemeQuery.addEventListener('change', updateMarkdownTheme);
+        if (colorSchemeQuery.matches) updateMarkdownTheme();
     </script>
 
 </body>

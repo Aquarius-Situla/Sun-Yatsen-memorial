@@ -189,6 +189,44 @@
             .icon-ios { display: block; }
             .icon-macos { display: none; }
         }
+
+        @media (prefers-color-scheme: light) {
+            html, body { background-color: #f5f0e8; color: #2c1810; }
+
+            .festival-hero {
+                background: linear-gradient(135deg, #f0e6cc 0%, #e8d8b0 50%, #f0e6cc 100%);
+                border-color: rgba(184,134,11,0.4);
+                box-shadow: 0 8px 32px rgba(80,50,10,0.12), inset 0 1px 0 rgba(184,134,11,0.15);
+            }
+            .festival-hero h1 { color: #7a4f00; text-shadow: 0 0 20px rgba(122,79,0,0.2); }
+            .festival-hero .festival-date { color: #8a6400; }
+
+            .markdown-container {
+                background-color: #ede8dc;
+                border-color: #c4a876;
+                box-shadow: 0 10px 30px rgba(80,50,10,0.12);
+            }
+
+            .tab-btn { background-color: #ede8dc; color: #7a5500; border-color: #c4a876; }
+            .tab-btn.active {
+                background-color: #f5e8c8;
+                color: #7a4f00;
+                border-color: #b8860b;
+                box-shadow: 0 0 10px rgba(184,134,11,0.2);
+            }
+
+            .lang-toggle-btn { background-color: #ede8dc; color: #6b4c35; border-color: #c4a876; }
+            .lang-toggle-btn:active { color: #b8860b; border-color: #b8860b; }
+
+            .top-back-btn { color: #8a7060; }
+            .top-back-btn:active { color: #2c1810; }
+        }
+
+        @media (prefers-color-scheme: light) and (hover: hover) and (pointer: fine) {
+            .tab-btn:hover:not(.active) { color: #2c1810; border-color: #8a6400; }
+            .lang-toggle-btn:hover { color: #b8860b; border-color: #b8860b; box-shadow: 0 0 10px rgba(184,134,11,0.2); }
+            .top-back-btn:hover { color: #2c1810; }
+        }
     </style>
 </head>
 <body>
@@ -341,6 +379,87 @@
 
         // 初始化顯示
         updateContent();
+
+        // 色彩模式切換：動態更新 zero-md 樣式表
+        const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: light)');
+        function updateMarkdownTheme() {
+            const isLight = colorSchemeQuery.matches;
+            const template = mdViewer.querySelector('template');
+            if (template) {
+                const link = template.content.querySelector('link');
+                if (link) {
+                    link.href = isLight
+                        ? 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown.css'
+                        : 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css';
+                }
+                const style = template.content.querySelector('style');
+                if (style) {
+                    style.textContent = getMarkdownStyles(isLight);
+                }
+            }
+            const currentSrc = mdViewer.getAttribute('src');
+            mdViewer.removeAttribute('src');
+            requestAnimationFrame(() => mdViewer.setAttribute('src', currentSrc));
+        }
+        function getMarkdownStyles(isLight) {
+            if (isLight) {
+                return `.markdown-body {
+                    color: #2c1810 !important;
+                    background-color: transparent !important;
+                    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif !important;
+                    line-height: 1.8;
+                    padding: 0 15px !important;
+                    overflow-wrap: break-word !important;
+                    word-wrap: break-word !important;
+                    word-break: break-all !important;
+                }
+                .markdown-body h1, .markdown-body h2 {
+                    color: #2c1810 !important;
+                    border-bottom-color: #c4a876 !important;
+                    padding-bottom: 10px;
+                }
+                .markdown-body a { color: #b8860b !important; text-decoration: none; }
+                .markdown-body a:hover { text-decoration: underline; }
+                .markdown-body ul { margin-bottom: 20px !important; }
+                .markdown-body li { margin-bottom: 8px !important; }
+                .markdown-body blockquote {
+                    border-left: 4px solid #b8860b !important;
+                    color: #5a3e2a !important;
+                    background: rgba(184,134,11,0.08) !important;
+                    padding: 12px 20px !important;
+                    border-radius: 0 6px 6px 0 !important;
+                }`;
+            } else {
+                return `.markdown-body {
+                    color: #e5e7eb !important;
+                    background-color: transparent !important;
+                    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif !important;
+                    line-height: 1.8;
+                    padding: 0 15px !important;
+                    overflow-wrap: break-word !important;
+                    word-wrap: break-word !important;
+                    word-break: break-all !important;
+                }
+                .markdown-body h1, .markdown-body h2 {
+                    color: #ffffff !important;
+                    border-bottom-color: #333333 !important;
+                    padding-bottom: 10px;
+                }
+                .markdown-body a { color: #f1c40f !important; text-decoration: none; }
+                .markdown-body a:hover { text-decoration: underline; }
+                .markdown-body ul { margin-bottom: 20px !important; }
+                .markdown-body li { margin-bottom: 8px !important; }
+                .markdown-body blockquote {
+                    border-left: 4px solid #b8860b !important;
+                    color: #cccccc !important;
+                    background: rgba(184,134,11,0.07) !important;
+                    padding: 12px 20px !important;
+                    border-radius: 0 6px 6px 0 !important;
+                }`;
+            }
+        }
+        colorSchemeQuery.addEventListener('change', updateMarkdownTheme);
+        if (colorSchemeQuery.matches) updateMarkdownTheme();
     </script>
 
 </body>
