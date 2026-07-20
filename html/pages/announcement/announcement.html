@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">關於與聲明 - 私立中山紀念堂</title>
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <title id="page-title">公告 - 私立中山紀念堂</title>
+    <link rel="icon" href="../../main/favicon/favicon.svg" type="image/svg+xml">
     
     <link rel="preload" href="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js" as="script" crossorigin="anonymous">
-    <link rel="preload" href="about_cn.md" as="fetch" crossorigin="anonymous">
+    <link rel="preload" href="./status_cn.md" as="fetch" crossorigin="anonymous">
 
     <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"></script>
     
@@ -196,7 +196,7 @@
             .icon-macos { display: none; }
         }
 
-        /* ===== Light mode overrides ===== */
+        /* Light mode overrides */
         @media (prefers-color-scheme: light) {
             html, body {
                 background-color: #f5f0e8;
@@ -256,7 +256,7 @@
 </head>
 <body>
 
-    <a href="index.html?from=return" class="top-back-btn">
+    <a href="../../index.html?from=return" class="top-back-btn">
         <svg class="icon-ios" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M15 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -269,13 +269,14 @@
     <button id="lang-btn" class="lang-toggle-btn">切换至简化字</button>
 
     <div class="tabs-container" id="tabs">
-        <button class="tab-btn active" data-tab="about">關於我們</button>
-        <button class="tab-btn" data-tab="changelog">更新日誌</button>
+        <button class="tab-btn active" data-tab="status">網站狀態</button>
+        <button class="tab-btn" data-tab="memorial">紀念日</button>
+        <button class="tab-btn" data-tab="Ukraine">聲援烏克蘭</button>
     </div>
 
     <div class="markdown-container">
-        <zero-md id="md-viewer" src="about_cn.md">
-            <template id="md-template">
+        <zero-md id="md-viewer" src="./status_cn.md">
+            <template>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css">
                 
                 <style>
@@ -287,7 +288,7 @@
                         padding: 0 15px !important; 
                         overflow-wrap: break-word !important;
                         word-wrap: break-word !important;
-                        word-break: break-all !important; 
+                        word-break: break-all !important;
                     }
                     .markdown-body h1, .markdown-body h2 {
                         color: #ffffff !important; 
@@ -319,11 +320,11 @@
         const tabBtns = document.querySelectorAll('.tab-btn');
         
         let isTraditional = true;
-        let currentTab = 'about';
+        let currentTab = 'status';
 
         function updateMarkdownSource() {
             const suffix = isTraditional ? '_cn.md' : '_cp.md';
-            const newSrc = currentTab + suffix;
+            const newSrc = './' + currentTab + suffix;
             
             if (mdViewer.getAttribute('src') !== newSrc) {
                 const container = document.querySelector('.markdown-container');
@@ -340,13 +341,15 @@
             if (isTraditional) {
                 langBtn.textContent = '切换至简化字';
                 document.documentElement.lang = 'zh-TW';
-                tabBtns[0].textContent = '關於我們';
-                tabBtns[1].textContent = '更新日誌';
+                tabBtns[0].textContent = '網站狀態';
+                tabBtns[1].textContent = '紀念日';
+                tabBtns[2].textContent = '聲援烏克蘭';
             } else {
                 langBtn.textContent = '切換至正體字';
                 document.documentElement.lang = 'zh-CN';
-                tabBtns[0].textContent = '关于我们';
-                tabBtns[1].textContent = '更新日志';
+                tabBtns[0].textContent = '网站状态';
+                tabBtns[1].textContent = '纪念日';
+                tabBtns[2].textContent = '声援乌克兰';
             }
             updateMarkdownSource();
         });
@@ -360,7 +363,6 @@
             });
         });
 
-// webapp内建链接bug修复
         mdViewer.addEventListener('zero-md-rendered', () => {
             document.querySelector('.markdown-container').classList.add('loaded');
             const links = mdViewer.shadowRoot.querySelectorAll('a');
@@ -372,8 +374,26 @@
             });
         });
 
-        // ===== Light/dark mode: dynamic zero-md stylesheet =====
         const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: light)');
+        function updateMarkdownTheme() {
+            const isLight = colorSchemeQuery.matches;
+            const template = mdViewer.querySelector('template');
+            if (template) {
+                const link = template.content.querySelector('link');
+                if (link) {
+                    link.href = isLight
+                        ? 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown.css'
+                        : 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css';
+                }
+                const style = template.content.querySelector('style');
+                if (style) {
+                    style.textContent = getMarkdownStyles(isLight);
+                }
+            }
+            const currentSrc = mdViewer.getAttribute('src');
+            mdViewer.removeAttribute('src');
+            requestAnimationFrame(() => mdViewer.setAttribute('src', currentSrc));
+        }
         function getMarkdownStyles(isLight) {
             if (isLight) {
                 return `.markdown-body {
@@ -395,9 +415,7 @@
                     color: #b8860b !important;
                     text-decoration: none;
                 }
-                .markdown-body a:hover {
-                    text-decoration: underline;
-                }
+                .markdown-body a:hover { text-decoration: underline; }
                 .markdown-body ul { margin-bottom: 20px !important; }
                 .markdown-body li { margin-bottom: 8px !important; }`;
             } else {
@@ -420,35 +438,12 @@
                     color: #f1c40f !important;
                     text-decoration: none;
                 }
-                .markdown-body a:hover {
-                    text-decoration: underline;
-                }
+                .markdown-body a:hover { text-decoration: underline; }
                 .markdown-body ul { margin-bottom: 20px !important; }
                 .markdown-body li { margin-bottom: 8px !important; }`;
             }
         }
-        function updateMarkdownTheme() {
-            const isLight = colorSchemeQuery.matches;
-            const template = mdViewer.querySelector('template');
-            if (template) {
-                const link = template.content.querySelector('link');
-                if (link) {
-                    link.href = isLight
-                        ? 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown.css'
-                        : 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css';
-                }
-                const style = template.content.querySelector('style');
-                if (style) {
-                    style.textContent = getMarkdownStyles(isLight);
-                }
-            }
-            // Force re-render by toggling src
-            const currentSrc = mdViewer.getAttribute('src');
-            mdViewer.removeAttribute('src');
-            requestAnimationFrame(() => mdViewer.setAttribute('src', currentSrc));
-        }
         colorSchemeQuery.addEventListener('change', updateMarkdownTheme);
-        // Apply on initial load if light mode
         if (colorSchemeQuery.matches) updateMarkdownTheme();
 
         const topBackBtn = document.querySelector('.top-back-btn');

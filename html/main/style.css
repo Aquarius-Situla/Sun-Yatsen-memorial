@@ -138,7 +138,8 @@ body.has-festival #minguo-date-display {
     letter-spacing: 0px !important;
 }
 /* ======================================================= */
-
+}
+@media (pointer: coarse) {
 .mobile-arrow-hint {
     display: block !important;
     position: absolute !important;
@@ -191,7 +192,8 @@ body.has-festival #minguo-date-display {
 .frame-container {
     transform: none !important;
 }        
-}/* mini适配 */@media (max-width: 375px) {body {padding-left: 8px;padding-right: 8px;}.testament-text { 
+}
+/* mini适配 */@media (max-width: 375px) {body {padding-left: 8px;padding-right: 8px;}.testament-text { 
     line-height: 1.4; 
     letter-spacing: 2px; 
 }
@@ -389,4 +391,543 @@ body.has-festival #minguo-date-display {
     }
 }
 
+/* ==========================================================================
+ / 彈幕系統 (Danmaku)
+ / ========================================================================== */
+#danmaku-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* 重要：讓滑鼠點擊穿透彈幕層 */
+    z-index: 9000;
+    overflow: hidden;
+}
 
+.danmaku-item {
+    position: absolute;
+    white-space: nowrap;
+    font-size: clamp(16px, 4vw, 24px);
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000,
+        0px 2px 4px rgba(0,0,0,0.8);
+    animation: danmaku-slide linear forwards;
+    will-change: transform;
+}
+
+@keyframes danmaku-slide {
+    from {
+        transform: translateX(100vw);
+    }
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+/* ==========================================================================
+ / 留言板 (iOS 18 App Store Bottom Sheet Style)
+ / ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0); /* Start transparent for smooth fade */
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Align to bottom for bottom sheet on mobile */
+    z-index: 30000;
+    opacity: 0;
+    visibility: hidden; /* Prevent blocking clicks when hidden */
+    pointer-events: none;
+    transition: opacity 0.4s cubic-bezier(0.32, 0.72, 0, 1), background-color 0.4s cubic-bezier(0.32, 0.72, 0, 1), visibility 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "PingFang TC", "Hiragino Sans GB", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.modal-overlay.active {
+    background-color: rgba(0, 0, 0, 0.4);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* The Sheet itself */
+.modal-sheet {
+    position: relative;
+    background: #f2f2f7;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 14px 14px 0 0; /* Smaller top corners, like App Store */
+    padding: 20px 16px calc(32px + env(safe-area-inset-bottom, 16px)) 16px;
+    box-sizing: border-box;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1);
+}
+
+.modal-overlay.active .modal-sheet {
+    transform: translateY(0) scale(1);
+}
+
+@media (prefers-color-scheme: dark) {
+    .modal-sheet {
+        background: #2c2c2e; /* iOS dark system gray */
+        box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
+    }
+}
+
+/* Header */
+.sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.sheet-title {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #000;
+}
+
+@media (prefers-color-scheme: dark) {
+    .sheet-title {
+        color: #fff;
+    }
+}
+
+.sheet-close-btn {
+    background: rgba(142, 142, 147, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #8e8e93;
+    cursor: pointer;
+    transition: background 0.2s;
+    padding: 0;
+    outline: none;
+}
+
+.sheet-close-btn:hover {
+    background: rgba(142, 142, 147, 0.3);
+}
+
+/* Content Area — white card like App Store */
+.sheet-content {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 0;
+    margin-bottom: 28px; /* Wider gap between white card and button, like App Store */
+    box-shadow: none;
+    overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+    .sheet-content {
+        background: #3a3a3c;
+    }
+}
+
+.ios-textarea {
+    width: 100%;
+    height: 90px;
+    background: transparent; /* Transparent — card provides white bg */
+    border: none;
+    border-radius: 0;
+    padding: 14px 16px;
+    color: #000;
+    font-size: 1rem;
+    resize: none;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.ios-textarea:focus {
+    outline: none;
+}
+
+@media (prefers-color-scheme: dark) {
+    .ios-textarea {
+        color: #fff;
+    }
+}
+
+/* Submit Button */
+.sheet-footer {
+    display: flex;
+    justify-content: center;
+    padding: 0;
+}
+
+.ios-submit-btn {
+    width: 110px;   /* Compact pill matching App Store "安裝" button */
+    height: 34px;   /* Native compact iOS button height */
+    background: #007AFF; /* iOS system blue */
+    color: #fff;
+    border: none;
+    border-radius: 17px; /* Exactly height/2 = mathematically perfect pill */
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition: filter 0.2s;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "PingFang TC", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.macos-cancel-btn, .macos-help-btn, .macos-popover {
+    display: none; /* Hidden on mobile */
+}
+
+.ios-submit-btn:hover {
+    filter: brightness(0.9);
+}
+
+.ios-submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Cloudflare Style Bottom Toast */
+.cloudflare-toast {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    z-index: 99999;
+    transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 200px;
+    text-align: center;
+    font-family: -apple-system, sans-serif;
+}
+
+.cloudflare-toast.show {
+    bottom: 40px;
+}
+
+.cloudflare-toast.success {
+    background-color: #2ecc71;
+    color: #fff;
+}
+
+.cloudflare-toast.error {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+.cloudflare-toast.info {
+    background-color: #3498db;
+    color: #fff;
+}
+
+.cloudflare-toast.system {
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #a67c00; /* Dark gold to adapt to light background, matches banner hue */
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+    .cloudflare-toast.system {
+        background-color: rgba(40, 40, 40, 0.95);
+        color: #b3b3b3; /* Legible gray instead of glaring gold */
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .cloudflare-toast.success {
+        background-color: #2ecc71;
+        color: #fff;
+    }
+    .cloudflare-toast.error {
+        background-color: #e74c3c;
+        color: #fff;
+    }
+    .cloudflare-toast.info {
+        background-color: #3498db;
+        color: #fff;
+    }
+}
+
+/* ==========================================================================
+ / macOS Desktop Alert Styles (overrides mobile iOS sheet on desktop)
+ / ========================================================================== */
+@media (min-width: 600px) {
+    .modal-overlay {
+        align-items: center; /* Center vertically */
+        background-color: rgba(0, 0, 0, 0); /* Start transparent */
+    }
+
+    .modal-overlay.active {
+        background-color: rgba(0, 0, 0, 0.2); /* Lighter backdrop for macOS */
+    }
+
+    .modal-sheet {
+        width: clamp(300px, 40vw, 420px); /* Responsive and more spacious */
+        border-radius: 16px;
+        padding: 24px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
+        transform: scale(0.9); /* Start smaller */
+        transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+    }
+
+    .modal-overlay.active .modal-sheet {
+        transform: scale(1); /* Pop in */
+    }
+
+    /* macOS Header layout */
+    .sheet-header {
+        justify-content: center;
+        margin-bottom: 16px;
+    }
+
+    .sheet-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+    }
+
+    /* Hide the top-right close button on desktop since we have a cancel button */
+    .sheet-close-btn {
+        display: none;
+    }
+
+    /* macOS help (?) button */
+    .macos-help-btn {
+        display: flex;
+        position: absolute;
+        right: 12px;
+        top: 12px;
+        background: rgba(0,0,0,0.06);
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        color: #555;
+        border: none;
+        justify-content: center;
+        align-items: center;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "PingFang TC", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+        transition: background 0.2s;
+    }
+    
+    .macos-help-btn:hover {
+        background: rgba(0,0,0,0.1);
+    }
+
+    /* macOS etiquette popover */
+    .macos-popover {
+        display: block; /* So it exists in DOM, hidden via opacity */
+        position: absolute;
+        top: 40px;
+        right: 12px;
+        width: 220px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(0,0,0,0.1);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        border-radius: 8px;
+        padding: 12px;
+        z-index: 100;
+        text-align: left;
+        
+        opacity: 0;
+        visibility: hidden;
+        transform: scale(0.95);
+        transform-origin: top right;
+        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .macos-popover.show {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1);
+    }
+    
+    .macos-popover h4 {
+        margin: 0 0 6px 0;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .macos-popover p {
+        margin: 0;
+        line-height: 1.5;
+        font-size: 0.8rem;
+        color: #555;
+    }
+
+    /* Make text area look like a macOS sunken input field */
+    .sheet-content {
+        background: rgba(0, 0, 0, 0.03);
+        border: 1px solid rgba(0,0,0,0.1);
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+        border-radius: 8px;
+        padding: 14px;
+        margin-bottom: 24px;
+    }
+
+    .ios-textarea {
+        height: 100px;
+        font-size: 1rem;
+    }
+
+    /* macOS dual button footer layout */
+    .sheet-footer {
+        display: flex;
+        gap: 12px;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    /* macOS secondary/cancel button */
+    .macos-cancel-btn {
+        display: flex;
+        flex: 1;
+        height: 36px;
+        background: #e4e4e6;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #000;
+        border: 1px solid rgba(0,0,0,0.05);
+        box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: background 0.2s;
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "PingFang TC", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    }
+    .macos-cancel-btn:active {
+        background: #d4d4d6;
+    }
+
+    /* macOS primary button */
+    .ios-submit-btn {
+        flex: 1;
+        width: auto;
+        max-width: none;
+        height: 36px;
+        background: linear-gradient(180deg, #3782f2 0%, #1562e8 100%);
+        border-radius: 8px; /* standard macOS button radius for thicker buttons */
+        font-size: 1rem;
+        font-weight: 500;
+        color: #fff;
+        border: none;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        box-shadow: 
+            0 1px 1px rgba(0, 0, 0, 0.1), 
+            inset 0 1px 0 rgba(255, 255, 255, 0.25), 
+            inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        line-height: normal; /* Reset line-height for desktop */
+    }
+
+    .ios-submit-btn:active {
+        background: #1562e8;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Dark mode overrides for macOS desktop */
+@media (min-width: 600px) and (prefers-color-scheme: dark) {
+    .modal-sheet {
+        background: rgba(40, 40, 40, 0.85);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.15);
+    }
+
+    .sheet-title {
+        color: #fff;
+    }
+
+    .sheet-close-btn {
+        background: rgba(255,255,255,0.15);
+        color: #ddd;
+    }
+
+    .sheet-content {
+        background: rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .macos-cancel-btn {
+        background: rgba(255,255,255,0.1);
+        color: #fff;
+        border: 1px solid rgba(255,255,255,0.05);
+        box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+    }
+    
+    .macos-cancel-btn:active {
+        background: rgba(255,255,255,0.15);
+    }
+
+    .macos-help-btn {
+        background: rgba(255,255,255,0.1);
+        color: #ddd;
+    }
+    
+    .macos-help-btn:hover {
+        background: rgba(255,255,255,0.15);
+    }
+
+    .macos-popover {
+        background: rgba(40, 40, 40, 0.95);
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    
+    .macos-popover h4 {
+        color: #eee;
+    }
+    
+    .macos-popover p {
+        color: #bbb;
+    }
+
+    .ios-submit-btn {
+        background: linear-gradient(180deg, #1b6aec 0%, #0c4ec3 100%);
+        box-shadow: 
+            0 1px 1px rgba(0, 0, 0, 0.2), 
+            inset 0 1px 0 rgba(255, 255, 255, 0.15), 
+            inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+    }
+
+    .ios-submit-btn:active {
+        background: #0c4ec3;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+    }
+}

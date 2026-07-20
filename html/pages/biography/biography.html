@@ -5,13 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="page-title">國父生平 - 私立中山紀念堂</title>
     
-    <link rel="preload" href="apple-touch-icon.png" as="image">
-    
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="../../main/favicon/favicon.svg" type="image/svg+xml">
     
     <link rel="preload" href="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js" as="script" crossorigin="anonymous">
-    <link rel="preload" href="biography_cn.md" as="fetch" crossorigin="anonymous">
+    <link rel="preload" href="./biography_cn.md" as="fetch" crossorigin="anonymous">
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js" as="script" crossorigin="anonymous">
 
     <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"></script>
@@ -326,7 +323,7 @@
 </head>
 <body>
 
-    <a href="index.html?from=return" class="top-back-btn">
+    <a href="../../index.html?from=return" class="top-back-btn">
         <svg class="icon-ios" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M15 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -344,7 +341,7 @@
     </div>
 
     <div class="markdown-container active" id="md-section">
-        <zero-md id="md-viewer" src="biography_cn.md">
+        <zero-md id="md-viewer" src="./biography_cn.md">
             <template>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css">
                 
@@ -617,7 +614,7 @@
                 mdSection.classList.add('active');
                 
                 const suffix = isTraditional ? '_cn.md' : '_cp.md';
-                const newSrc = 'biography' + suffix;
+                const newSrc = './biography' + suffix;
                 
                 if (mdViewer.getAttribute('src') !== newSrc) {
                     mdSection.classList.remove('loaded');

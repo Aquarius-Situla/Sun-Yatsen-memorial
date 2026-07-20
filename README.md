@@ -26,6 +26,17 @@ docker-compose up -d
 
 部署後，Nginx 將會以唯讀模式掛載 `./html` 目錄並對外提供靜態網頁服務。
 
+## ☁️ 後端與資料庫 (Cloudflare Workers)
+
+本專案的「參典人數統計」與「留言彈幕系統」依賴 Cloudflare Workers 與 KV 進行後端處理。
+我們在專案根目錄提供了 `workers.js` 作為後端部署的原始碼。
+
+**部署步驟：**
+1. 登入 Cloudflare 後台，建立一個新的 Worker。
+2. 為該 Worker 綁定一個 KV 命名空間，且變數名稱**必須**設定為 `MEMORIAL_KV`。
+3. 將 `workers.js` 內的程式碼全選複製，貼上並覆蓋 Worker 編輯器內的預設程式碼，然後發布。
+4. 將您的 Worker 網址（如 `https://your-worker-api.workers.dev`）填入 `html/env.js`（可參考 `env.example.js`）中的 `WORKER_API` 變數。
+
 ## 📜 授權聲明
 
 本專案採用**雙軌制**授權：

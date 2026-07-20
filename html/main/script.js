@@ -1,33 +1,33 @@
 //模块化音乐
-const DEFAULT_MUSIC = { src: 'anthem.m4a', title: '三民主義歌', artist: '孫文' };
+const DEFAULT_MUSIC = { src: 'main/anthem/anthem.m4a', title: '三民主義歌', artist: '孫文' };
 
 const SPECIAL_MEMORIAL_DAYS = [
     {
-        urlKeyword: 'whampoa',
+        urlKeyword: 'events/whampoa',
         dates: [ { month: 6, date: 16 } ],
-        config: { src: 'Whampoa.mp3', title: '黃埔組曲', artist: '戴季陶' },
+        config: { src: 'events/whampoa/Whampoa.mp3', title: '黃埔組曲', artist: '戴季陶' },
         getBanner: (year) => `陸軍官校建校 ${year - 1924} 週年`,
-        festivalPage: 'whampoa.html'
+        festivalPage: 'events/whampoa/whampoa.html'
     },
     {
-        urlKeyword: 'militaries',
+        urlKeyword: 'events/militaries',
         dates: [ { month: 9, date: 3 } ],
-        config: { src: 'Militaries.mp3', title: '三軍軍歌組曲', artist: '何志浩、樊燮華' },
+        config: { src: 'events/militaries/Militaries.mp3', title: '三軍軍歌組曲', artist: '何志浩、樊燮華' },
         getBanner: (year) => `抗戰勝利 ${year - 1945} 週年`,
-        festivalPage: 'militaries.html'
+        festivalPage: 'events/militaries/militaries.html'
     },
     {
-        urlKeyword: 'yat-sen',
+        urlKeyword: 'events/yatsen',
         dates: [ 
             { month: 3, date: 12, type: 'death' }, 
             { month: 11, date: 12, type: 'birth' } 
         ],
-        config: { src: 'Yat-sen memorial.mp3', title: '國父紀念歌', artist: '戴傳賢' },
+        config: { src: 'events/yatsen/Yat-sen memorial.mp3', title: '國父紀念歌', artist: '戴傳賢' },
         getBanner: (year, dateObj) => {
             if (!dateObj) dateObj = { type: 'death' }; 
             return dateObj.type === 'death' ? `國父逝世 ${year - 1925} 週年` : `國父誕辰 ${year - 1866} 週年`;
         },
-        festivalPage: 'yat-sen.html'
+        festivalPage: 'events/yatsen/yat-sen.html'
     }
 ];
 
@@ -171,7 +171,7 @@ function setupMediaSession(config) {
             title: config.title,        
             artist: config.artist,      
             album: '私立中山紀念堂',    
-            artwork: [ { src: 'album-cover.png', sizes: '1254x1254', type: 'image/png' } ]
+            artwork: [ { src: 'main/anthem/album-cover.png', sizes: '1254x1254', type: 'image/png' } ]
         });
 
         navigator.mediaSession.setActionHandler('play', () => { audio.play(); isPlaying = true; });
@@ -444,4 +444,303 @@ if (_woodFrame && window.matchMedia('(hover: hover) and (pointer: fine)').matche
 
 })();
 
+// ============================================================================
+// 留言板與彈幕系統 (Message Board & Danmaku System)
+// ============================================================================
+const openMessageBtn = document.getElementById('open-message-btn');
+const messageModal = document.getElementById('message-modal');
+const closeMessageBtn = document.getElementById('close-message-btn');
+const testamentBox = document.querySelector('.testament-box');
+const danmakuContainer = document.getElementById('danmaku-container');
+const messageInput = document.getElementById('message-input');
+const submitMessageBtn = document.getElementById('submit-message-btn');
+const messageStatus = document.getElementById('message-status');
+const portraitImg = document.querySelector('.portrait-img');
 
+// 前端敏感詞庫 (防君子不防小人，真正的過濾在後端)
+const BANNED_WORDS = ['測試敏感詞', '髒話', '廣告', '法輪功', '台獨', '共匪'];
+// 我們這裡示範簡單的敏感詞，可以隨意擴充
+
+let isDanmakuEnabled = false;
+let messageCooldown = false;
+let knownDanmaku = new Set(); // 記錄已經播放過的彈幕，避免重複播放
+
+// 打開留言板
+if (openMessageBtn) {
+    openMessageBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        messageModal.classList.add('active');
+    });
+}
+
+// 關閉留言板
+if (closeMessageBtn) {
+    closeMessageBtn.addEventListener('click', () => {
+        messageModal.classList.remove('active');
+    });
+}
+
+const desktopCancelBtn = document.getElementById('desktop-cancel-btn');
+if (desktopCancelBtn) {
+    desktopCancelBtn.addEventListener('click', () => {
+        messageModal.classList.remove('active');
+    });
+}
+
+const desktopHelpBtn = document.getElementById('desktop-help-btn');
+const etiquettePopover = document.getElementById('etiquette-popover');
+if (desktopHelpBtn && etiquettePopover) {
+    desktopHelpBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        etiquettePopover.classList.toggle('show');
+    });
+}
+
+// 點擊遮罩層也可關閉 (或關閉 popover)
+messageModal.addEventListener('click', (e) => {
+    if (etiquettePopover && etiquettePopover.classList.contains('show') && !etiquettePopover.contains(e.target) && e.target !== desktopHelpBtn) {
+        etiquettePopover.classList.remove('show');
+    }
+    
+    if (e.target === messageModal) {
+        messageModal.classList.remove('active');
+    }
+});
+
+// 點擊總理遺囑切換彈幕
+if (testamentBox) {
+    testamentBox.style.cursor = 'pointer'; // 提示可點擊
+    testamentBox.addEventListener('click', () => {
+        isDanmakuEnabled = !isDanmakuEnabled;
+        if (isDanmakuEnabled) {
+            danmakuContainer.classList.remove('hidden');
+            fetchAndPlayDanmaku(); // 打開時立刻拉取並播放
+            // 設定每 15 秒定期拉取一次新彈幕
+            if (!window.danmakuInterval) {
+                window.danmakuInterval = setInterval(fetchAndPlayDanmaku, 15000);
+            }
+            showCloudflareToast("彈幕已開啟", "system");
+        } else {
+            danmakuContainer.classList.add('hidden');
+            danmakuContainer.innerHTML = ''; // 清空畫面上現有的彈幕
+            if (window.danmakuInterval) {
+                clearInterval(window.danmakuInterval);
+                window.danmakuInterval = null;
+            }
+            showCloudflareToast("彈幕已關閉", "system");
+        }
+    });
+}
+
+// 前端敏感詞檢查
+function containsBannedWords(text) {
+    for (let word of BANNED_WORDS) {
+        if (text.includes(word)) return true;
+    }
+    return false;
+}
+
+let currentToast = null;
+let toastTimeout = null;
+
+// Cloudflare style bottom toast (Singleton)
+function showCloudflareToast(msg, type = 'info') {
+    if (currentToast) {
+        currentToast.className = `cloudflare-toast ${type} show`;
+        currentToast.innerText = msg;
+        
+        if (toastTimeout) clearTimeout(toastTimeout);
+        
+        toastTimeout = setTimeout(() => {
+            if (currentToast) {
+                currentToast.classList.remove('show');
+                setTimeout(() => {
+                    if (currentToast) {
+                        currentToast.remove();
+                        currentToast = null;
+                    }
+                }, 400);
+            }
+        }, 3000);
+        return;
+    }
+
+    let toast = document.createElement('div');
+    toast.className = `cloudflare-toast ${type}`;
+    toast.innerText = msg;
+    document.body.appendChild(toast);
+    currentToast = toast;
+    
+    // trigger reflow for animation
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    
+    toastTimeout = setTimeout(() => {
+        if (currentToast === toast) {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                if (currentToast === toast) {
+                    toast.remove();
+                    currentToast = null;
+                }
+            }, 400);
+        }
+    }, 3000);
+}
+
+// 送出留言
+submitMessageBtn.addEventListener('click', async () => {
+    if (messageCooldown) return;
+
+    const text = messageInput.value.trim();
+    if (!text) {
+        showCloudflareToast("留言不能為空！", "error");
+        return;
+    }
+    if (text.length > 50) {
+        showCloudflareToast("留言請限制在 50 字以內！", "error");
+        return;
+    }
+    if (containsBannedWords(text)) {
+        showCloudflareToast("您的留言包含不適當的詞彙，請修改。", "error");
+        return;
+    }
+
+    // 關閉 Modal (像 App Store 一樣立即關閉)
+    messageModal.classList.remove('active');
+
+    // 進入冷卻狀態
+    messageCooldown = true;
+    submitMessageBtn.disabled = true;
+    let countdown = 10;
+    
+    let timer = setInterval(() => {
+        countdown--;
+        if (countdown <= 0) {
+            clearInterval(timer);
+            messageCooldown = false;
+            submitMessageBtn.disabled = false;
+        }
+    }, 1000);
+
+    showCloudflareToast("傳送中...", "info");
+
+    // 呼叫 API 送出
+    try {
+        const fingerprint = await generateBrowserFingerprint();
+        const response = await fetch(WORKER_API + '/danmaku', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fp: fingerprint, text: text })
+        });
+
+        if (response.ok) {
+            showCloudflareToast("發送成功！", "success");
+            messageInput.value = ''; // 成功才清空內容
+            
+            // 如果開關有打開，立刻在自己畫面上先播放一次（帶來即時回饋感）
+            if (isDanmakuEnabled) {
+                createDanmaku(text);
+            }
+        } else {
+            const err = await response.json();
+            showCloudflareToast(err.error || "發送失敗，請稍後再試。", "error");
+            // 提早解除冷卻以方便重試
+            if (err.error && err.error.includes("刷屏")) {
+                // 如果是防刷屏，保留冷卻
+            } else {
+                clearInterval(timer);
+                messageCooldown = false;
+                submitMessageBtn.disabled = false;
+            }
+        }
+    } catch (e) {
+        showCloudflareToast("網路連線異常，請檢查網路。", "error");
+        clearInterval(timer);
+        messageCooldown = false;
+        submitMessageBtn.disabled = false;
+    }
+});
+
+// 動態生成彈幕 (避開遺像區域)
+function createDanmaku(text) {
+    if (!isDanmakuEnabled) return;
+
+    const span = document.createElement('span');
+    span.className = 'danmaku-item';
+    span.innerText = text;
+
+    // 計算可用高度與避讓區塊
+    const screenHeight = window.innerHeight;
+    const safePadding = 30; // 避免太靠邊緣
+    let availableRanges = [];
+    
+    // 如果找得到畫像，避開它
+    if (portraitImg) {
+        const rect = portraitImg.getBoundingClientRect();
+        // 畫像上方的區域
+        if (rect.top > 60) {
+            availableRanges.push({ min: safePadding, max: rect.top - 20 });
+        }
+        // 畫像下方的區域 (扣掉底部導航列空間)
+        if (screenHeight - rect.bottom > 100) {
+            availableRanges.push({ min: rect.bottom + 20, max: screenHeight - 100 });
+        }
+    }
+
+    // 如果沒有畫像或區間太小，就全螢幕隨機 (扣掉頭尾)
+    if (availableRanges.length === 0) {
+        availableRanges.push({ min: safePadding, max: screenHeight - 100 });
+    }
+
+    // 隨機選一個合法區間
+    const targetRange = availableRanges[Math.floor(Math.random() * availableRanges.length)];
+    // 在合法區間內隨機高度
+    const randomTop = Math.random() * (targetRange.max - targetRange.min) + targetRange.min;
+    
+    span.style.top = `${randomTop}px`;
+    
+    // 隨機動畫時間 8s ~ 15s (根據字數也可以微調)
+    const duration = Math.max(8, 15 - Math.random() * 5 + (text.length * 0.1));
+    span.style.animationDuration = `${duration}s`;
+
+    danmakuContainer.appendChild(span);
+
+    // 動畫結束後自動清理 DOM
+    span.addEventListener('animationend', () => {
+        span.remove();
+    });
+}
+
+// 取得最新彈幕並播放
+async function fetchAndPlayDanmaku() {
+    if (!isDanmakuEnabled) return;
+    try {
+        const response = await fetch(WORKER_API + '/danmaku');
+        if (response.ok) {
+            const data = await response.json();
+            const list = data.list || [];
+            
+            // 每抓到一批，我們隨機延遲播放，營造錯落有致的感覺
+            let delay = 0;
+            list.forEach(item => {
+                // 利用內容+時間戳(如果有的話)當作唯一識別。如果只有內容，暫時用內容判斷
+                if (!knownDanmaku.has(item)) {
+                    knownDanmaku.add(item);
+                    setTimeout(() => {
+                        createDanmaku(item);
+                    }, delay);
+                    delay += Math.random() * 2000 + 500; // 每條彈幕間隔 0.5~2.5 秒
+                }
+            });
+
+            // 保持 knownDanmaku 的大小，避免無限增長
+            if (knownDanmaku.size > 200) {
+                const arr = Array.from(knownDanmaku);
+                knownDanmaku = new Set(arr.slice(-100)); // 只保留最近 100 筆
+            }
+        }
+    } catch (e) {
+        console.log("拉取彈幕失敗", e);
+    }
+}

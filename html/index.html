@@ -5,34 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>私立中山紀念堂</title>
 
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <link rel="alternate icon" href="favicon.ico" type="image/x-icon" sizes="any">
+    <link rel="icon" href="main/favicon/favicon.svg" type="image/svg+xml">
+    <link rel="alternate icon" href="main/favicon/favicon.ico" type="image/x-icon" sizes="any">
 
-    <link rel="preload" href="icon-mobile.png" as="image">    
-    <link rel="apple-touch-icon" href="icon-mobile.png">
+    <link rel="preload" href="webapp/icon/icon-mobile.png" as="image">    
+    <link rel="apple-touch-icon" href="webapp/icon/icon-mobile.png">
     
-    <link rel="stylesheet" href="style.css?v=1043">
+    <link rel="stylesheet" href="main/style.css?v=1076">
 
     <!-- 系統深淺色 theme-color -->
     <meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)">
     <meta name="theme-color" content="#f5f0e8" media="(prefers-color-scheme: light)">
 
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="webapp/manifest.json">
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="國父紀念堂">
     
     <!-- iOS 啟動圖 (統一中性淺灰色背景) -->
-    <link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="splash-1290x2796.png">
-    <link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="splash-1179x2556.png">
-    <link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)" href="splash-1284x2778.png">
-    <link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" href="splash-1170x2532.png">
-    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" href="splash-1125x2436.png">
-    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" href="splash-1242x2688.png">
-    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" href="splash-828x1792.png">
-    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" href="splash-1242x2208.png">
-    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="splash-750x1334.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1290x2796.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1179x2556.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1284x2778.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1170x2532.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1125x2436.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1242x2688.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" href="webapp/splash/splash-828x1792.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1242x2208.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="webapp/splash/splash-750x1334.png">
 
     <script>
         // 動態預加載當前設備對應的 iOS 啟動圖，防止添加到主畫面時動畫丟失
@@ -51,7 +51,7 @@
     </script>
 </head>
 <body>
-
+    <div id="danmaku-container" class="hidden"></div>
     <div id="memorial-banner" class="memorial-banner hidden">
         請向國父遺像行三鞠躬禮
     </div>
@@ -82,7 +82,7 @@
     <div class="container">
         <div class="frame-container" id="portrait-btn">
             <div class="wood-frame">
-                <img src="portrait.jpg" alt="國父遺像" class="portrait-img">
+                <img src="main/portrait.jpg" alt="國父遺像" class="portrait-img">
             </div>
         </div>
 
@@ -98,20 +98,49 @@
         </div>
     </div>
 
-    <audio id="bg-music" src="anthem.m4a"></audio>
-
-    <script src="env.js"></script>
-    <script src="script.js?v=1025"></script>
-
     <div class="stealth-footer">
-        <a href="announcement.html">公告</a>
+        <a href="pages/announcement/announcement.html">公告</a>
         <span>|</span>
-        <a href="biography.html">國父生平</a>
+        <a href="pages/biography/biography.html">國父生平</a>
         <span>|</span>
-        <a href="thanks.html">特別鳴謝</a>
+        <a href="pages/about/about.html">關於與聲明</a>
         <span>|</span>
-        <a href="about.html">關於與聲明</a>
+        <a href="pages/thanks/thanks.html">特別鳴謝</a>
+        <span>|</span>
+        <a href="javascript:void(0);" id="open-message-btn">留言</a>
     </div>
 
+    <!-- Message Modal (iOS 18 App Store Style) -->
+    <div id="message-modal" class="modal-overlay">
+        <div class="modal-sheet">
+            <div class="sheet-header">
+                <h2 class="sheet-title">留言</h2>
+                <button id="close-message-btn" class="sheet-close-btn">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+                <button id="desktop-help-btn" class="macos-help-btn">?</button>
+                <div id="etiquette-popover" class="macos-popover">
+                    <h4>彈幕禮儀</h4>
+                    <p>1. 請保持理性與尊重<br>2. 勿發表謾罵或攻擊言論<br>3. 共同維護紀念堂的莊嚴</p>
+                </div>
+            </div>
+            
+            <div class="sheet-content">
+                <textarea id="message-input" class="ios-textarea" placeholder="寫下您的留言致意... (限 50 字)"></textarea>
+            </div>
+            
+            <div class="sheet-footer">
+                <button id="desktop-cancel-btn" class="macos-cancel-btn">取消</button>
+                <button id="submit-message-btn" class="ios-submit-btn">發送</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bg-music" src="main/anthem/anthem.m4a"></audio>
+    <script src="api/env.js"></script>
+    <script src="main/script.js?v=1032"></script>
 </body>
 </html>

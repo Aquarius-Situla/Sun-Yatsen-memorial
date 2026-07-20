@@ -3,13 +3,13 @@
   "name": "私立中山紀念堂",
   "icons": [
     {
-      "src": "icon-desktop.png",
+      "src": "icon/icon-desktop.png",
       "sizes": "144x144 192x192 256x256 512x512 1254x1254",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon-mobile.png",
+      "src": "icon/icon-mobile.png",
       "sizes": "144x144 192x192 256x256 512x512 1254x1254",
       "type": "image/png",
       "purpose": "maskable"
