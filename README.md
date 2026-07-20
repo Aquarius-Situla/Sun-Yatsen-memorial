@@ -15,6 +15,24 @@
 - **核心技術**：原生 HTML5 / CSS3 / Vanilla JavaScript
 - **部署配置**：提供 `docker-compose.yml` 結合 Nginx 進行快速容器化部署。
 
+## 📂 專案目錄結構
+
+```text
+📦 sys-memorial
+ ┣ 📂 html                     # 前端靜態頁面根目錄
+ ┃ ┣ 📜 index.html             # 專案首頁
+ ┃ ┣ 📂 api                    # API 變數設定檔
+ ┃ ┣ 📂 archive                # 靜態字體與歷史資源
+ ┃ ┣ 📂 events                 # 節日與紀念日專屬介紹頁面
+ ┃ ┣ 📂 main                   # 核心邏輯 (JS)、樣式 (CSS) 與主視覺
+ ┃ ┣ 📂 pages                  # 附屬頁面 (生平/公告/關於/鳴謝)
+ ┃ ┗ 📂 webapp                 # PWA 應用設定與 iOS 原生適配啟動圖
+ ┣ 📜 docker-compose.yml       # Docker 快速部署配置
+ ┣ 📜 LICENSE                  # 授權聲明 (MIT)
+ ┣ 📜 README.md                # 專案說明文件
+ ┗ 📜 workers.js               # Cloudflare Workers 後端伺服器代碼
+```
+
 ## 🚀 快速啟動 (Docker)
 
 本專案支援使用 Docker 與 Nginx 快速部署。
@@ -41,7 +59,7 @@ docker-compose up -d
 
 本專案採用**雙軌制**授權：
 1. **程式碼部分**：基於 [MIT License](LICENSE) 開源，歡迎自由學習、修改與分享。
-2. **視聽素材部分**：專案內的音樂、遺像等視聽素材版權歸原權利人所有，嚴禁未經授權挪用作商業營利或不當用途。詳細規範請參閱專案內的 [關於與聲明 (繁體)](html/about_cn.md) / [关于与声明 (简体)](html/about_cp.md) 文件。
+2. **視聽素材部分**：專案內的音樂、遺像等視聽素材版權歸原權利人所有，嚴禁未經授權挪用作商業營利或不當用途。詳細規範請參閱專案內的 [關於與聲明 (繁體)](html/pages/about/about_cn.md) / [关于与声明 (简体)](html/pages/about/about_cp.md) 文件。
 
 ---
 *「革命尚未成功，同志仍須努力。」*
