@@ -1331,77 +1331,12 @@ body.banner-active .dropdown-nav-bar {
         font-weight: 700;
     }
 
-    /* Replace the header close button with the footer cancel button on desktop */
+    /* Make the history button appear on desktop in the top right, same as mobile */
     .sheet-close-btn {
-        display: none;
-    }
-
-    /* macOS (?) helper */
-    .macos-help-btn {
         display: flex;
         position: absolute;
-        right: 12px;
-        top: 12px;
-        background: rgba(0, 0, 0, 0.06);
-        border-radius: 50%;
-        width: 22px;
-        height: 22px;
-        color: #555;
-        border: none;
-        justify-content: center;
-        align-items: center;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "PingFang TC", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-        transition: background 0.2s;
-    }
-
-    .macos-help-btn:hover {
-        background: rgba(0, 0, 0, 0.1);
-    }
-
-    /* Etiquette helper box */
-    .macos-popover {
-        display: block;
-        position: absolute;
-        top: 40px;
-        right: 12px;
-        width: 220px;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-        border-radius: 8px;
-        padding: 12px;
-        z-index: 100;
-        text-align: left;
-        opacity: 0;
-        visibility: hidden;
-        transform: scale(0.95);
-        transform-origin: top right;
-        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .macos-popover.show {
-        opacity: 1;
-        visibility: visible;
-        transform: scale(1);
-    }
-
-    .macos-popover h4 {
-        margin: 0 0 6px 0;
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: #333;
-    }
-
-    .macos-popover p {
-        margin: 0;
-        line-height: 1.5;
-        font-size: 0.8rem;
-        color: #555;
+        right: 16px;
+        top: 20px;
     }
 
     /* Sunken field emulation */

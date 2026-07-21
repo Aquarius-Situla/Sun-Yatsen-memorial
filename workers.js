@@ -75,7 +75,13 @@ async function handleRequest(request) {
         }
         
         /* 0. Meaningless Spam Check */
-        if (/(.)\1{4,}/.test(text) || (text.length >= 10 && new Set(text).size <= 2)) {
+        if (
+            /(.)\1{4,}/.test(text) || 
+            (text.length >= 10 && new Set(text).size <= 2) ||
+            /[bcdfghjklmnpqrstvwxz]{7,}/i.test(text) ||
+            /\d{12,}/.test(text) ||
+            (/^[a-zA-Z]{12,}$/.test(text) && !/[aeiouy]{2,}/i.test(text))
+        ) {
             return new Response(JSON.stringify({ error: "請勿發送無意義的重複內容 (Spam detected)." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
         }
 

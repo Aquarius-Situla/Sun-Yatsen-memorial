@@ -662,10 +662,9 @@ async function retractMessage(id) {
 }
 
 /* History popover toggle (replaces mobile close btn logic) */
-if (historyMessageBtn && historyPopover) {
+if (historyMessageBtn) {
     historyMessageBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (etiquettePopover) etiquettePopover.classList.remove('show');
         historyPopover.classList.toggle('show');
         if (historyPopover.classList.contains('show')) {
             renderHistoryPopover();
@@ -681,24 +680,8 @@ if (desktopCancelBtn) {
     });
 }
 
-/* Desktop Etiquette Popover */
-const desktopHelpBtn   = document.getElementById('desktop-help-btn');
-const etiquettePopover = document.getElementById('etiquette-popover');
-if (desktopHelpBtn && etiquettePopover) {
-    desktopHelpBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        etiquettePopover.classList.toggle('show');
-    });
-}
-
 /* Backdrop dismiss handlers */
 messageModal.addEventListener('click', (e) => {
-    if (etiquettePopover &&
-        etiquettePopover.classList.contains('show') &&
-        !etiquettePopover.contains(e.target) &&
-        e.target !== desktopHelpBtn) {
-        etiquettePopover.classList.remove('show');
-    }
     if (historyPopover &&
         historyPopover.classList.contains('show') &&
         !historyPopover.contains(e.target) &&
@@ -710,7 +693,6 @@ messageModal.addEventListener('click', (e) => {
         messageInput.value = '';
         if (charCount) charCount.textContent = '0';
         if (historyPopover) historyPopover.classList.remove('show');
-        if (etiquettePopover) etiquettePopover.classList.remove('show');
         messageModal.classList.remove('active');
     }
 });
@@ -747,14 +729,21 @@ function containsBannedWords(text) {
 
 /* Meaningless spam check */
 function isSpam(text) {
-    // Check for 5 or more consecutive identical characters (e.g. aaaaa)
-    if (/(.)\1{4,}/.test(text)) {
-        return true;
-    }
-    // Check for extreme lack of unique characters in long strings
-    if (text.length >= 10 && new Set(text).size <= 2) {
-        return true;
-    }
+    // 1. Check for 5 or more consecutive identical characters (e.g. aaaaa, 11111)
+    if (/(.)\1{4,}/.test(text)) return true;
+    
+    // 2. Check for extreme lack of unique characters in long strings
+    if (text.length >= 10 && new Set(text).size <= 2) return true;
+    
+    // 3. Check for keyboard smashes: 7 or more consecutive consonants
+    if (/[bcdfghjklmnpqrstvwxz]{7,}/i.test(text)) return true;
+    
+    // 4. Check for pure long number sequences (likely spam or phone numbers, allows 8-digit dates)
+    if (/\d{12,}/.test(text)) return true;
+    
+    // 5. Entire string is long random letters without spaces (e.g. asdfghjklqwe)
+    if (/^[a-zA-Z]{12,}$/.test(text) && !/[aeiouy]{2,}/i.test(text)) return true;
+    
     return false;
 }
 
