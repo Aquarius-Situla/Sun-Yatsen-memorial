@@ -14,10 +14,10 @@ addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request))
 })
 
-/* ============================================================================
- * Server-Side Banned Word Dictionary
- * ============================================================================ */
-const SERVER_BANNED_WORDS = ['測試敏感詞', '髒話', '廣告', '法輪功', '台獨', '共匪'];
+/* Server-Side Banned Word Dictionary will be dynamically loaded from KV when possible.
+ * This is a minimal fallback list if KV fetch fails or is empty.
+ */
+const FALLBACK_BANNED_WORDS = ['測試敏感詞', '髒話', '廣告', '法輪功', '台獨', '共匪'];
 
 async function handleRequest(request) {
   /* ============================================================================
@@ -25,7 +25,7 @@ async function handleRequest(request) {
    * ============================================================================ */
   const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, HEAD, POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, HEAD, POST, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
   };
 
@@ -56,6 +56,8 @@ async function handleRequest(request) {
       if (request.method === "GET") {
         let danmakuData = await MEMORIAL_KV.get("DANMAKU_LIST");
         let list = danmakuData ? JSON.parse(danmakuData) : [];
+        /* Gracefully migrate any legacy strings to object schema */
+        list = list.map(item => typeof item === 'string' ? { id: crypto.randomUUID(), text: item, fp: 'legacy', time: Date.now() } : item);
         return new Response(JSON.stringify({ list: list }), {
           status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" }
@@ -71,6 +73,11 @@ async function handleRequest(request) {
         if (!text.trim()) {
             return new Response(JSON.stringify({ error: "Message cannot be empty." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
         }
+        
+        /* 0. Meaningless Spam Check */
+        if (/(.)\1{4,}/.test(text) || (text.length >= 10 && new Set(text).size <= 2)) {
+            return new Response(JSON.stringify({ error: "請勿發送無意義的重複內容 (Spam detected)." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
 
         /* 1. Server-side Rate Limiting: Check for a recent lock (10 seconds) */
         const lockKey = `msg_lock_${fp}`;
@@ -80,7 +87,20 @@ async function handleRequest(request) {
         }
 
         /* 2. Server-side Profanity Filter: Mask banned words with *** */
-        for (let word of SERVER_BANNED_WORDS) {
+        let serverBannedWords = FALLBACK_BANNED_WORDS;
+        try {
+            const kvBannedWords = await MEMORIAL_KV.get("BANNED_WORDS_DICT");
+            if (kvBannedWords) {
+                const parsedWords = JSON.parse(kvBannedWords);
+                if (Array.isArray(parsedWords)) {
+                    serverBannedWords = parsedWords;
+                }
+            }
+        } catch (e) {
+            /* Silently fallback to FALLBACK_BANNED_WORDS if JSON parse fails */
+        }
+
+        for (let word of serverBannedWords) {
             const regex = new RegExp(word, 'gi');
             text = text.replace(regex, '***');
         }
@@ -88,8 +108,11 @@ async function handleRequest(request) {
         /* 3. Retrieve and update the Danmaku array (Capped at 50 to prevent KV bloat) */
         let danmakuData = await MEMORIAL_KV.get("DANMAKU_LIST");
         let list = danmakuData ? JSON.parse(danmakuData) : [];
+        list = list.map(item => typeof item === 'string' ? { id: crypto.randomUUID(), text: item, fp: 'legacy', time: Date.now() } : item);
         
-        list.push(text);
+        const msgId = crypto.randomUUID();
+        const msgObj = { id: msgId, text: text, fp: fp, time: Date.now() };
+        list.push(msgObj);
         
         /* Trim array to keep only the 50 most recent messages */
         if (list.length > 50) {
@@ -102,7 +125,35 @@ async function handleRequest(request) {
         await MEMORIAL_KV.put("DANMAKU_LIST", JSON.stringify(list));
         await MEMORIAL_KV.put(lockKey, "1", { expirationTtl: 60 });
 
-        return new Response(JSON.stringify({ success: true, text: text }), {
+        return new Response(JSON.stringify({ success: true, text: text, id: msgId, time: msgObj.time }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        });
+      }
+
+      /* [DELETE] Retract a Danmaku message */
+      if (request.method === "DELETE") {
+        const body = await request.json();
+        const { id, fp } = body;
+        
+        if (!id || !fp) {
+            return new Response(JSON.stringify({ error: "Missing required parameters." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+
+        let danmakuData = await MEMORIAL_KV.get("DANMAKU_LIST");
+        let list = danmakuData ? JSON.parse(danmakuData) : [];
+        list = list.map(item => typeof item === 'string' ? { id: crypto.randomUUID(), text: item, fp: 'legacy', time: Date.now() } : item);
+
+        const originalLength = list.length;
+        list = list.filter(item => !(item.id === id && item.fp === fp));
+
+        if (list.length === originalLength) {
+            return new Response(JSON.stringify({ error: "Message not found or unauthorized to retract." }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+
+        await MEMORIAL_KV.put("DANMAKU_LIST", JSON.stringify(list));
+
+        return new Response(JSON.stringify({ success: true }), {
           status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" }
         });

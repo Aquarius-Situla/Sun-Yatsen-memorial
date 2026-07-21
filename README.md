@@ -67,6 +67,15 @@ The compose file mounts `./html` as a read-only volume served by Nginx.
 3. Deploy `workers.js` to the Worker.
 4. Copy `html/api/env.example.js` to `html/api/env.js` and set `WORKER_API` to your Worker URL.
 
+## AI Agent Instructions
+
+When maintaining this project, AI assistants and agents **must** adhere to the following rules:
+- **English Comments Only**: All comments, notes, and documentation inside source code files (`.html`, `.js`, `.css`) must be written exclusively in English. Do not write Chinese comments.
+- **Block Comments Only**: The use of inline/single-line comments (like `//`) is strictly prohibited. You must use standard block comments (`/* ... */` for JavaScript/CSS and `<!-- ... -->` for HTML).
+- **Format Integrity**: Do not translate or alter any strings intended for user display (e.g. Traditional Chinese UI text, banners, toasts) unless explicitly instructed to do so.
+- **No Temporary Notes**: Do not commit debugging notes, temporary workarounds, or informal remarks into the codebase. Keep comments professional, focusing on architecture and module boundaries.
+
+
 ## Licensing
 
 This project uses a dual-license model:

@@ -1,4 +1,4 @@
-﻿<!-- ==========================================================================
+<!-- ==========================================================================
  * COMMENTING STANDARDS
  * 1. Block comments only. Use HTML comments for DOM and /* */ for inline scripts.
  * 2. Section dividers use the === banner format.
@@ -329,6 +329,21 @@
         let isTraditional = true;
         let currentTab = 'status';
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+        if (tabParam) {
+            const validTabs = ['status', 'memorial', 'Ukraine'];
+            if (validTabs.includes(tabParam)) {
+                currentTab = tabParam;
+                tabBtns.forEach(b => b.classList.remove('active'));
+                const activeBtn = Array.from(tabBtns).find(btn => btn.getAttribute('data-tab') === currentTab);
+                if (activeBtn) activeBtn.classList.add('active');
+                
+                const suffix = isTraditional ? '_tc.md' : '_sc.md';
+                mdViewer.setAttribute('src', './' + currentTab + suffix);
+            }
+        }
+
         function updateMarkdownSource() {
             const suffix = isTraditional ? '_tc.md' : '_sc.md';
             const newSrc = './' + currentTab + suffix;
@@ -374,7 +389,8 @@
             document.querySelector('.markdown-container').classList.add('loaded');
             const links = mdViewer.shadowRoot.querySelectorAll('a');
             links.forEach(link => {
-                if (link.href.startsWith('http')) {
+                const href = link.getAttribute('href');
+                if (href && href.startsWith('http')) {
                     link.setAttribute('target', '_blank'); 
                     link.setAttribute('rel', 'noopener noreferrer'); 
                 }

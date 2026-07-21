@@ -1,4 +1,4 @@
-﻿<!-- ==========================================================================
+<!-- ==========================================================================
  * COMMENTING STANDARDS
  * 1. Block comments only. Use HTML comments for DOM and /* */ for inline scripts.
  * 2. Section dividers use the === banner format.
@@ -10,14 +10,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">國父紀念日 - 私立中山紀念堂</title>
-    <meta name="description" content="國父孫中山先生紀念日介紹——三月十二日逝世紀念日，十一月十二日誕辰紀念日。緬懷國父革命精神，傳承天下為公理念。">
+    <title id="page-title">國父誕辰紀念日 - 私立中山紀念堂</title>
+    <meta name="description" content="國父孫中山先生誕辰紀念日介紹——緬懷國父革命精神，傳承天下為公理念。">
 
     <link rel="icon" href="../../main/favicon/favicon.svg" type="image/svg+xml">
     <link rel="alternate icon" href="../../main/favicon/favicon.ico" type="image/x-icon" sizes="any">
 
     <link rel="preload" href="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js" as="script" crossorigin="anonymous">
-    <link rel="preload" href="./yatsen_tc.md" as="fetch" crossorigin="anonymous">
+    <link rel="preload" href="./yatsen-birth_tc.md" as="fetch" crossorigin="anonymous">
 
     <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"></script>
 
@@ -45,39 +45,7 @@
             min-height: 100vh;
         }
 
-        /* 節日切換標籤 */
-        .tabs-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 16px;
-            width: 100%;
-            max-width: 800px;
-            overflow-x: auto;
-            scrollbar-width: none;
-        }
-        .tabs-container::-webkit-scrollbar { display: none; }
-        .tab-btn {
-            background-color: #1a1a1a;
-            color: #888888;
-            border: 1px solid #333333;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;
-            font-size: 14px;
-            white-space: nowrap;
-            transition: all 0.3s ease;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .tab-btn.active {
-            background-color: #2d1e0d;
-            color: #f1c40f;
-            border-color: #f1c40f;
-            box-shadow: 0 0 10px rgba(241, 196, 15, 0.15);
-        }
-        @media (hover: hover) and (pointer: fine) {
-            .tab-btn:hover:not(.active) { color: #cccccc; border-color: #555555; }
-        }
+
 
         /* 節日標題橫幅 */
         .festival-hero {
@@ -214,13 +182,7 @@
                 box-shadow: 0 10px 30px rgba(80,50,10,0.12);
             }
 
-            .tab-btn { background-color: #ede8dc; color: #7a5500; border-color: #c4a876; }
-            .tab-btn.active {
-                background-color: #f5e8c8;
-                color: #7a4f00;
-                border-color: #b8860b;
-                box-shadow: 0 0 10px rgba(184,134,11,0.2);
-            }
+
 
             .lang-toggle-btn { background-color: #ede8dc; color: #6b4c35; border-color: #c4a876; }
             .lang-toggle-btn:active { color: #b8860b; border-color: #b8860b; }
@@ -230,7 +192,6 @@
         }
 
         @media (prefers-color-scheme: light) and (hover: hover) and (pointer: fine) {
-            .tab-btn:hover:not(.active) { color: #2c1810; border-color: #8a6400; }
             .lang-toggle-btn:hover { color: #b8860b; border-color: #b8860b; box-shadow: 0 0 10px rgba(184,134,11,0.2); }
             .top-back-btn:hover { color: #2c1810; }
         }
@@ -250,19 +211,16 @@
 
     <button id="lang-btn" class="lang-toggle-btn">切换至简化字</button>
 
-    <div class="tabs-container" id="tabs">
-        <button class="tab-btn active" data-tab="death" id="tab-death">逝世紀念日（3月12日）</button>
-        <button class="tab-btn" data-tab="birth" id="tab-birth">誕辰紀念日（11月12日）</button>
-    </div>
+    <button id="lang-btn" class="lang-toggle-btn">切换至简化字</button>
 
     <div class="festival-hero">
-        <span class="festival-icon" id="hero-icon">🕯️</span>
-        <h1 id="hero-title">國父逝世紀念日</h1>
-        <div class="festival-date" id="hero-date">民國十四年（1925年）三月十二日</div>
+        <span class="festival-icon" id="hero-icon">🎂</span>
+        <h1 id="hero-title">國父誕辰紀念日</h1>
+        <div class="festival-date" id="hero-date">民國前四十五年（1866年）十一月十二日</div>
     </div>
 
     <div class="markdown-container">
-        <zero-md id="md-viewer" src="./yatsen_tc.md">
+        <zero-md id="md-viewer" src="./yatsen-birth_tc.md">
             <template>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css">
                 <style>
@@ -303,44 +261,22 @@
     <script>
         const langBtn = document.getElementById('lang-btn');
         const mdViewer = document.getElementById('md-viewer');
+        const container = document.querySelector('.markdown-container');
         const heroTitle = document.getElementById('hero-title');
         const heroDate = document.getElementById('hero-date');
-        const heroIcon = document.getElementById('hero-icon');
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const container = document.querySelector('.markdown-container');
 
         let isTraditional = true;
-        let currentTab = 'death'; // 'death' | 'birth'
-
-        // 自動根據當天日期決定預設頁籤
-        const now = new Date();
-        const m = now.getMonth() + 1;
-        const d = now.getDate();
-        if (m === 11 && d === 12) {
-            currentTab = 'birth';
-            document.getElementById('tab-death').classList.remove('active');
-            document.getElementById('tab-birth').classList.add('active');
-        }
 
         const texts = {
-            death: {
-                tc: { btn: '切换至简化字', title: '國父逝世紀念日', date: '民國十四年（1925年）三月十二日', tabDeath: '逝世紀念日（3月12日）', tabBirth: '誕辰紀念日（11月12日）', src: './yatsen_tc.md' },
-                sc: { btn: '切換至正體字', title: '国父逝世纪念日', date: '民国十四年（1925年）三月十二日', tabDeath: '逝世纪念日（3月12日）', tabBirth: '诞辰纪念日（11月12日）', src: './yatsen_sc.md' }
-            },
-            birth: {
-                tc: { btn: '切换至简化字', title: '國父誕辰紀念日', date: '民國前四十五年（1866年）十一月十二日', tabDeath: '逝世紀念日（3月12日）', tabBirth: '誕辰紀念日（11月12日）', src: './yatsen_tc.md' },
-                sc: { btn: '切換至正體字', title: '国父诞辰纪念日', date: '民国前四十五年（1866年）十一月十二日', tabDeath: '逝世纪念日（3月12日）', tabBirth: '诞辰纪念日（11月12日）', src: './yatsen_sc.md' }
-            }
+            tc: { btn: '切换至简化字', title: '國父誕辰紀念日', date: '民國前四十五年（1866年）十一月十二日', src: './yatsen-birth_tc.md' },
+            sc: { btn: '切換至正體字', title: '国父诞辰纪念日', date: '民国前四十五年（1866年）十一月十二日', src: './yatsen-birth_sc.md' }
         };
 
         function updateContent() {
-            const t = texts[currentTab][isTraditional ? 'tc' : 'sc'];
+            const t = texts[isTraditional ? 'tc' : 'sc'];
             langBtn.textContent = t.btn;
             heroTitle.textContent = t.title;
             heroDate.textContent = t.date;
-            heroIcon.textContent = currentTab === 'death' ? '🕯️' : '🎂';
-            document.getElementById('tab-death').textContent = t.tabDeath;
-            document.getElementById('tab-birth').textContent = t.tabBirth;
             document.documentElement.lang = isTraditional ? 'zh-TW' : 'zh-CN';
 
             if (mdViewer.getAttribute('src') !== t.src) {
@@ -354,21 +290,12 @@
             updateContent();
         });
 
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (btn.classList.contains('active')) return;
-                tabBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentTab = btn.getAttribute('data-tab');
-                updateContent();
-            });
-        });
-
         mdViewer.addEventListener('zero-md-rendered', () => {
             container.classList.add('loaded');
             const links = mdViewer.shadowRoot.querySelectorAll('a');
             links.forEach(link => {
-                if (link.href.startsWith('http')) {
+                const href = link.getAttribute('href');
+                if (href && href.startsWith('http')) {
                     link.setAttribute('target', '_blank');
                     link.setAttribute('rel', 'noopener noreferrer');
                 }
@@ -380,7 +307,14 @@
             topBackBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 document.body.classList.add('page-transition');
-                setTimeout(() => { window.location.href = this.href; }, 300);
+                setTimeout(() => {
+                    const params = new URLSearchParams(window.location.search);
+                    if (params.get('from') === 'announcement') {
+                        window.location.href = '../../pages/announcement/announcement.html?tab=memorial';
+                    } else {
+                        window.location.href = this.href;
+                    }
+                }, 300);
             });
         }
 

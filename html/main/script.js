@@ -27,37 +27,36 @@
  *   festivalPage — URL path for the festival detail page.
  * ============================================================================ */
 
-const DEFAULT_MUSIC = { src: 'main/anthem/anthem.m4a', title: 'National Anthem', artist: 'Sun Yat-sen' };
+const DEFAULT_MUSIC = { src: 'main/anthem/anthem.m4a', title: '中華民國國歌', artist: '孫中山' };
 
 const SPECIAL_MEMORIAL_DAYS = [
     {
         urlKeyword:  'events/whampoa',
         dates:       [ { month: 6, date: 16 } ],
-        config:      { src: 'events/whampoa/whampoa.mp3', title: 'Whampoa Suite', artist: 'Tai Chi-tao' },
-        getBanner:   (year) => `${year - 1924}th Anniversary of Whampoa Military Academy`,
+        config:      { src: 'events/whampoa/whampoa.mp3', title: '黃埔軍校校歌', artist: '戴季陶' },
+        getBanner:   (year) => `黃埔建軍 ${year - 1924} 週年`,
         festivalPage: 'events/whampoa/whampoa.html'
     },
     {
         urlKeyword:  'events/militaries',
         dates:       [ { month: 9, date: 3 } ],
-        config:      { src: 'events/militaries/militaries.mp3', title: 'Armed Forces March', artist: 'Ho Chih-hao' },
-        getBanner:   (year) => `${year - 1945}th Anniversary of Victory over Japan`,
+        config:      { src: 'events/militaries/militaries.mp3', title: '國軍建軍歌', artist: '何志浩' },
+        getBanner:   (year) => `抗戰勝利 ${year - 1945} 週年`,
         festivalPage: 'events/militaries/militaries.html'
     },
     {
-        urlKeyword:  'events/yatsen',
-        dates:       [
-            { month: 3,  date: 12, type: 'death' },
-            { month: 11, date: 12, type: 'birth' }
-        ],
-        config:      { src: 'events/yatsen/yatsen.mp3', title: 'Memorial Song', artist: 'Tai Chi-tao' },
-        getBanner:   (year, dateObj) => {
-            if (!dateObj) dateObj = { type: 'death' };
-            return dateObj.type === 'death'
-                ? `${year - 1925}th Anniversary of Dr. Sun's Passing`
-                : `${year - 1866}th Anniversary of Dr. Sun's Birth`;
-        },
-        festivalPage: 'events/yatsen/yatsen.html'
+        urlKeyword:  'events/yatsen-passing',
+        dates:       [ { month: 3,  date: 12 } ],
+        config:      { src: 'events/yatsen/yatsen.mp3', title: '國父紀念歌', artist: '戴季陶' },
+        getBanner:   (year) => `國父逝世 ${year - 1925} 週年`,
+        festivalPage: 'events/yatsen/yatsen-passing.html'
+    },
+    {
+        urlKeyword:  'events/yatsen-birth',
+        dates:       [ { month: 11, date: 12 } ],
+        config:      { src: 'events/yatsen/yatsen.mp3', title: '國父紀念歌', artist: '戴季陶' },
+        getBanner:   (year) => `國父誕辰 ${year - 1866} 週年`,
+        festivalPage: 'events/yatsen/yatsen-birth.html'
     }
 ];
 
@@ -153,7 +152,7 @@ window.addEventListener('pageshow', function (event) {
             navFestivalBanner.style.cursor = 'pointer';
             navFestivalBanner.setAttribute('role',       'link');
             navFestivalBanner.setAttribute('tabindex',   '0');
-            navFestivalBanner.setAttribute('aria-label', `${bannerText}——Click to learn more`);
+            navFestivalBanner.setAttribute('aria-label', `${bannerText}——點擊了解更多`);
             navFestivalBanner.addEventListener('click',   () => { window.location.href = festivalPage; });
             navFestivalBanner.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -229,7 +228,7 @@ function setupMediaSession(config) {
     navigator.mediaSession.metadata = new MediaMetadata({
         title:   config.title,
         artist:  config.artist,
-        album:   'Private Sun Yat-sen Memorial Hall',
+        album:   '私立中山紀念堂',
         artwork: [ { src: 'main/anthem/album-cover.png', sizes: '1254x1254', type: 'image/png' } ]
     });
 
@@ -274,11 +273,11 @@ function playMemorialMusic() {
     const minguoYear = now.getFullYear() - 1911;
     const month      = now.getMonth() + 1;
     const date       = now.getDate();
-    const days       = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const days       = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
     const dayOfWeek  = days[now.getDay()];
 
     document.getElementById('minguo-date-display').innerText =
-        `Republic of China Year ${minguoYear}, ${month}/${date} (${dayOfWeek})`;
+        `中華民國 ${minguoYear} 年 ${month} 月 ${date} 日 (${dayOfWeek})`;
 })();
 
 /* ============================================================================
@@ -319,7 +318,7 @@ const isFromReturn = urlParams.get('from') === 'return';
 if (isFromReturn) {
     window.history.replaceState({}, document.title, window.location.pathname);
 } else {
-    setTimeout(() => { triggerToastBanner('Please bow three times', 5000); }, 1000);
+    setTimeout(() => { triggerToastBanner('請向國父遺像行三鞠躬禮', 5000); }, 1000);
 }
 
 /* ============================================================================
@@ -329,9 +328,10 @@ if (isFromReturn) {
 /* Portrait click starts music; subsequent clicks show a standing reminder. */
 portraitBtn.addEventListener('click', () => {
     if (audio.paused) {
+        triggerToastBanner('請起立', 2000);
         playMemorialMusic();
     } else {
-        triggerToastBanner('Please stand respectfully!', 2000);
+        triggerToastBanner('請肅立！', 2000);
     }
 });
 
@@ -559,19 +559,39 @@ if (_woodFrame && window.matchMedia('(hover: hover) and (pointer: fine)').matche
 
 const openMessageBtn    = document.getElementById('open-message-btn');
 const messageModal      = document.getElementById('message-modal');
-const closeMessageBtn   = document.getElementById('close-message-btn');
+const historyMessageBtn = document.getElementById('history-message-btn');
+const historyPopover    = document.getElementById('history-popover');
+const historyList       = document.getElementById('history-list');
 const testamentBox      = document.querySelector('.testament-box');
 const danmakuContainer  = document.getElementById('danmaku-container');
 const messageInput      = document.getElementById('message-input');
+const charCount         = document.getElementById('char-count');
 const submitMessageBtn  = document.getElementById('submit-message-btn');
 const portraitImg       = document.querySelector('.portrait-img');
 
-/* Soft-ban dictionary; absolute validation occurs on the server */
-const BANNED_WORDS = ['test_banned', 'profanity', 'ad', 'falungong', 'taiwan_independence', 'communist'];
+/* Banned words are dynamically loaded from the server */
+let bannedWordsList = [];
+
+/* Fetch banned words from static JSON on load */
+fetch('api/banned_words.json')
+    .then(res => res.json())
+    .then(data => {
+        if (Array.isArray(data)) {
+            bannedWordsList = data;
+        }
+    })
+    .catch(err => console.error("Failed to load banned words library:", err));
 
 let isDanmakuEnabled = false;
 let messageCooldown  = false;
 let knownDanmaku     = new Set(); /* Deduplication set to avoid replaying seen messages */
+
+/* Character Counter Listener */
+if (messageInput && charCount) {
+    messageInput.addEventListener('input', () => {
+        charCount.textContent = messageInput.value.length;
+    });
+}
 
 /* Open modal */
 if (openMessageBtn) {
@@ -581,10 +601,75 @@ if (openMessageBtn) {
     });
 }
 
-/* Close modal (Mobile) */
-if (closeMessageBtn) {
-    closeMessageBtn.addEventListener('click', () => {
-        messageModal.classList.remove('active');
+/* Track Sent Messages locally */
+let mySentMessages = JSON.parse(localStorage.getItem('mySentMessages')) || [];
+
+function renderHistoryPopover() {
+    if (!historyList) return;
+    historyList.innerHTML = '';
+    
+    if (mySentMessages.length === 0) {
+        historyList.innerHTML = '<div class="empty-history">暫無留言紀錄</div>';
+        return;
+    }
+    
+    mySentMessages.slice().reverse().forEach(msg => {
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        
+        const textSpan = document.createElement('div');
+        textSpan.className = 'history-text';
+        textSpan.textContent = msg.text;
+        
+        const retractBtn = document.createElement('button');
+        retractBtn.className = 'retract-btn';
+        retractBtn.innerHTML = '×';
+        retractBtn.title = '撤回留言';
+        retractBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (confirm('確定要撤回這則留言嗎？')) {
+                retractMessage(msg.id);
+            }
+        });
+        
+        item.appendChild(textSpan);
+        item.appendChild(retractBtn);
+        historyList.appendChild(item);
+    });
+}
+
+async function retractMessage(id) {
+    try {
+        const fp = await generateBrowserFingerprint();
+        const response = await fetch(WORKER_API + '/danmaku', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, fp })
+        });
+        
+        if (response.ok) {
+            mySentMessages = mySentMessages.filter(m => m.id !== id);
+            localStorage.setItem('mySentMessages', JSON.stringify(mySentMessages));
+            renderHistoryPopover();
+            showCloudflareToast('留言已撤回', 'success');
+        } else {
+            const err = await response.json();
+            showCloudflareToast(err.error || '撤回失敗', 'error');
+        }
+    } catch (e) {
+        showCloudflareToast('網路連線異常，請檢查網路。', 'error');
+    }
+}
+
+/* History popover toggle (replaces mobile close btn logic) */
+if (historyMessageBtn && historyPopover) {
+    historyMessageBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (etiquettePopover) etiquettePopover.classList.remove('show');
+        historyPopover.classList.toggle('show');
+        if (historyPopover.classList.contains('show')) {
+            renderHistoryPopover();
+        }
     });
 }
 
@@ -614,7 +699,18 @@ messageModal.addEventListener('click', (e) => {
         e.target !== desktopHelpBtn) {
         etiquettePopover.classList.remove('show');
     }
+    if (historyPopover &&
+        historyPopover.classList.contains('show') &&
+        !historyPopover.contains(e.target) &&
+        e.target !== historyMessageBtn &&
+        !e.target.closest('#history-message-btn')) {
+        historyPopover.classList.remove('show');
+    }
     if (e.target === messageModal) {
+        messageInput.value = '';
+        if (charCount) charCount.textContent = '0';
+        if (historyPopover) historyPopover.classList.remove('show');
+        if (etiquettePopover) etiquettePopover.classList.remove('show');
         messageModal.classList.remove('active');
     }
 });
@@ -631,7 +727,7 @@ if (testamentBox) {
             if (!window.danmakuInterval) {
                 window.danmakuInterval = setInterval(fetchAndPlayDanmaku, 15000);
             }
-            showCloudflareToast('Danmaku Enabled', 'system');
+            showCloudflareToast('彈幕已開啟', 'system');
         } else {
             danmakuContainer.classList.add('hidden');
             danmakuContainer.innerHTML = '';
@@ -639,14 +735,27 @@ if (testamentBox) {
                 clearInterval(window.danmakuInterval);
                 window.danmakuInterval = null;
             }
-            showCloudflareToast('Danmaku Disabled', 'system');
+            showCloudflareToast('彈幕已關閉', 'system');
         }
     });
 }
 
 /* Soft ban check */
 function containsBannedWords(text) {
-    return BANNED_WORDS.some(word => text.includes(word));
+    return bannedWordsList.some(word => text.includes(word));
+}
+
+/* Meaningless spam check */
+function isSpam(text) {
+    // Check for 5 or more consecutive identical characters (e.g. aaaaa)
+    if (/(.)\1{4,}/.test(text)) {
+        return true;
+    }
+    // Check for extreme lack of unique characters in long strings
+    if (text.length >= 10 && new Set(text).size <= 2) {
+        return true;
+    }
+    return false;
 }
 
 /* ============================================================================
@@ -705,15 +814,19 @@ submitMessageBtn.addEventListener('click', async () => {
     const text = messageInput.value.trim();
 
     if (!text) {
-        showCloudflareToast('Message cannot be empty.', 'error');
+        showCloudflareToast('留言不能為空', 'error');
         return;
     }
     if (text.length > 50) {
-        showCloudflareToast('Please restrict your message to 50 characters.', 'error');
+        showCloudflareToast('留言限 50 字內', 'error');
         return;
     }
     if (containsBannedWords(text)) {
-        showCloudflareToast('Inappropriate language detected. Please edit.', 'error');
+        showCloudflareToast('請勿包含敏感詞彙', 'error');
+        return;
+    }
+    if (isSpam(text)) {
+        showCloudflareToast('請勿發送無意義的重複內容', 'error');
         return;
     }
 
@@ -731,7 +844,7 @@ submitMessageBtn.addEventListener('click', async () => {
         }
     }, 1000);
 
-    showCloudflareToast('Sending...', 'info');
+    showCloudflareToast('傳送中...', 'info');
 
     try {
         const fingerprint = await generateBrowserFingerprint();
@@ -742,12 +855,21 @@ submitMessageBtn.addEventListener('click', async () => {
         });
 
         if (response.ok) {
-            showCloudflareToast('Message sent successfully.', 'success');
+            const data = await response.json();
+            showCloudflareToast('發送成功！', 'success');
             messageInput.value = '';
+            if (charCount) charCount.textContent = '0';
+            
+            mySentMessages.push({ id: data.id, text: text, time: data.time || Date.now() });
+            localStorage.setItem('mySentMessages', JSON.stringify(mySentMessages));
+            if (historyPopover && historyPopover.classList.contains('show')) {
+                renderHistoryPopover();
+            }
+
             if (isDanmakuEnabled) createDanmaku(text); /* Local immediate preview */
         } else {
             const err = await response.json();
-            showCloudflareToast(err.error || 'Failed to send. Please try again.', 'error');
+            showCloudflareToast(err.error || '發送失敗，請稍後再試。', 'error');
 
             /* Lift cooldown early if the server rejected for reasons other than spam */
             if (!err.error || !err.error.includes('ratelimit')) {
@@ -757,7 +879,7 @@ submitMessageBtn.addEventListener('click', async () => {
             }
         }
     } catch (e) {
-        showCloudflareToast('Network error detected.', 'error');
+        showCloudflareToast('網路連線異常，請檢查網路。', 'error');
         clearInterval(timer);
         messageCooldown = false;
         submitMessageBtn.disabled = false;
@@ -820,9 +942,12 @@ async function fetchAndPlayDanmaku() {
         let   delay = 0;
 
         list.forEach(item => {
-            if (knownDanmaku.has(item)) return;
-            knownDanmaku.add(item);
-            setTimeout(() => { createDanmaku(item); }, delay);
+            const idToTrack = item.id || item; /* fallback for legacy strings */
+            const textToPlay = item.text || item;
+            
+            if (knownDanmaku.has(idToTrack)) return;
+            knownDanmaku.add(idToTrack);
+            setTimeout(() => { createDanmaku(textToPlay); }, delay);
             delay += Math.random() * 2000 + 500;
         });
 

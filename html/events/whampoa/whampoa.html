@@ -1,4 +1,4 @@
-﻿<!-- ==========================================================================
+<!-- ==========================================================================
  * COMMENTING STANDARDS
  * 1. Block comments only. Use HTML comments for DOM and /* */ for inline scripts.
  * 2. Section dividers use the === banner format.
@@ -315,7 +315,8 @@
             container.classList.add('loaded');
             const links = mdViewer.shadowRoot.querySelectorAll('a');
             links.forEach(link => {
-                if (link.href.startsWith('http')) {
+                const href = link.getAttribute('href');
+                if (href && href.startsWith('http')) {
                     link.setAttribute('target', '_blank');
                     link.setAttribute('rel', 'noopener noreferrer');
                 }
@@ -327,7 +328,14 @@
             topBackBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 document.body.classList.add('page-transition');
-                setTimeout(() => { window.location.href = this.href; }, 300);
+                setTimeout(() => {
+                    const params = new URLSearchParams(window.location.search);
+                    if (params.get('from') === 'announcement') {
+                        window.location.href = '../../pages/announcement/announcement.html?tab=memorial';
+                    } else {
+                        window.location.href = this.href;
+                    }
+                }, 300);
             });
         }
 

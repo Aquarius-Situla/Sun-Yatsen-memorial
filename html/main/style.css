@@ -934,16 +934,14 @@ body.banner-active .dropdown-nav-bar {
     justify-content: center;
     align-items: flex-end;
     z-index: 30000;
-    opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.4s cubic-bezier(0.32, 0.72, 0, 1), background-color 0.4s cubic-bezier(0.32, 0.72, 0, 1), visibility 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: background-color 0.1s linear, visibility 0.1s linear;
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "PingFang TC", "Hiragino Sans GB", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .modal-overlay.active {
-    background-color: rgba(0, 0, 0, 0.4);
-    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.65); /* App Store style deep dimming */
     visibility: visible;
     pointer-events: auto;
 }
@@ -951,24 +949,25 @@ body.banner-active .dropdown-nav-bar {
 /* The Sheet Container */
 .modal-sheet {
     position: relative;
-    background: #f2f2f7;
+    background: #faf7f2; /* Harmonized warm off-white */
     width: 100%;
     max-width: 500px;
     border-radius: 14px 14px 0 0;
     padding: 20px 16px calc(32px + env(safe-area-inset-bottom, 16px)) 16px;
     box-sizing: border-box;
     transform: translateY(100%);
-    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: transform 0.1s linear;
     box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1);
 }
 
 .modal-overlay.active .modal-sheet {
     transform: translateY(0) scale(1);
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); /* Keep entrance slightly snappier */
 }
 
 @media (prefers-color-scheme: dark) {
     .modal-sheet {
-        background: #2c2c2e;
+        background: #1c1c1e; /* Deeper dark mode gray to match iOS/webpage */
         box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
     }
 }
@@ -986,6 +985,7 @@ body.banner-active .dropdown-nav-bar {
     font-size: 1.3rem;
     font-weight: 700;
     color: #000;
+    line-height: 1; /* Tight wrap to fix flex geometric center offset */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -1016,6 +1016,7 @@ body.banner-active .dropdown-nav-bar {
 
 /* Input Area Restyling */
 .sheet-content {
+    position: relative;
     background: #ffffff;
     border-radius: 14px;
     padding: 0;
@@ -1026,7 +1027,7 @@ body.banner-active .dropdown-nav-bar {
 
 @media (prefers-color-scheme: dark) {
     .sheet-content {
-        background: #3a3a3c;
+        background: #2c2c2e; /* Harmonized dark mode card color */
     }
 }
 
@@ -1054,6 +1055,16 @@ body.banner-active .dropdown-nav-bar {
     }
 }
 
+.char-counter {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-size: 0.75rem;
+    color: #8e8e93; /* Apple system gray */
+    pointer-events: none;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+}
+
 /* Footer & Buttons */
 .sheet-footer {
     display: flex;
@@ -1064,8 +1075,8 @@ body.banner-active .dropdown-nav-bar {
 .ios-submit-btn {
     width: 110px;
     height: 34px;
-    background: #007AFF;
-    color: #fff;
+    background: #8a6400; /* Solemn dark gold */
+    color: #f5f0e8; /* Soft cream/off-white text, not as glaring as pure white */
     border: none;
     border-radius: 17px;
     font-size: 0.9rem;
@@ -1087,6 +1098,122 @@ body.banner-active .dropdown-nav-bar {
     display: none;
 }
 
+/* History Popover (MacOS Spotlight Style) */
+.history-popover {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    width: 260px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 12px;
+    z-index: 100;
+    text-align: left;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.95);
+    transform-origin: top right;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.history-popover.show {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+.history-popover h4 {
+    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding-bottom: 6px;
+}
+
+#history-list {
+    max-height: 180px;
+    overflow-y: auto;
+    font-size: 0.85rem;
+}
+
+.empty-history {
+    color: #8e8e93;
+    text-align: center;
+    padding: 10px 0;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    color: #333;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-text {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 10px;
+}
+
+.retract-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: #8e8e93;
+    transition: background 0.2s, color 0.2s;
+}
+
+.retract-btn:hover {
+    background: rgba(0, 0, 0, 0.12);
+    color: #8e8e93;
+}
+
+@media (prefers-color-scheme: dark) {
+    .history-popover {
+        background: rgba(40, 40, 40, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+    
+    .history-popover h4 {
+        color: #eee;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .history-item {
+        color: #ddd;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .retract-btn {
+        background: rgba(255, 255, 255, 0.1);
+        color: #aaa;
+    }
+
+    .retract-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+}
+
 .ios-submit-btn:hover {
     filter: brightness(0.9);
 }
@@ -1094,6 +1221,13 @@ body.banner-active .dropdown-nav-bar {
 .ios-submit-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+@media (prefers-color-scheme: dark) {
+    .ios-submit-btn {
+        background: #007AFF; /* Revert to App Store Blue in dark mode */
+        color: #ffffff;
+    }
 }
 
 /* ============================================================================
@@ -1322,7 +1456,7 @@ body.banner-active .dropdown-nav-bar {
         width: auto;
         max-width: none;
         height: 36px;
-        background: linear-gradient(180deg, #3782f2 0%, #1562e8 100%);
+        background: linear-gradient(180deg, #b8860b 0%, #8a6400 100%); /* Memorial gold gradient */
         border-radius: 8px;
         font-size: 1rem;
         font-weight: 500;
@@ -1340,7 +1474,7 @@ body.banner-active .dropdown-nav-bar {
     }
 
     .ios-submit-btn:active {
-        background: #1562e8;
+        background: #8a6400;
         box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
     }
 }

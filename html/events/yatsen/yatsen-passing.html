@@ -10,14 +10,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>抗戰勝利紀念 - 私立中山紀念堂</title>
-    <meta name="description" content="抗戰勝利紀念日介紹——民國三十四年九月三日，中華民國政府正式訂定為抗戰勝利紀念日，銘記八年抗戰的艱苦卓絕與最終勝利。">
+    <title id="page-title">國父逝世紀念日 - 私立中山紀念堂</title>
+    <meta name="description" content="國父孫中山先生逝世紀念日介紹——緬懷國父革命精神，傳承天下為公理念。">
 
     <link rel="icon" href="../../main/favicon/favicon.svg" type="image/svg+xml">
     <link rel="alternate icon" href="../../main/favicon/favicon.ico" type="image/x-icon" sizes="any">
 
     <link rel="preload" href="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js" as="script" crossorigin="anonymous">
-    <link rel="preload" href="./militaries_tc.md" as="fetch" crossorigin="anonymous">
+    <link rel="preload" href="./yatsen-passing_tc.md" as="fetch" crossorigin="anonymous">
 
     <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"></script>
 
@@ -45,6 +45,8 @@
             min-height: 100vh;
         }
 
+
+
         /* 節日標題橫幅 */
         .festival-hero {
             width: 100%;
@@ -52,11 +54,12 @@
             margin-bottom: 20px;
             text-align: center;
             padding: 28px 20px 24px;
-            background: linear-gradient(135deg, #0d1a0d 0%, #162814 50%, #0d1a0d 100%);
+            background: linear-gradient(135deg, #1a0e06 0%, #2d1408 50%, #1a0e06 100%);
             border-radius: 12px;
-            border: 1px solid rgba(100, 160, 100, 0.3);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.7), inset 0 1px 0 rgba(120,200,120,0.06);
+            border: 1px solid rgba(184, 134, 11, 0.35);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.7), inset 0 1px 0 rgba(241,196,15,0.08);
             box-sizing: border-box;
+            transition: all 0.4s ease;
         }
 
         .festival-hero .festival-icon {
@@ -66,16 +69,16 @@
         }
 
         .festival-hero h1 {
-            color: #7cba7c;
+            color: #f1c40f;
             font-size: clamp(1.3rem, 4vw, 1.8rem);
             font-weight: bold;
             letter-spacing: 4px;
             margin: 0 0 8px 0;
-            text-shadow: 0 0 20px rgba(124, 186, 124, 0.3);
+            text-shadow: 0 0 20px rgba(241, 196, 15, 0.35);
         }
 
         .festival-hero .festival-date {
-            color: #5a8f5a;
+            color: #b8860b;
             font-size: 0.9rem;
             letter-spacing: 2px;
         }
@@ -162,17 +165,16 @@
             .icon-macos { display: none; }
         }
 
-        /* ===== Light Mode Overrides ===== */
         @media (prefers-color-scheme: light) {
             html, body { background-color: #f5f0e8; color: #2c1810; }
 
             .festival-hero {
-                background: linear-gradient(135deg, #e8f0e8 0%, #d4e8d4 50%, #e8f0e8 100%);
-                border-color: rgba(100,160,100,0.4);
-                box-shadow: 0 8px 32px rgba(20,60,20,0.12), inset 0 1px 0 rgba(120,200,120,0.1);
+                background: linear-gradient(135deg, #f0e6cc 0%, #e8d8b0 50%, #f0e6cc 100%);
+                border-color: rgba(184,134,11,0.4);
+                box-shadow: 0 8px 32px rgba(80,50,10,0.12), inset 0 1px 0 rgba(184,134,11,0.15);
             }
-            .festival-hero h1 { color: #2d6b2d; text-shadow: 0 0 20px rgba(45,107,45,0.2); }
-            .festival-hero .festival-date { color: #3d7a3d; }
+            .festival-hero h1 { color: #7a4f00; text-shadow: 0 0 20px rgba(122,79,0,0.2); }
+            .festival-hero .festival-date { color: #8a6400; }
 
             .markdown-container {
                 background-color: #ede8dc;
@@ -180,23 +182,18 @@
                 box-shadow: 0 10px 30px rgba(80,50,10,0.12);
             }
 
+
+
             .lang-toggle-btn { background-color: #ede8dc; color: #6b4c35; border-color: #c4a876; }
             .lang-toggle-btn:active { color: #b8860b; border-color: #b8860b; }
 
-            @media (hover: hover) and (pointer: fine) {
-                .lang-toggle-btn:hover {
-                    color: #b8860b;
-                    border-color: #b8860b;
-                    box-shadow: 0 0 10px rgba(184,134,11,0.2);
-                }
-            }
-
             .top-back-btn { color: #8a7060; }
             .top-back-btn:active { color: #2c1810; }
+        }
 
-            @media (hover: hover) and (pointer: fine) {
-                .top-back-btn:hover { color: #2c1810; }
-            }
+        @media (prefers-color-scheme: light) and (hover: hover) and (pointer: fine) {
+            .lang-toggle-btn:hover { color: #b8860b; border-color: #b8860b; box-shadow: 0 0 10px rgba(184,134,11,0.2); }
+            .top-back-btn:hover { color: #2c1810; }
         }
     </style>
 </head>
@@ -214,14 +211,16 @@
 
     <button id="lang-btn" class="lang-toggle-btn">切换至简化字</button>
 
+    <button id="lang-btn" class="lang-toggle-btn">切换至简化字</button>
+
     <div class="festival-hero">
-        <span class="festival-icon">🕊️</span>
-        <h1 id="hero-title">抗戰勝利紀念日</h1>
-        <div class="festival-date" id="hero-date">民國三十四年（1945年）九月三日</div>
+        <span class="festival-icon" id="hero-icon">🕯️</span>
+        <h1 id="hero-title">國父逝世紀念日</h1>
+        <div class="festival-date" id="hero-date">民國十四年（1925年）三月十二日</div>
     </div>
 
     <div class="markdown-container">
-        <zero-md id="md-viewer" src="./militaries_tc.md">
+        <zero-md id="md-viewer" src="./yatsen-passing_tc.md">
             <template>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css">
                 <style>
@@ -248,9 +247,9 @@
                     .markdown-body ul { margin-bottom: 20px !important; }
                     .markdown-body li { margin-bottom: 8px !important; }
                     .markdown-body blockquote {
-                        border-left: 4px solid #5a8f5a !important;
+                        border-left: 4px solid #b8860b !important;
                         color: #cccccc !important;
-                        background: rgba(90,143,90,0.07) !important;
+                        background: rgba(184,134,11,0.07) !important;
                         padding: 12px 20px !important;
                         border-radius: 0 6px 6px 0 !important;
                     }
@@ -262,32 +261,18 @@
     <script>
         const langBtn = document.getElementById('lang-btn');
         const mdViewer = document.getElementById('md-viewer');
-        const heroTitle = document.getElementById('hero-title');
-        const heroDate = document.getElementById('hero-date');
         const container = document.querySelector('.markdown-container');
 
         let isTraditional = true;
 
         const texts = {
-            tc: {
-                btn: '切换至简化字',
-                title: '抗戰勝利紀念日',
-                date: '民國三十四年（1945年）九月三日',
-                src: './militaries_tc.md'
-            },
-            sc: {
-                btn: '切換至正體字',
-                title: '抗战胜利纪念日',
-                date: '民国三十四年（1945年）九月三日',
-                src: './militaries_sc.md'
-            }
+            tc: { btn: '切换至简化字', src: './yatsen-passing_tc.md' },
+            sc: { btn: '切換至正體字', src: './yatsen-passing_sc.md' }
         };
 
         function updateContent() {
-            const t = isTraditional ? texts.tc : texts.sc;
+            const t = texts[isTraditional ? 'tc' : 'sc'];
             langBtn.textContent = t.btn;
-            heroTitle.textContent = t.title;
-            heroDate.textContent = t.date;
             document.documentElement.lang = isTraditional ? 'zh-TW' : 'zh-CN';
 
             if (mdViewer.getAttribute('src') !== t.src) {
@@ -329,6 +314,10 @@
             });
         }
 
+        // 初始化顯示
+        updateContent();
+
+        // 色彩模式切換：動態更新 zero-md 樣式表
         const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: light)');
         function updateMarkdownTheme() {
             const isLight = colorSchemeQuery.matches;
@@ -369,7 +358,14 @@
                 .markdown-body a { color: #b8860b !important; text-decoration: none; }
                 .markdown-body a:hover { text-decoration: underline; }
                 .markdown-body ul { margin-bottom: 20px !important; }
-                .markdown-body li { margin-bottom: 8px !important; }`;
+                .markdown-body li { margin-bottom: 8px !important; }
+                .markdown-body blockquote {
+                    border-left: 4px solid #b8860b !important;
+                    color: #5a3e2a !important;
+                    background: rgba(184,134,11,0.08) !important;
+                    padding: 12px 20px !important;
+                    border-radius: 0 6px 6px 0 !important;
+                }`;
             } else {
                 return `.markdown-body {
                     color: #e5e7eb !important;
@@ -389,7 +385,14 @@
                 .markdown-body a { color: #f1c40f !important; text-decoration: none; }
                 .markdown-body a:hover { text-decoration: underline; }
                 .markdown-body ul { margin-bottom: 20px !important; }
-                .markdown-body li { margin-bottom: 8px !important; }`;
+                .markdown-body li { margin-bottom: 8px !important; }
+                .markdown-body blockquote {
+                    border-left: 4px solid #b8860b !important;
+                    color: #cccccc !important;
+                    background: rgba(184,134,11,0.07) !important;
+                    padding: 12px 20px !important;
+                    border-radius: 0 6px 6px 0 !important;
+                }`;
             }
         }
         colorSchemeQuery.addEventListener('change', updateMarkdownTheme);
