@@ -1,65 +1,79 @@
-# 🏛️ 私立中山紀念堂 (Sun-Yatsen-memorial)
+# 私立中山紀念堂
 
-歡迎來到**私立中山紀念堂**。這是一個非營利性質的線上互動紀念專案，旨在緬懷孫中山先生及致敬歷史上的革命先驅。本專案同時也是一個純前端技術的實踐，探索了現代 Web 互動、多媒體播放與響應式設計。
+A client-side memorial web application for Dr. Sun Yat-sen and the pioneers of the Chinese Republican revolution. The project serves as both a commemorative platform and a technical exploration of multimedia playback, immersive interaction, and responsive design without framework dependencies.
 
-## ✨ 核心功能與特色
+---
 
-- **儀式感互動設計**：包含向國父遺像行三鞠躬禮的互動提示與狀態列。
-- **多媒體播放**：點擊遺像即可自動播放紀念樂曲（如國歌等）。
-- **民國曆法轉換**：即時讀取並顯示對應的民國紀年與日期。
-- **PWA 與響應式支援**：支援行動端設備，配備完整的 Web App Manifest 與各種 iOS 啟動圖 (Splash Screens)，提供原生 App 般的沉浸式體驗。
-- **豐富的歷史文獻**：內建國父遺囑、生平事蹟介紹、以及相關的紀念與歷史文章。
+## Features
 
-## 🛠️ 技術棧
+- **Ritual interaction** — Ceremony prompt guiding visitors to bow before the presidential portrait, with sequential music playback tied to the interaction.
+- **Contextual audio** — Background music automatically switches based on the current date or active memorial event page.
+- **Republican calendar** — Displays the current date in the Republic of China (Minguo) era in the navigation bar.
+- **PWA support** — Full Web App Manifest, iOS splash screens, and `apple-touch-icon` for a native-like experience on mobile and desktop.
+- **Historical content** — Includes Sun Yat-sen's last will, biographical timelines, and dedicated memorial event pages with associated music.
+- **Danmaku commentary** — Live bullet-comment overlay backed by Cloudflare Workers KV with rate limiting and backend content filtering.
 
-- **核心技術**：原生 HTML5 / CSS3 / Vanilla JavaScript
-- **部署配置**：提供 `docker-compose.yml` 結合 Nginx 進行快速容器化部署。
+## Tech Stack
 
-## 📂 專案目錄結構
+| Layer | Technology |
+|---|---|
+| Frontend | HTML5 / Vanilla CSS3 / Vanilla JavaScript |
+| Backend | Cloudflare Workers + KV |
+| Deployment | Docker + Nginx |
 
-```text
-📦 sys-memorial
- ┣ 📂 html                     # 前端靜態頁面根目錄
- ┃ ┣ 📜 index.html             # 專案首頁
- ┃ ┣ 📂 api                    # API 變數設定檔
- ┃ ┣ 📂 archive                # 靜態字體與歷史資源
- ┃ ┣ 📂 events                 # 節日與紀念日專屬介紹頁面
- ┃ ┣ 📂 main                   # 核心邏輯 (JS)、樣式 (CSS) 與主視覺
- ┃ ┣ 📂 pages                  # 附屬頁面 (生平/公告/關於/鳴謝)
- ┃ ┗ 📂 webapp                 # PWA 應用設定與 iOS 原生適配啟動圖
- ┣ 📜 docker-compose.yml       # Docker 快速部署配置
- ┣ 📜 LICENSE                  # 授權聲明 (MIT)
- ┣ 📜 README.md                # 專案說明文件
- ┗ 📜 workers.js               # Cloudflare Workers 後端伺服器代碼
+## Directory Structure
+
+```
+sys-memorial/
+├── html/
+│   ├── index.html              # Application entry point
+│   ├── api/                    # Runtime environment configuration (env.js)
+│   ├── archive/                # Assets not in active use
+│   ├── events/                 # Memorial event pages
+│   │   ├── whampoa/            # Whampoa Military Academy founding anniversary
+│   │   ├── militaries/         # Victory of the War of Resistance anniversary
+│   │   └── yatsen/             # Sun Yat-sen birth / death anniversaries
+│   ├── main/                   # Core stylesheet, scripts, and primary assets
+│   │   ├── style.css
+│   │   ├── script.js
+│   │   ├── portrait.jpg
+│   │   ├── anthem/             # Default music and album cover
+│   │   └── favicon/            # SVG and ICO favicons
+│   ├── pages/                  # Secondary pages
+│   │   ├── announcement/       # Site status and memorial announcements
+│   │   ├── biography/          # Sun Yat-sen biographical timeline
+│   │   ├── about/              # About and legal statement
+│   │   └── thanks/             # Credits
+│   └── webapp/                 # PWA manifest, icons, and iOS splash screens
+├── docker-compose.yml
+├── workers.js                  # Cloudflare Worker source
+└── README.md
 ```
 
-## 🚀 快速啟動 (Docker)
+## Deployment
 
-本專案支援使用 Docker 與 Nginx 快速部署。
+### Docker (Nginx)
 
 ```bash
-# 確保你已安裝 Docker 與 docker-compose
 docker-compose up -d
 ```
 
-部署後，Nginx 將會以唯讀模式掛載 `./html` 目錄並對外提供靜態網頁服務。
+The compose file mounts `./html` as a read-only volume served by Nginx.
 
-## ☁️ 後端與資料庫 (Cloudflare Workers)
+### Cloudflare Worker
 
-本專案的「參典人數統計」與「留言彈幕系統」依賴 Cloudflare Workers 與 KV 進行後端處理。
-我們在專案根目錄提供了 `workers.js` 作為後端部署的原始碼。
+1. Create a new Worker in the Cloudflare dashboard.
+2. Bind a KV namespace with the binding name `MEMORIAL_KV`.
+3. Deploy `workers.js` to the Worker.
+4. Copy `html/api/env.example.js` to `html/api/env.js` and set `WORKER_API` to your Worker URL.
 
-**部署步驟：**
-1. 登入 Cloudflare 後台，建立一個新的 Worker。
-2. 為該 Worker 綁定一個 KV 命名空間，且變數名稱**必須**設定為 `MEMORIAL_KV`。
-3. 將 `workers.js` 內的程式碼全選複製，貼上並覆蓋 Worker 編輯器內的預設程式碼，然後發布。
-4. 將您的 Worker 網址（如 `https://your-worker-api.workers.dev`）填入 `html/env.js`（可參考 `env.example.js`）中的 `WORKER_API` 變數。
+## Licensing
 
-## 📜 授權聲明
+This project uses a dual-license model:
 
-本專案採用**雙軌制**授權：
-1. **程式碼部分**：基於 [MIT License](LICENSE) 開源，歡迎自由學習、修改與分享。
-2. **視聽素材部分**：專案內的音樂、遺像等視聽素材版權歸原權利人所有，嚴禁未經授權挪用作商業營利或不當用途。詳細規範請參閱專案內的 [關於與聲明 (繁體)](html/pages/about/about_cn.md) / [关于与声明 (简体)](html/pages/about/about_cp.md) 文件。
+- **Source code** — Released under the [MIT License](LICENSE).
+- **Audiovisual assets** — Music, portraits, and other media remain the property of their respective rights holders. Unauthorized commercial or inappropriate use is strictly prohibited. See [html/pages/about/about_tc.md](html/pages/about/about_tc.md) for the full statement (Traditional Chinese) or [html/pages/about/about_sc.md](html/pages/about/about_sc.md) (Simplified Chinese).
 
 ---
+
 *「革命尚未成功，同志仍須努力。」*

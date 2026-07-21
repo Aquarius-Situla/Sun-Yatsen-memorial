@@ -1,3 +1,10 @@
+<!-- ==========================================================================
+ * COMMENTING STANDARDS
+ * 1. Block comments only. Use HTML comments for DOM and /* */ for inline scripts.
+ * 2. Section dividers use the === banner format.
+ * 3. All prose is written in English.
+ * 4. No debugging notes or temporary workarounds in committed code.
+ ========================================================================== -->
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -13,7 +20,7 @@
     
     <link rel="stylesheet" href="main/style.css?v=1076">
 
-    <!-- 系統深淺色 theme-color -->
+    <!-- System Dark/Light theme-color -->
     <meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)">
     <meta name="theme-color" content="#f5f0e8" media="(prefers-color-scheme: light)">
 
@@ -23,7 +30,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="國父紀念堂">
     
-    <!-- iOS 啟動圖 (統一中性淺灰色背景) -->
+    <!-- iOS Splash Screens (Unified Neutral Light Gray Background) -->
     <link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1290x2796.png">
     <link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1179x2556.png">
     <link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1284x2778.png">
@@ -35,7 +42,7 @@
     <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="webapp/splash/splash-750x1334.png">
 
     <script>
-        // 動態預加載當前設備對應的 iOS 啟動圖，防止添加到主畫面時動畫丟失
+        /* Dynamically preload the iOS splash screen for the current device to prevent animation loss when added to the home screen */
         (function() {
             var links = document.querySelectorAll('link[rel="apple-touch-startup-image"]');
             for (var i = 0; i < links.length; i++) {

@@ -1,3 +1,10 @@
+﻿<!-- ==========================================================================
+ * COMMENTING STANDARDS
+ * 1. Block comments only. Use HTML comments for DOM and /* */ for inline scripts.
+ * 2. Section dividers use the === banner format.
+ * 3. All prose is written in English.
+ * 4. No debugging notes or temporary workarounds in committed code.
+ ========================================================================== -->
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -10,7 +17,7 @@
     <link rel="alternate icon" href="../../main/favicon/favicon.ico" type="image/x-icon" sizes="any">
 
     <link rel="preload" href="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js" as="script" crossorigin="anonymous">
-    <link rel="preload" href="./yat-sen_cn.md" as="fetch" crossorigin="anonymous">
+    <link rel="preload" href="./yatsen_tc.md" as="fetch" crossorigin="anonymous">
 
     <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"></script>
 
@@ -255,7 +262,7 @@
     </div>
 
     <div class="markdown-container">
-        <zero-md id="md-viewer" src="./yat-sen_cn.md">
+        <zero-md id="md-viewer" src="./yatsen_tc.md">
             <template>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css">
                 <style>
@@ -317,12 +324,12 @@
 
         const texts = {
             death: {
-                tc: { btn: '切换至简化字', title: '國父逝世紀念日', date: '民國十四年（1925年）三月十二日', tabDeath: '逝世紀念日（3月12日）', tabBirth: '誕辰紀念日（11月12日）', src: './yat-sen_cn.md' },
-                sc: { btn: '切換至正體字', title: '国父逝世纪念日', date: '民国十四年（1925年）三月十二日', tabDeath: '逝世纪念日（3月12日）', tabBirth: '诞辰纪念日（11月12日）', src: './yat-sen_cp.md' }
+                tc: { btn: '切换至简化字', title: '國父逝世紀念日', date: '民國十四年（1925年）三月十二日', tabDeath: '逝世紀念日（3月12日）', tabBirth: '誕辰紀念日（11月12日）', src: './yatsen_tc.md' },
+                sc: { btn: '切換至正體字', title: '国父逝世纪念日', date: '民国十四年（1925年）三月十二日', tabDeath: '逝世纪念日（3月12日）', tabBirth: '诞辰纪念日（11月12日）', src: './yatsen_sc.md' }
             },
             birth: {
-                tc: { btn: '切换至简化字', title: '國父誕辰紀念日', date: '民國前四十五年（1866年）十一月十二日', tabDeath: '逝世紀念日（3月12日）', tabBirth: '誕辰紀念日（11月12日）', src: './yat-sen_cn.md' },
-                sc: { btn: '切換至正體字', title: '国父诞辰纪念日', date: '民国前四十五年（1866年）十一月十二日', tabDeath: '逝世纪念日（3月12日）', tabBirth: '诞辰纪念日（11月12日）', src: './yat-sen_cp.md' }
+                tc: { btn: '切换至简化字', title: '國父誕辰紀念日', date: '民國前四十五年（1866年）十一月十二日', tabDeath: '逝世紀念日（3月12日）', tabBirth: '誕辰紀念日（11月12日）', src: './yatsen_tc.md' },
+                sc: { btn: '切換至正體字', title: '国父诞辰纪念日', date: '民国前四十五年（1866年）十一月十二日', tabDeath: '逝世纪念日（3月12日）', tabBirth: '诞辰纪念日（11月12日）', src: './yatsen_sc.md' }
             }
         };
 

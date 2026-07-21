@@ -1,260 +1,748 @@
-@charset "UTF-8";/* ========================================================================== /
-/ 全局排版與鎖定一屏流 /
-/ ========================================================================== */html,body {width: 100%;height: 100%;height: 100vh;height: 100dvh;position: fixed;top: 0;left: 0;margin: 0;padding: 0;background-color: #111111;overflow: hidden;}body {color: #ffffff;font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;display: flex;flex-direction: column;justify-content: flex-start;align-items: center;box-sizing: border-box;position: relative;padding: max(60px, 8vh) 20px calc(75px + env(safe-area-inset-bottom, 0px)) 20px;padding: max(60px, 8dvh) 20px calc(75px + env(safe-area-inset-bottom, 0px)) 20px;}*,*:before,*:after {box-sizing: inherit;}.container {display: flex;flex-direction: column;align-items: center;justify-content: center;width: 100%;max-width: 500px;margin: auto 0;perspective: 1000px;}/* ========================================================================== /
-/ 畫框與遺像 (防抖動核心優化) /
-/ ========================================================================== */.frame-container {cursor: none;width: fit-content;display: flex;justify-content: center;align-items: center;margin: 0 auto 17px auto;transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);/* 啟用 3D 加速並預告變換，減少外層抖動 */
-transform: scale(0.9816) translateZ(0);
-will-change: transform;
--webkit-backface-visibility: hidden;
-backface-visibility: hidden;
+@charset "UTF-8";
 
-transform-origin: center center;
--webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
--webkit-tap-highlight-color: transparent !important;
-}@media (hover: hover) and (pointer: fine) {.frame-container:hover {/* 保持 translateZ(0) */transform: scale(1) translateZ(0);}}.wood-frame {display: inline-block;line-height: 0;box-sizing: border-box;border-radius: 4px;position: relative;padding: clamp(10px, 3.5vw, 20px);background:repeating-linear-gradient(90deg,rgba(40, 18, 9, 0.06) 0px,rgba(40, 18, 9, 0.06) 3px,rgba(70, 35, 18, 0.04) 3px,rgba(70, 35, 18, 0.04) 6px),linear-gradient(135deg, #2d140a 0%, #3f1f11 50%, #200e05 100%);background-blend-mode: multiply;border: clamp(2px, 0.8vw, 4px) solid #1a0a03;box-shadow:0 clamp(10px, 3vw, 20px) clamp(20px, 6vw, 45px) rgba(0, 0, 0, 0.9),inset 0 0 0 clamp(1px, 0.5vw, 2px) #4d2615,inset 0 0 0 clamp(2px, 0.6vw, 3px) #150802,inset var(--sh-x, 8px) var(--sh-y, 8px) clamp(15px, 4vw, 25px) rgba(0, 0, 0, var(--sh-alpha, 0.65)),inset var(--hl-x, -6px) var(--hl-y, -6px) clamp(15px, 4vw, 25px) rgba(255, 255, 255, var(--hl-alpha, 0.04)),inset 0 0 clamp(8px, 2.5vw, 15px) rgba(0, 0, 0, 0.85);/* 給內部畫框也加上防抖，防止邊框渲染抽搐 */
-transform: translateZ(0);
--webkit-backface-visibility: hidden;
-backface-visibility: hidden;
-transform-style: preserve-3d;
-transition: transform 0.1s ease-out;
-}.wood-frame img {box-sizing: border-box;display: block;padding: 1px;background-color: #9c7210;border: 2px solid #150802;box-shadow: 0 3px 10px rgba(0, 0, 0, 0.85);border-radius: 1px;/* 防抖 */
--webkit-backface-visibility: hidden;
-backface-visibility: hidden;
-}.portrait-img {height: min(440px, 38vh) !important;height: min(440px, 38dvh) !important;width: auto !important;aspect-ratio: 320 / 440;object-fit: cover;border: 4px solid #140a05;box-shadow: 0 0 15px rgba(0,0,0,0.6);image-rendering: -webkit-optimize-contrast;image-rendering: high-quality;/* 給圖片自身加上最嚴格的防抖 */
-transform: translateZ(0);
-will-change: transform;
--webkit-backface-visibility: hidden;
-backface-visibility: hidden;
-}/* ========================================================================== /
-/ 計數器與遺囑 /
-/ ========================================================================== */.attendance-box {margin: 0 auto 25px auto;font-family: "BiauKai", "Kaiti TC", "Kaiti SC", "標楷體", "KaiTi", "DFKai-SB", serif !important;background: rgba(35, 16, 7, 0.4);padding: 5px 18px;border-radius: 20px;border: 1px solid rgba(138, 100, 15, 0.4);text-align: center;}.attendance-label {color: #aaaaaa;font-size: 0.95rem;}.attendance-count {color: #f1c40f;font-size: 1.25rem;font-weight: bold;margin: 0 3px;}.attendance-unit {color: #aaaaaa;font-size: 0.95rem;}.testament-box {margin-top: 15px;width: 100%;position: relative;}.testament-text {writing-mode: vertical-rl;text-orient: mixed;font-family: "BiauKai", "Kaiti TC", "Kaiti SC", "標楷體", "KaiTi", "DFKai-SB", serif !important;height: min(340px, 35vh);height: min(340px, 35dvh);font-size: clamp(0.9rem, 2.2vh, 1.15rem);font-size: clamp(0.9rem, 2.2dvh, 1.15rem);text-align: start;word-break: break-all;color: #dcdee0;line-height: 1.8;letter-spacing: 4px;padding: 0 15px;border-left: 1px rgba(255, 255, 255, 0.18) dashed;border-right: 1px rgba(255, 255, 255, 0.18) dashed;position: relative;width: max-content !important;left: 50%;transform: translateX(-50%);transition: all 0.3s ease;}/* 桌面端適配 */@media (min-width: 1025px) {.testament-text {height: min(280px, 30vh) !important;height: min(280px, 30dvh) !important;font-size: clamp(14px, 2.5vh, 18px) !important;line-height: 2.1 !important;letter-spacing: 6px !important;padding: 0 40px !important;margin-bottom: 10px !important;}}/* ========================================================================== /
-/ 通知橫幅與導航 /
-/ ========================================================================== */.memorial-banner,.status-banner {position: fixed;top: 0;left: 0;width: 100%;background-color: #231007;color: #f1c40f;border-bottom: 2px solid #8a640f;padding: 14px 0;text-align: center;font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif !important;font-size: 1.05rem;font-weight: bold;letter-spacing: 5px;box-shadow: 0 4px 15px rgba(0,0,0,0.6);transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;}.memorial-banner {z-index: 10000;transform: translateY(0);opacity: 1;}.memorial-banner.hidden {transform: translateY(-100%);opacity: 0;}.status-banner {z-index: 10005;pointer-events: none;transform: translateY(-100%);opacity: 0;}.status-banner.show {transform: translateY(0);opacity: 1;}.top-hover-trigger {position: fixed;top: 0;left: 0;width: 100%;height: 15px;z-index: 20000;}.dropdown-nav-bar {position: absolute;top: 0;left: 0;width: 100%;background: linear-gradient(to bottom, #1c0e07, #110804);border-bottom: 2px solid #b8860b;padding: 12px 30px;display: flex;justify-content: space-between;align-items: center;box-sizing: border-box;box-shadow: 0 5px 25px rgba(0,0,0,0.9);transform: translateY(-100%);transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);}.nav-festival-banner {position: absolute;left: 50%;transform: translateX(-50%);color: #f1c40f;font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;font-weight: bold;font-size: clamp(12px, 3vw, 15px);text-align: center;letter-spacing: 2px;margin: 0;white-space: nowrap;text-shadow: 0 0 8px rgba(241, 196, 15, 0.4);pointer-events: none;}.nav-festival-banner:empty {display: none !important;}
+/* ============================================================================
+ * Private Sun Yat-sen Memorial Hall — Main Stylesheet (style.css)
+ * ============================================================================
+ * COMMENTING STANDARDS
+ * 1. Block comments only. Inline comments (//) are strictly prohibited.
+ * 2. Section dividers use the === banner format shown above.
+ * 3. All prose is written in English.
+ * 4. No debugging notes, temporary workarounds, or console output in
+ *    committed code.
+ * 5. Tailwind Migration Preparation: utility-mappable rules should be annotated
+ *    with `@tw:` followed by the suggested Tailwind class equivalents to aid
+ *    future migration.
+ * ============================================================================
+ */
+
+/* ============================================================================
+ * Global Layout & Viewport Lock
+ * ============================================================================
+ * Locks the viewport height to prevent scrolling, ensuring immersion.
+ * @tw: fixed inset-0 w-full h-full h-screen h-dvh bg-[#111111] overflow-hidden
+ * ============================================================================ */
+html,
+body {
+    width: 100%;
+    height: 100%;
+    height: 100vh;
+    height: 100dvh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    background-color: #111111;
+    overflow: hidden;
+}
+
+/* ============================================================================
+ * Typography & Flexbox Foundation
+ * ============================================================================
+ * Defines global font families catering to native OS preferences.
+ * @tw: text-white flex flex-col justify-start items-center box-border
+ * ============================================================================ */
+body {
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    box-sizing: border-box;
+    position: relative;
+    padding: max(60px, 8vh) 20px calc(75px + env(safe-area-inset-bottom, 0px)) 20px;
+    padding: max(60px, 8dvh) 20px calc(75px + env(safe-area-inset-bottom, 0px)) 20px;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+
+/* ============================================================================
+ * Main Container
+ * ============================================================================
+ * Caps maximum width and initializes the 3D perspective context.
+ * @tw: flex flex-col items-center justify-center w-full max-w-[500px] my-auto
+ * ============================================================================ */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 500px;
+    margin: auto 0;
+    perspective: 1000px;
+}
+
+/* ============================================================================
+ * Portrait Frame Module
+ * ============================================================================
+ * Embeds anti-jitter 3D transformations for fluid hardware acceleration.
+ * @tw: cursor-none w-fit flex justify-center items-center mx-auto mb-[17px]
+ * ============================================================================ */
+.frame-container {
+    cursor: none;
+    width: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 17px auto;
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    /* HW acceleration forcing and subtle scaling to hide border aliasing */
+    transform: scale(0.9816) translateZ(0);
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform-origin: center center;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .frame-container:hover {
+        /* Maintains translateZ(0) across transforms */
+        transform: scale(1) translateZ(0);
+    }
+}
+
+/* ============================================================================
+ * Wood Frame Material
+ * ============================================================================
+ * Composes complex linear gradients and shadows to simulate a lit wooden frame.
+ * @tw: inline-block relative rounded-[4px]
+ * ============================================================================ */
+.wood-frame {
+    display: inline-block;
+    line-height: 0;
+    box-sizing: border-box;
+    border-radius: 4px;
+    position: relative;
+    padding: clamp(10px, 3.5vw, 20px);
+    background: repeating-linear-gradient(90deg,
+            rgba(40, 18, 9, 0.06) 0px,
+            rgba(40, 18, 9, 0.06) 3px,
+            rgba(70, 35, 18, 0.04) 3px,
+            rgba(70, 35, 18, 0.04) 6px),
+        linear-gradient(135deg, #2d140a 0%, #3f1f11 50%, #200e05 100%);
+    background-blend-mode: multiply;
+    border: clamp(2px, 0.8vw, 4px) solid #1a0a03;
+    box-shadow: 0 clamp(10px, 3vw, 20px) clamp(20px, 6vw, 45px) rgba(0, 0, 0, 0.9),
+        inset 0 0 0 clamp(1px, 0.5vw, 2px) #4d2615,
+        inset 0 0 0 clamp(2px, 0.6vw, 3px) #150802,
+        inset var(--sh-x, 8px) var(--sh-y, 8px) clamp(15px, 4vw, 25px) rgba(0, 0, 0, var(--sh-alpha, 0.65)),
+        inset var(--hl-x, -6px) var(--hl-y, -6px) clamp(15px, 4vw, 25px) rgba(255, 255, 255, var(--hl-alpha, 0.04)),
+        inset 0 0 clamp(8px, 2.5vw, 15px) rgba(0, 0, 0, 0.85);
+    /* Prevents render glitching during transitions */
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    transition: transform 0.1s ease-out;
+}
+
+/* ============================================================================
+ * Portrait Inner Frame
+ * ============================================================================
+ * @tw: box-border block p-[1px] bg-[#9c7210] border-2 border-[#150802] rounded-[1px] shadow-[0_3px_10px_rgba(0,0,0,0.85)]
+ * ============================================================================ */
+.wood-frame img {
+    box-sizing: border-box;
+    display: block;
+    padding: 1px;
+    background-color: #9c7210;
+    border: 2px solid #150802;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.85);
+    border-radius: 1px;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+/* ============================================================================
+ * Portrait Image
+ * ============================================================================
+ * @tw: w-auto object-cover border-4 border-[#140a05] shadow-[0_0_15px_rgba(0,0,0,0.6)]
+ * ============================================================================ */
+.portrait-img {
+    height: min(440px, 38vh) !important;
+    height: min(440px, 38dvh) !important;
+    width: auto !important;
+    aspect-ratio: 320 / 440;
+    object-fit: cover;
+    border: 4px solid #140a05;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: high-quality;
+    /* Strict hardware acceleration */
+    transform: translateZ(0);
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+/* ============================================================================
+ * Attendance Counter
+ * ============================================================================
+ * @tw: mx-auto mb-[25px] bg-[rgba(35,16,7,0.4)] px-[18px] py-[5px] rounded-[20px] border border-[rgba(138,100,15,0.4)] text-center
+ * ============================================================================ */
+.attendance-box {
+    margin: 0 auto 25px auto;
+    font-family: "BiauKai", "Kaiti TC", "Kaiti SC", "標楷體", "KaiTi", "DFKai-SB", serif !important;
+    background: rgba(35, 16, 7, 0.4);
+    padding: 5px 18px;
+    border-radius: 20px;
+    border: 1px solid rgba(138, 100, 15, 0.4);
+    text-align: center;
+}
+
+.attendance-label {
+    color: #aaaaaa;
+    font-size: 0.95rem;
+}
+
+.attendance-count {
+    color: #f1c40f;
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin: 0 3px;
+}
+
+.attendance-unit {
+    color: #aaaaaa;
+    font-size: 0.95rem;
+}
+
+/* ============================================================================
+ * Testament Box
+ * ============================================================================
+ * Uses traditional vertical reading alignment (writing-mode: vertical-rl).
+ * @tw: mt-[15px] w-full relative
+ * ============================================================================ */
+.testament-box {
+    margin-top: 15px;
+    width: 100%;
+    position: relative;
+}
+
+.testament-text {
+    writing-mode: vertical-rl;
+    text-orient: mixed;
+    font-family: "BiauKai", "Kaiti TC", "Kaiti SC", "標楷體", "KaiTi", "DFKai-SB", serif !important;
+    height: min(340px, 35vh);
+    height: min(340px, 35dvh);
+    font-size: clamp(0.9rem, 2.2vh, 1.15rem);
+    font-size: clamp(0.9rem, 2.2dvh, 1.15rem);
+    text-align: start;
+    word-break: break-all;
+    color: #dcdee0;
+    line-height: 1.8;
+    letter-spacing: 4px;
+    padding: 0 15px;
+    border-left: 1px rgba(255, 255, 255, 0.18) dashed;
+    border-right: 1px rgba(255, 255, 255, 0.18) dashed;
+    position: relative;
+    width: max-content !important;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: all 0.3s ease;
+}
+
+/* Desktop spacing adaptations for typography */
+@media (min-width: 1025px) {
+    .testament-text {
+        height: min(280px, 30vh) !important;
+        height: min(280px, 30dvh) !important;
+        font-size: clamp(14px, 2.5vh, 18px) !important;
+        line-height: 2.1 !important;
+        letter-spacing: 6px !important;
+        padding: 0 40px !important;
+        margin-bottom: 10px !important;
+    }
+}
+
+/* ============================================================================
+ * Top Banners & Navigation
+ * ============================================================================
+ * Controls entry and exit animations of notification toasts.
+ * @tw: fixed top-0 left-0 w-full bg-[#231007] text-[#f1c40f] border-b-2 border-[#8a640f] py-[14px] text-center font-bold tracking-[5px] shadow-[0_4px_15px_rgba(0,0,0,0.6)]
+ * ============================================================================ */
+.memorial-banner,
+.status-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #231007;
+    color: #f1c40f;
+    border-bottom: 2px solid #8a640f;
+    padding: 14px 0;
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif !important;
+    font-size: 1.05rem;
+    font-weight: bold;
+    letter-spacing: 5px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+}
+
+.memorial-banner {
+    z-index: 10000;
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.memorial-banner.hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.status-banner {
+    z-index: 10005;
+    pointer-events: none;
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.status-banner.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Top Hover Trigger Area */
+.top-hover-trigger {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 15px;
+    z-index: 20000;
+}
+
+/* Dropdown Navbar */
+.dropdown-nav-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to bottom, #1c0e07, #110804);
+    border-bottom: 2px solid #b8860b;
+    padding: 12px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.9);
+    transform: translateY(-100%);
+    transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Festival Banner Text */
+.nav-festival-banner {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #f1c40f;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;
+    font-weight: bold;
+    font-size: clamp(12px, 3vw, 15px);
+    text-align: center;
+    letter-spacing: 2px;
+    margin: 0;
+    white-space: nowrap;
+    text-shadow: 0 0 8px rgba(241, 196, 15, 0.4);
+    pointer-events: none;
+}
+
+.nav-festival-banner:empty {
+    display: none !important;
+}
+
 .nav-festival-banner[role="link"] {
     pointer-events: auto;
     transition: text-shadow 0.2s ease, letter-spacing 0.2s ease;
     -webkit-tap-highlight-color: transparent;
 }
+
 @media (hover: hover) and (pointer: fine) {
     .nav-festival-banner[role="link"]:hover {
         text-shadow: 0 0 14px rgba(241, 196, 15, 0.85);
         letter-spacing: 3px;
     }
 }
+
 .nav-festival-banner[role="link"]:active {
     text-shadow: 0 0 18px rgba(241, 196, 15, 1);
     opacity: 0.8;
-}@media (min-width: 1025px) {body:not(.banner-active) .top-hover-trigger:hover .dropdown-nav-bar,body:not(.banner-active) .dropdown-nav-bar:hover {transform: translateY(0);}}body.banner-active .dropdown-nav-bar {transform: translateY(-100%) !important;opacity: 0 !important;pointer-events: none !important;}.dropdown-nav-bar.force-show {transform: translateY(0) !important;}.nav-link {color: #f1c40f;text-decoration: none;font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;font-size: 1.02rem;letter-spacing: 1px;transition: color 0.2s;-webkit-tap-highlight-color: transparent;}@media (hover: hover) and (pointer: fine) {.nav-link:hover {color: #ffffff;text-shadow: 0 0 8px rgba(255,255,255,0.6);}}.nav-link:active {color: #ffffff;text-shadow: 0 0 8px rgba(255,255,255,0.6);}#minguo-date-display {color: #cddee0;font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;font-size: 1.02rem;}.mobile-arrow-hint {display: none !important;}.memorial-banner:not(.hidden) ~ .top-hover-trigger .mobile-arrow-hint,.status-banner.show ~ .top-hover-trigger .mobile-arrow-hint {display: none !important;opacity: 0 !important;pointer-events: none !important;}.dropdown-nav-bar.force-show + .mobile-arrow-hint {opacity: 0 !important;pointer-events: none !important;}@keyframes arrowBounce {0%, 100% {transform: translateX(-50%) translateY(0);}50% {transform: translateX(-50%) translateY(3px);}}/* ========================================================================== /
-/ 移動端適配 /
-/ ========================================================================== */@media (max-width: 1024px) {body {padding-top: max(85px, 10vh);padding-top: max(85px, 10dvh);padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px));}.portrait-img {
-    height: min(350px, 29vh) !important;
-    height: min(350px, 29dvh) !important;
 }
 
-.attendance-box {
-    margin: 15px auto 20px auto; 
+@media (min-width: 1025px) {
+
+    body:not(.banner-active) .top-hover-trigger:hover .dropdown-nav-bar,
+    body:not(.banner-active) .dropdown-nav-bar:hover {
+        transform: translateY(0);
+    }
 }
 
-.testament-box {
-    padding: 0 20px !important; 
-    box-sizing: border-box;
-    width: 100%;
-    position: relative;
+body.banner-active .dropdown-nav-bar {
+    transform: translateY(-100%) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
-.testament-text {
-    height: min(330px, 34vh) !important;
-    height: min(330px, 34dvh) !important;
-    font-size: clamp(12px, 3.5vw, 16px) !important;
-    line-height: 1.8 !important;
-    letter-spacing: 4px !important;
-    padding: 0 15px !important; 
-    box-sizing: border-box;
-    width: max-content !important; 
-    left: 50%;
-    transform: translateX(-50%);
+.dropdown-nav-bar.force-show {
+    transform: translateY(0) !important;
 }
 
-.frame-container, 
-.wood-frame, 
-.wood-frame img, 
-.portrait-img {
-    outline: none !important;
-    -webkit-tap-highlight-color: transparent !important;
+/* Navigation Links */
+.nav-link {
+    color: #f1c40f;
+    text-decoration: none;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;
+    font-size: 1.02rem;
+    letter-spacing: 1px;
+    transition: color 0.2s;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.wood-frame img {
-    padding: 1px !important;                 
-    background-color: #9c7210 !important;    
-    border: none !important;    
-    box-shadow: 0 0 0 2px #150802, 0 3px 10px rgba(0, 0, 0, 0.9) !important; 
-    border-radius: 1px !important;
+@media (hover: hover) and (pointer: fine) {
+    .nav-link:hover {
+        color: #ffffff;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    }
 }
 
-.portrait-img {
-    border: 2px solid #111111 !important; 
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.95), 0 0 15px rgba(0,0,0,0.8) !important;
+.nav-link:active {
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
 }
 
-/* ================= 移動端導航欄專屬設定 ================= */
-.dropdown-nav-bar { 
-    padding: 12px 15px; 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* Minguo Date Display */
+#minguo-date-display {
+    color: #cddee0;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;
+    font-size: 1.02rem;
 }
 
-body.has-festival #minguo-date-display {
+/* Mobile Dropdown Arrow */
+.mobile-arrow-hint {
     display: none !important;
 }
 
-.nav-festival-banner {
-    position: relative !important;
-    left: auto !important;
-    transform: none !important;
-    margin: 0 0 0 auto !important;
-    display: flex !important;
-    align-items: center !important;
-    font-size: clamp(11px, 2.8vw, 13px) !important; 
-    white-space: nowrap !important;
-    letter-spacing: 0px !important;
+.memorial-banner:not(.hidden)~.top-hover-trigger .mobile-arrow-hint,
+.status-banner.show~.top-hover-trigger .mobile-arrow-hint {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.dropdown-nav-bar.force-show+.mobile-arrow-hint {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+@keyframes arrowBounce {
+
+    0%,
+    100% {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    50% {
+        transform: translateX(-50%) translateY(3px);
+    }
+}
+
+/* ============================================================================
+ * Mobile Viewport Adjustments
+ * ============================================================================
+ * Dynamically corrects padding and layout sizes on constrained devices.
+ * ============================================================================ */
+@media (max-width: 1024px) {
+    body {
+        padding-top: max(85px, 10vh);
+        padding-top: max(85px, 10dvh);
+        padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .portrait-img {
+        height: min(350px, 29vh) !important;
+        height: min(350px, 29dvh) !important;
+    }
+
+    .attendance-box {
+        margin: 15px auto 20px auto;
+    }
+
+    .testament-box {
+        padding: 0 20px !important;
+        box-sizing: border-box;
+        width: 100%;
+        position: relative;
+    }
+
+    .testament-text {
+        height: min(330px, 34vh) !important;
+        height: min(330px, 34dvh) !important;
+        font-size: clamp(12px, 3.5vw, 16px) !important;
+        line-height: 1.8 !important;
+        letter-spacing: 4px !important;
+        padding: 0 15px !important;
+        box-sizing: border-box;
+        width: max-content !important;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .frame-container,
+    .wood-frame,
+    .wood-frame img,
+    .portrait-img {
+        outline: none !important;
+        -webkit-tap-highlight-color: transparent !important;
+    }
+
+    .wood-frame img {
+        padding: 1px !important;
+        background-color: #9c7210 !important;
+        border: none !important;
+        box-shadow: 0 0 0 2px #150802, 0 3px 10px rgba(0, 0, 0, 0.9) !important;
+        border-radius: 1px !important;
+    }
+
+    .portrait-img {
+        border: 2px solid #111111 !important;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.95), 0 0 15px rgba(0, 0, 0, 0.8) !important;
+    }
+
+    /* Mobile Navbar Formatting */
+    .dropdown-nav-bar {
+        padding: 12px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    body.has-festival #minguo-date-display {
+        display: none !important;
+    }
+
+    .nav-festival-banner {
+        position: relative !important;
+        left: auto !important;
+        transform: none !important;
+        margin: 0 0 0 auto !important;
+        display: flex !important;
+        align-items: center !important;
+        font-size: clamp(11px, 2.8vw, 13px) !important;
+        white-space: nowrap !important;
+        letter-spacing: 0px !important;
+        text-shadow: 0 0 8px rgba(241, 196, 15, 0.4);
+    }
+
+    .nav-link {
+        display: flex !important;
+        align-items: center !important;
+        margin-right: auto !important;
+        font-size: clamp(11px, 2.8vw, 13px) !important;
+        white-space: nowrap !important;
+        letter-spacing: 0px !important;
+    }
+
+    #minguo-date-display {
+        display: flex !important;
+        align-items: center !important;
+        font-size: clamp(11px, 2.8vw, 13px) !important;
+        white-space: nowrap !important;
+        letter-spacing: 0px !important;
+    }
+}
+
+@media (pointer: coarse) {
+    .mobile-arrow-hint {
+        display: block !important;
+        position: absolute !important;
+        top: 25px !important;
+        left: 50% !important;
+        transform: translateX(-50%) translateY(0);
+        width: 26px !important;
+        height: 18px !important;
+        background: rgba(24, 12, 6, 0.85) !important;
+        border: 1px solid rgba(200, 200, 200, 0.18) !important;
+        border-radius: 6px !important;
+        color: rgba(160, 160, 160, 0.6) !important;
+        cursor: pointer !important;
+        z-index: 19000 !important;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4) !important;
+        overflow: hidden !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        transition:
+            opacity 0.4s cubic-bezier(0.215, 0.610, 0.355, 1),
+            transform 0.4s cubic-bezier(0.215, 0.610, 0.355, 1),
+            visibility 0.4s !important;
+        transition-delay: 0.35s !important;
+        animation: arrowBounce 2s infinite;
+    }
+
+    .memorial-banner:not(.hidden)~.top-hover-trigger .mobile-arrow-hint,
+    .status-banner.show~.top-hover-trigger .mobile-arrow-hint,
+    .dropdown-nav-bar.force-show+.mobile-arrow-hint {
+        display: block !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        transform: translateX(-50%) translateY(-40px) !important;
+        transition:
+            opacity 0s,
+            transform 0s,
+            visibility 0s !important;
+        transition-delay: 0s !important;
+    }
+
+    .mobile-arrow-hint svg {
+        width: 11px !important;
+        height: 11px !important;
+        display: block !important;
+        margin: 3px auto 0 auto !important;
+    }
+
+    .frame-container {
+        transform: none !important;
+    }
+}
+
+/* Mini Screens Fallback */
+@media (max-width: 375px) {
+    body {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .testament-text {
+        line-height: 1.4;
+        letter-spacing: 2px;
+    }
+
+    .attendance-box {
+        margin-bottom: 15px;
+        padding: 3px 12px;
+    }
+
+    .nav-link,
+    #minguo-date-display,
+    .nav-festival-banner {
+        font-size: 11px !important;
+    }
+}
+
+/* ============================================================================
+ * Extremely Short Viewport Fallback
+ * ============================================================================
+ * Prevents overlaps on low-resolution landscape screens.
+ * ============================================================================ */
+@media (max-height: 750px) {
+    body {
+        padding-top: max(55px, 6vh);
+        padding-top: max(55px, 6dvh);
+        padding-bottom: calc(45px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .stealth-footer {
+        bottom: calc(15px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .portrait-img {
+        height: min(260px, 26vh) !important;
+        height: min(260px, 26dvh) !important;
+    }
+
+    .attendance-box {
+        margin: 8px auto 15px auto;
+        padding: 4px 16px;
+    }
+
+    .testament-box {
+        margin-top: 5px;
+    }
+
+    .testament-text {
+        height: min(240px, 35vh) !important;
+        height: min(240px, 35dvh) !important;
+        font-size: clamp(11px, 3vw, 13px) !important;
+    }
+}
+
+/* ============================================================================
+ * Stealth Footer
+ * ============================================================================
+ * @tw: fixed bottom-[28px] left-1/2 -translate-x-1/2 flex gap-[15px] items-center z-[10000]
+ * ============================================================================ */
+.stealth-footer {
+    position: fixed;
+    bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: clamp(8px, 2vw, 15px);
+    align-items: center;
+    z-index: 10000;
+}
+
+.stealth-footer a {
+    color: #383838;
+    text-decoration: none;
+    font-size: clamp(10px, 2.5vw, 13px);
+    letter-spacing: 2px;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;
+    transition: color 0.4s ease, text-shadow 0.4s ease;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.stealth-footer span {
+    color: #2a2a2a;
+    font-size: clamp(8px, 2vw, 11px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .stealth-footer a:hover {
+        color: #f1c40f;
+        text-shadow: 0 0 8px rgba(241, 196, 15, 0.4);
+    }
+}
+
+.stealth-footer a:active {
+    color: #f1c40f;
     text-shadow: 0 0 8px rgba(241, 196, 15, 0.4);
 }
 
-.nav-link { 
-    display: flex !important;
-    align-items: center !important;
-    margin-right: auto !important;
-    font-size: clamp(11px, 2.8vw, 13px) !important; 
-    white-space: nowrap !important;
-    letter-spacing: 0px !important;
-}
-
-#minguo-date-display {
-    display: flex !important;
-    align-items: center !important;
-    font-size: clamp(11px, 2.8vw, 13px) !important; 
-    white-space: nowrap !important;
-    letter-spacing: 0px !important;
-}
-/* ======================================================= */
-}
-@media (pointer: coarse) {
-.mobile-arrow-hint {
-    display: block !important;
-    position: absolute !important;
-    top: 25px !important; 
-    left: 50% !important;
-    transform: translateX(-50%) translateY(0);
-    width: 26px !important;     
-    height: 18px !important;    
-    background: rgba(24, 12, 6, 0.85) !important; 
-    border: 1px solid rgba(200, 200, 200, 0.18) !important; 
-    border-radius: 6px !important; 
-    color: rgba(160, 160, 160, 0.6) !important; 
-    cursor: pointer !important;
-    z-index: 19000 !important;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.4) !important;
-    overflow: hidden !important; 
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    transition: 
-        opacity 0.4s cubic-bezier(0.215, 0.610, 0.355, 1),
-        transform 0.4s cubic-bezier(0.215, 0.610, 0.355, 1),
-        visibility 0.4s !important;
-    transition-delay: 0.35s !important; 
-    animation: arrowBounce 2s infinite;
-}
-
-.memorial-banner:not(.hidden) ~ .top-hover-trigger .mobile-arrow-hint,
-.status-banner.show ~ .top-hover-trigger .mobile-arrow-hint,
-.dropdown-nav-bar.force-show + .mobile-arrow-hint {
-    display: block !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    transform: translateX(-50%) translateY(-40px) !important;
-    transition: 
-        opacity 0s,
-        transform 0s,
-        visibility 0s !important;
-    transition-delay: 0s !important; 
-}
-
-.mobile-arrow-hint svg {
-    width: 11px !important;
-    height: 11px !important;
-    display: block !important;
-    margin: 3px auto 0 auto !important; 
-}
-
-.frame-container {
-    transform: none !important;
-}        
-}
-/* mini适配 */@media (max-width: 375px) {body {padding-left: 8px;padding-right: 8px;}.testament-text { 
-    line-height: 1.4; 
-    letter-spacing: 2px; 
-}
-
-.attendance-box { 
-    margin-bottom: 15px; 
-    padding: 3px 12px; 
-}
-
-.nav-link, 
-#minguo-date-display, 
-.nav-festival-banner { 
-    font-size: 11px !important; 
-}
-}/* ========================================================================== /
-/ 極端短螢幕急救包 /
-/ ========================================================================== */@media (max-height: 750px) {body {padding-top: max(55px, 6vh);padding-top: max(55px, 6dvh);padding-bottom: calc(45px + env(safe-area-inset-bottom, 0px));}.stealth-footer {
-    bottom: calc(15px + env(safe-area-inset-bottom, 0px)); 
-}
-
-.portrait-img {
-    height: min(260px, 26vh) !important;
-    height: min(260px, 26dvh) !important;
-}
-
-.attendance-box {
-    margin: 8px auto 15px auto;
-    padding: 4px 16px;
-}
-
-.testament-box {
-    margin-top: 5px;
-}
-
-.testament-text {
-    height: min(240px, 35vh) !important; 
-    height: min(240px, 35dvh) !important; 
-    font-size: clamp(11px, 3vw, 13px) !important;
-}
-}/* ========================================================================== /
-/ 底部导航 /
-/ ========================================================================== */.stealth-footer {position: fixed;bottom: calc(28px + env(safe-area-inset-bottom, 0px));left: 50%;transform: translateX(-50%);display: flex;gap: clamp(8px, 2vw, 15px);align-items: center;z-index: 10000;}.stealth-footer a {color: #383838;text-decoration: none;font-size: clamp(10px, 2.5vw, 13px);letter-spacing: 2px;font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;transition: color 0.4s ease, text-shadow 0.4s ease;white-space: nowrap;-webkit-tap-highlight-color: transparent;}.stealth-footer span {color: #2a2a2a;font-size: clamp(8px, 2vw, 11px);}@media (hover: hover) and (pointer: fine) {.stealth-footer a:hover {color: #f1c40f;text-shadow: 0 0 8px rgba(241, 196, 15, 0.4);}}.stealth-footer a:active {color: #f1c40f;text-shadow: 0 0 8px rgba(241, 196, 15, 0.4);}
-
-/* ==========================================================================
- / 陀螺儀動態光照 (Gyroscope Lighting) — 僅觸控設備
- / ========================================================================== */
-
-/* 觸控設備：禁用 CSS transition，讓 JS RAF 完全掌控 transform 動畫 */
-@media (hover: none), (pointer: coarse) {
+/* ============================================================================
+ * Gyroscope Lighting (Touch Devices Only)
+ * ============================================================================
+ * Disables CSS transitions on touch devices allowing requestAnimationFrame
+ * absolute control over transform logic.
+ * ============================================================================ */
+@media (hover: none),
+(pointer: coarse) {
     .wood-frame {
         transition: none;
     }
 }
 
-/* ==========================================================================
- / 淺色模式 (Light Mode) — 跟隨系統自動切換
- / 配色主題：羊皮紙米白 × 深棕 × 沉金，符合歷史紀念館氛圍
- / ========================================================================== */
+/* ============================================================================
+ * Light Mode Overrides (Automatic Switcher)
+ * ============================================================================
+ * Alters the palette to a warmer historical parchment aesthetic for daytime.
+ * @tw: dark:bg-[#111111] bg-[#f5f0e8]
+ * ============================================================================ */
 @media (prefers-color-scheme: light) {
 
-    html, body {
+    html,
+    body {
         background-color: #f5f0e8;
     }
 
@@ -262,22 +750,18 @@ body.has-festival #minguo-date-display {
         color: #2c1810;
     }
 
-    /* 畫框與遺像 — 淺色模式下換成白天感的中性暖木色 */
+    /* Modifies frame casting shadow */
     .frame-container {
-        /* 輕柔的暖棕投影，使畫框自然懸浮於米白背景 */
         filter: drop-shadow(0 10px 22px rgba(80, 45, 10, 0.18));
     }
 
     .wood-frame {
-        /* 深胡桃木色：比原版亮、比上版暗，加強紋理可見度避免塑料感 */
         background:
-            repeating-linear-gradient(
-                90deg,
+            repeating-linear-gradient(90deg,
                 rgba(60, 30, 10, 0.12) 0px,
                 rgba(60, 30, 10, 0.12) 3px,
                 rgba(90, 50, 18, 0.09) 3px,
-                rgba(90, 50, 18, 0.09) 6px
-            ),
+                rgba(90, 50, 18, 0.09) 6px),
             linear-gradient(135deg, #4a2c12 0%, #633c22 50%, #3e2510 100%);
         background-blend-mode: multiply;
         border-color: #321a08;
@@ -290,28 +774,27 @@ body.has-festival #minguo-date-display {
             inset 0 0 clamp(8px, 2.5vw, 15px) rgba(0, 0, 0, 0.4);
     }
 
-    /* 金色墊板邊線配合框色調 */
     .wood-frame img {
         background-color: #b8880e !important;
         border-color: #251408 !important;
         box-shadow: 0 3px 10px rgba(40, 20, 0, 0.5) !important;
     }
 
-    /* 遺像本身：配合暖木框的邊線顏色 */
     .portrait-img {
         border-color: #5a3412 !important;
         box-shadow: 0 0 10px rgba(80, 45, 0, 0.25) !important;
     }
 
-    /* 計數器與遺囑 */
     .attendance-box {
         background: rgba(196, 168, 118, 0.25);
         border-color: rgba(138, 100, 15, 0.35);
     }
+
     .attendance-label,
     .attendance-unit {
         color: #6b4c35;
     }
+
     .attendance-count {
         color: #8a6400;
     }
@@ -322,7 +805,6 @@ body.has-festival #minguo-date-display {
         border-right-color: rgba(100, 70, 30, 0.3);
     }
 
-    /* 通知橫幅 */
     .memorial-banner,
     .status-banner {
         background-color: #e8dcc8;
@@ -331,7 +813,6 @@ body.has-festival #minguo-date-display {
         box-shadow: 0 4px 15px rgba(100, 70, 0, 0.15);
     }
 
-    /* 下拉導航欄 */
     .dropdown-nav-bar {
         background: linear-gradient(to bottom, #ede8dc, #e0d8c8);
         border-bottom-color: #b8860b;
@@ -341,12 +822,14 @@ body.has-festival #minguo-date-display {
     .nav-link {
         color: #7a5200;
     }
+
     @media (hover: hover) and (pointer: fine) {
         .nav-link:hover {
             color: #2c1810;
             text-shadow: 0 0 8px rgba(44, 24, 16, 0.3);
         }
     }
+
     .nav-link:active {
         color: #2c1810;
         text-shadow: 0 0 8px rgba(44, 24, 16, 0.3);
@@ -356,6 +839,7 @@ body.has-festival #minguo-date-display {
         color: #8a6400;
         text-shadow: 0 0 8px rgba(138, 100, 0, 0.3);
     }
+
     .nav-festival-banner[role="link"]:hover {
         text-shadow: 0 0 14px rgba(138, 100, 0, 0.6);
     }
@@ -364,7 +848,6 @@ body.has-festival #minguo-date-display {
         color: #5a3e2a;
     }
 
-    /* 移動端箭頭提示 */
     .mobile-arrow-hint {
         background: rgba(232, 220, 200, 0.9) !important;
         border-color: rgba(100, 70, 30, 0.25) !important;
@@ -372,35 +855,40 @@ body.has-festival #minguo-date-display {
         box-shadow: 0 3px 6px rgba(80, 50, 10, 0.2) !important;
     }
 
-    /* 底部導航 */
     .stealth-footer a {
         color: #c8b898;
     }
+
     .stealth-footer span {
         color: #d4c4a0;
     }
+
     @media (hover: hover) and (pointer: fine) {
         .stealth-footer a:hover {
             color: #8a6400;
             text-shadow: 0 0 8px rgba(138, 100, 0, 0.3);
         }
     }
+
     .stealth-footer a:active {
         color: #8a6400;
         text-shadow: 0 0 8px rgba(138, 100, 0, 0.3);
     }
 }
 
-/* ==========================================================================
- / 彈幕系統 (Danmaku)
- / ========================================================================== */
+/* ============================================================================
+ * Danmaku Rendering Layer
+ * ============================================================================
+ * Penetrative overlay strictly for animation frames.
+ * @tw: fixed inset-0 w-full h-full pointer-events-none z-[9000] overflow-hidden
+ * ============================================================================ */
 #danmaku-container {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    pointer-events: none; /* 重要：讓滑鼠點擊穿透彈幕層 */
+    pointer-events: none;
     z-index: 9000;
     overflow: hidden;
 }
@@ -411,12 +899,12 @@ body.has-festival #minguo-date-display {
     font-size: clamp(16px, 4vw, 24px);
     font-weight: bold;
     color: #ffffff;
-    text-shadow: 
+    text-shadow:
         -1px -1px 0 #000,
         1px -1px 0 #000,
         -1px 1px 0 #000,
         1px 1px 0 #000,
-        0px 2px 4px rgba(0,0,0,0.8);
+        0px 2px 4px rgba(0, 0, 0, 0.8);
     animation: danmaku-slide linear forwards;
     will-change: transform;
 }
@@ -430,22 +918,24 @@ body.has-festival #minguo-date-display {
     }
 }
 
-/* ==========================================================================
- / 留言板 (iOS 18 App Store Bottom Sheet Style)
- / ========================================================================== */
+/* ============================================================================
+ * Bottom Sheet Modal (iOS App Store Style)
+ * ============================================================================
+ * Overridden for desktop views subsequently.
+ * ============================================================================ */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0); /* Start transparent for smooth fade */
+    background-color: rgba(0, 0, 0, 0);
     display: flex;
     justify-content: center;
-    align-items: flex-end; /* Align to bottom for bottom sheet on mobile */
+    align-items: flex-end;
     z-index: 30000;
     opacity: 0;
-    visibility: hidden; /* Prevent blocking clicks when hidden */
+    visibility: hidden;
     pointer-events: none;
     transition: opacity 0.4s cubic-bezier(0.32, 0.72, 0, 1), background-color 0.4s cubic-bezier(0.32, 0.72, 0, 1), visibility 0.4s cubic-bezier(0.32, 0.72, 0, 1);
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "PingFang TC", "Hiragino Sans GB", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -458,13 +948,13 @@ body.has-festival #minguo-date-display {
     pointer-events: auto;
 }
 
-/* The Sheet itself */
+/* The Sheet Container */
 .modal-sheet {
     position: relative;
     background: #f2f2f7;
     width: 100%;
     max-width: 500px;
-    border-radius: 14px 14px 0 0; /* Smaller top corners, like App Store */
+    border-radius: 14px 14px 0 0;
     padding: 20px 16px calc(32px + env(safe-area-inset-bottom, 16px)) 16px;
     box-sizing: border-box;
     transform: translateY(100%);
@@ -478,12 +968,12 @@ body.has-festival #minguo-date-display {
 
 @media (prefers-color-scheme: dark) {
     .modal-sheet {
-        background: #2c2c2e; /* iOS dark system gray */
+        background: #2c2c2e;
         box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
     }
 }
 
-/* Header */
+/* Modal Header Layout */
 .sheet-header {
     display: flex;
     justify-content: space-between;
@@ -524,12 +1014,12 @@ body.has-festival #minguo-date-display {
     background: rgba(142, 142, 147, 0.3);
 }
 
-/* Content Area — white card like App Store */
+/* Input Area Restyling */
 .sheet-content {
     background: #ffffff;
     border-radius: 14px;
     padding: 0;
-    margin-bottom: 28px; /* Wider gap between white card and button, like App Store */
+    margin-bottom: 28px;
     box-shadow: none;
     overflow: hidden;
 }
@@ -543,7 +1033,7 @@ body.has-festival #minguo-date-display {
 .ios-textarea {
     width: 100%;
     height: 90px;
-    background: transparent; /* Transparent — card provides white bg */
+    background: transparent;
     border: none;
     border-radius: 0;
     padding: 14px 16px;
@@ -564,7 +1054,7 @@ body.has-festival #minguo-date-display {
     }
 }
 
-/* Submit Button */
+/* Footer & Buttons */
 .sheet-footer {
     display: flex;
     justify-content: center;
@@ -572,12 +1062,12 @@ body.has-festival #minguo-date-display {
 }
 
 .ios-submit-btn {
-    width: 110px;   /* Compact pill matching App Store "安裝" button */
-    height: 34px;   /* Native compact iOS button height */
-    background: #007AFF; /* iOS system blue */
+    width: 110px;
+    height: 34px;
+    background: #007AFF;
     color: #fff;
     border: none;
-    border-radius: 17px; /* Exactly height/2 = mathematically perfect pill */
+    border-radius: 17px;
     font-size: 0.9rem;
     font-weight: 600;
     line-height: 1;
@@ -590,8 +1080,11 @@ body.has-festival #minguo-date-display {
     align-items: center;
 }
 
-.macos-cancel-btn, .macos-help-btn, .macos-popover {
-    display: none; /* Hidden on mobile */
+/* Hide desktop-exclusive elements on mobile */
+.macos-cancel-btn,
+.macos-help-btn,
+.macos-popover {
+    display: none;
 }
 
 .ios-submit-btn:hover {
@@ -603,7 +1096,11 @@ body.has-festival #minguo-date-display {
     cursor: not-allowed;
 }
 
-/* Cloudflare Style Bottom Toast */
+/* ============================================================================
+ * Cloudflare Notification Toast (Global Overrides)
+ * ============================================================================
+ * @tw: fixed bottom-[-100px] left-1/2 -translate-x-1/2 px-6 py-3 rounded-lg z-[99999] shadow-lg
+ * ============================================================================ */
 .cloudflare-toast {
     position: fixed;
     bottom: -100px;
@@ -615,7 +1112,7 @@ body.has-festival #minguo-date-display {
     font-weight: 500;
     z-index: 99999;
     transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -647,63 +1144,49 @@ body.has-festival #minguo-date-display {
     background-color: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    color: #a67c00; /* Dark gold to adapt to light background, matches banner hue */
-    border: 1px solid rgba(0,0,0,0.1);
+    color: #a67c00;
+    border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
     .cloudflare-toast.system {
         background-color: rgba(40, 40, 40, 0.95);
-        color: #b3b3b3; /* Legible gray instead of glaring gold */
-        border: 1px solid rgba(255,255,255,0.1);
+        color: #b3b3b3;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 }
 
-@media (prefers-color-scheme: dark) {
-    .cloudflare-toast.success {
-        background-color: #2ecc71;
-        color: #fff;
-    }
-    .cloudflare-toast.error {
-        background-color: #e74c3c;
-        color: #fff;
-    }
-    .cloudflare-toast.info {
-        background-color: #3498db;
-        color: #fff;
-    }
-}
-
-/* ==========================================================================
- / macOS Desktop Alert Styles (overrides mobile iOS sheet on desktop)
- / ========================================================================== */
+/* ============================================================================
+ * macOS Desktop Alert Styles
+ * ============================================================================
+ * Alters the layout for wider screens to match macOS native dialogues.
+ * ============================================================================ */
 @media (min-width: 600px) {
     .modal-overlay {
-        align-items: center; /* Center vertically */
-        background-color: rgba(0, 0, 0, 0); /* Start transparent */
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0);
     }
 
     .modal-overlay.active {
-        background-color: rgba(0, 0, 0, 0.2); /* Lighter backdrop for macOS */
+        background-color: rgba(0, 0, 0, 0.2);
     }
 
     .modal-sheet {
-        width: clamp(300px, 40vw, 420px); /* Responsive and more spacious */
+        width: clamp(300px, 40vw, 420px);
         border-radius: 16px;
         padding: 24px;
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        box-shadow: 0 10px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
-        transform: scale(0.9); /* Start smaller */
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+        transform: scale(0.9);
         transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
     }
 
     .modal-overlay.active .modal-sheet {
-        transform: scale(1); /* Pop in */
+        transform: scale(1);
     }
 
-    /* macOS Header layout */
     .sheet-header {
         justify-content: center;
         margin-bottom: 16px;
@@ -714,18 +1197,18 @@ body.has-festival #minguo-date-display {
         font-weight: 700;
     }
 
-    /* Hide the top-right close button on desktop since we have a cancel button */
+    /* Replace the header close button with the footer cancel button on desktop */
     .sheet-close-btn {
         display: none;
     }
 
-    /* macOS help (?) button */
+    /* macOS (?) helper */
     .macos-help-btn {
         display: flex;
         position: absolute;
         right: 12px;
         top: 12px;
-        background: rgba(0,0,0,0.06);
+        background: rgba(0, 0, 0, 0.06);
         border-radius: 50%;
         width: 22px;
         height: 22px;
@@ -739,14 +1222,14 @@ body.has-festival #minguo-date-display {
         font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "PingFang TC", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
         transition: background 0.2s;
     }
-    
+
     .macos-help-btn:hover {
-        background: rgba(0,0,0,0.1);
+        background: rgba(0, 0, 0, 0.1);
     }
 
-    /* macOS etiquette popover */
+    /* Etiquette helper box */
     .macos-popover {
-        display: block; /* So it exists in DOM, hidden via opacity */
+        display: block;
         position: absolute;
         top: 40px;
         right: 12px;
@@ -754,33 +1237,32 @@ body.has-festival #minguo-date-display {
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(0,0,0,0.1);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
         border-radius: 8px;
         padding: 12px;
         z-index: 100;
         text-align: left;
-        
         opacity: 0;
         visibility: hidden;
         transform: scale(0.95);
         transform-origin: top right;
         transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    
+
     .macos-popover.show {
         opacity: 1;
         visibility: visible;
         transform: scale(1);
     }
-    
+
     .macos-popover h4 {
         margin: 0 0 6px 0;
         font-size: 0.9rem;
         font-weight: 600;
         color: #333;
     }
-    
+
     .macos-popover p {
         margin: 0;
         line-height: 1.5;
@@ -788,11 +1270,11 @@ body.has-festival #minguo-date-display {
         color: #555;
     }
 
-    /* Make text area look like a macOS sunken input field */
+    /* Sunken field emulation */
     .sheet-content {
         background: rgba(0, 0, 0, 0.03);
-        border: 1px solid rgba(0,0,0,0.1);
-        box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
         border-radius: 8px;
         padding: 14px;
         margin-bottom: 24px;
@@ -803,7 +1285,7 @@ body.has-festival #minguo-date-display {
         font-size: 1rem;
     }
 
-    /* macOS dual button footer layout */
+    /* Desktop dual-button mapping */
     .sheet-footer {
         display: flex;
         gap: 12px;
@@ -811,7 +1293,7 @@ body.has-festival #minguo-date-display {
         justify-content: space-between;
     }
 
-    /* macOS secondary/cancel button */
+    /* Secondary Action Button */
     .macos-cancel-btn {
         display: flex;
         flex: 1;
@@ -821,39 +1303,40 @@ body.has-festival #minguo-date-display {
         font-size: 1rem;
         font-weight: 500;
         color: #000;
-        border: 1px solid rgba(0,0,0,0.05);
-        box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
         justify-content: center;
         align-items: center;
         cursor: pointer;
         transition: background 0.2s;
         font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "PingFang TC", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
     }
+
     .macos-cancel-btn:active {
         background: #d4d4d6;
     }
 
-    /* macOS primary button */
+    /* Primary Action Button */
     .ios-submit-btn {
         flex: 1;
         width: auto;
         max-width: none;
         height: 36px;
         background: linear-gradient(180deg, #3782f2 0%, #1562e8 100%);
-        border-radius: 8px; /* standard macOS button radius for thicker buttons */
+        border-radius: 8px;
         font-size: 1rem;
         font-weight: 500;
         color: #fff;
         border: none;
         text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-        box-shadow: 
-            0 1px 1px rgba(0, 0, 0, 0.1), 
-            inset 0 1px 0 rgba(255, 255, 255, 0.25), 
+        box-shadow:
+            0 1px 1px rgba(0, 0, 0, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.25),
             inset 0 0 0 1px rgba(0, 0, 0, 0.1);
         display: flex;
         justify-content: center;
         align-items: center;
-        line-height: normal; /* Reset line-height for desktop */
+        line-height: normal;
     }
 
     .ios-submit-btn:active {
@@ -862,11 +1345,13 @@ body.has-festival #minguo-date-display {
     }
 }
 
-/* Dark mode overrides for macOS desktop */
+/* ============================================================================
+ * macOS Desktop Dark Mode Variants
+ * ============================================================================ */
 @media (min-width: 600px) and (prefers-color-scheme: dark) {
     .modal-sheet {
         background: rgba(40, 40, 40, 0.85);
-        box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.15);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.15);
     }
 
     .sheet-title {
@@ -874,55 +1359,55 @@ body.has-festival #minguo-date-display {
     }
 
     .sheet-close-btn {
-        background: rgba(255,255,255,0.15);
+        background: rgba(255, 255, 255, 0.15);
         color: #ddd;
     }
 
     .sheet-content {
-        background: rgba(0,0,0,0.3);
-        border: 1px solid rgba(255,255,255,0.1);
-        box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
     }
 
     .macos-cancel-btn {
-        background: rgba(255,255,255,0.1);
+        background: rgba(255, 255, 255, 0.1);
         color: #fff;
-        border: 1px solid rgba(255,255,255,0.05);
-        box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
     }
-    
+
     .macos-cancel-btn:active {
-        background: rgba(255,255,255,0.15);
+        background: rgba(255, 255, 255, 0.15);
     }
 
     .macos-help-btn {
-        background: rgba(255,255,255,0.1);
+        background: rgba(255, 255, 255, 0.1);
         color: #ddd;
     }
-    
+
     .macos-help-btn:hover {
-        background: rgba(255,255,255,0.15);
+        background: rgba(255, 255, 255, 0.15);
     }
 
     .macos-popover {
         background: rgba(40, 40, 40, 0.95);
-        border: 1px solid rgba(255,255,255,0.1);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
-    
+
     .macos-popover h4 {
         color: #eee;
     }
-    
+
     .macos-popover p {
         color: #bbb;
     }
 
     .ios-submit-btn {
         background: linear-gradient(180deg, #1b6aec 0%, #0c4ec3 100%);
-        box-shadow: 
-            0 1px 1px rgba(0, 0, 0, 0.2), 
-            inset 0 1px 0 rgba(255, 255, 255, 0.15), 
+        box-shadow:
+            0 1px 1px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15),
             inset 0 0 0 1px rgba(0, 0, 0, 0.2);
     }
 

@@ -1,3 +1,10 @@
+﻿<!-- ==========================================================================
+ * COMMENTING STANDARDS
+ * 1. Block comments only. Use HTML comments for DOM and /* */ for inline scripts.
+ * 2. Section dividers use the === banner format.
+ * 3. All prose is written in English.
+ * 4. No debugging notes or temporary workarounds in committed code.
+ ========================================================================== -->
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -8,14 +15,14 @@
     <link rel="icon" href="../../main/favicon/favicon.svg" type="image/svg+xml">
     
     <link rel="preload" href="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js" as="script" crossorigin="anonymous">
-    <link rel="preload" href="./biography_cn.md" as="fetch" crossorigin="anonymous">
+    <link rel="preload" href="./biography_tc.md" as="fetch" crossorigin="anonymous">
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js" as="script" crossorigin="anonymous">
 
     <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        /* 全局設定 */
+        /* Global Settings */
         html, body {
             background-color: #111111;
             margin: 0;
@@ -63,7 +70,7 @@
             display: block;
         }
 
-        /* 标签页导航 */
+        /* Tab Navigation */
         .tabs-container {
             display: flex;
             gap: 10px;
@@ -116,7 +123,7 @@
             padding-bottom: 10px;
         }
 
-        /* 语言切换 */
+        /* Language Toggle */
         .lang-toggle-btn {
             position: absolute;
             top: 25px;
@@ -135,7 +142,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 返回按钮 */
+        /* Back Button */
         .top-back-btn {
             position: absolute;
             top: 25px;
@@ -205,13 +212,13 @@
             }
         }
 
-        /* 桌面端适配 */
+        /* Desktop Layout Adaptations */
         @media (min-width: 769px) {
             .icon-ios { display: none; }
             .icon-macos { display: block; }
         }
 
-        /* 移动端适配 */
+        /* Mobile Layout Adaptations */
         @media (max-width: 768px) {
             body {
                 padding: 65px 16px 30px 16px; 
@@ -341,7 +348,7 @@
     </div>
 
     <div class="markdown-container active" id="md-section">
-        <zero-md id="md-viewer" src="./biography_cn.md">
+        <zero-md id="md-viewer" src="./biography_tc.md">
             <template>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css">
                 
@@ -613,7 +620,7 @@
                 chartsSection.classList.remove('active', 'loaded');
                 mdSection.classList.add('active');
                 
-                const suffix = isTraditional ? '_cn.md' : '_cp.md';
+                const suffix = isTraditional ? '_tc.md' : '_sc.md';
                 const newSrc = './biography' + suffix;
                 
                 if (mdViewer.getAttribute('src') !== newSrc) {

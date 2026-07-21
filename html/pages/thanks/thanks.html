@@ -1,3 +1,10 @@
+﻿<!-- ==========================================================================
+ * COMMENTING STANDARDS
+ * 1. Block comments only. Use HTML comments for DOM and /* */ for inline scripts.
+ * 2. Section dividers use the === banner format.
+ * 3. All prose is written in English.
+ * 4. No debugging notes or temporary workarounds in committed code.
+ ========================================================================== -->
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -7,12 +14,12 @@
     <link rel="icon" href="../../main/favicon/favicon.svg" type="image/svg+xml">
     
     <link rel="preload" href="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js" as="script" crossorigin="anonymous">
-    <link rel="preload" href="./thanks_cn.md" as="fetch" crossorigin="anonymous">
+    <link rel="preload" href="./thanks_tc.md" as="fetch" crossorigin="anonymous">
 
     <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"></script>
     
     <style>
-        /* 全局設定 */
+        /* Global Settings */
         html, body {
             background-color: #111111;
             margin: 0;
@@ -36,7 +43,7 @@
             min-height: 100vh;
         }
         
-        /* Markdown卡片 */
+        /* Markdown Container */
         .markdown-container {
             width: 100%;
             max-width: 800px;
@@ -54,7 +61,7 @@
             opacity: 1;
         }
 
-        /* 语言切换 */
+        /* Language Toggle */
         .lang-toggle-btn {
             position: absolute;
             top: 25px;
@@ -73,7 +80,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 返回按钮 */
+        /* Back Button */
         .top-back-btn {
             position: absolute;
             top: 25px;
@@ -120,13 +127,13 @@
             margin-left: -4px;
         }
 
-        /* 桌面端适配 */
+        /* Desktop Layout Adaptations */
         @media (min-width: 769px) {
             .icon-ios { display: none; }
             .icon-macos { display: block; }
         }
 
-        /* 移动端适配 */
+        /* Mobile Layout Adaptations */
         @media (max-width: 768px) {
             body {
                 padding: 80px 16px 30px 16px; 
@@ -210,7 +217,7 @@
     <button id="lang-btn" class="lang-toggle-btn">切换至简化字</button>
 
     <div class="markdown-container">
-        <zero-md id="md-viewer" src="./thanks_cn.md">
+        <zero-md id="md-viewer" src="./thanks_tc.md">
             <template>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css">
                 
@@ -259,12 +266,12 @@
             isTraditional = !isTraditional;
             
             if (isTraditional) {
-                mdViewer.setAttribute('src', './thanks_cn.md');
+                mdViewer.setAttribute('src', './thanks_tc.md');
                 langBtn.textContent = '切换至简化字';
                 pageTitle.textContent = '特別鳴謝 - 私立中山紀念堂';
                 document.documentElement.lang = 'zh-TW';
             } else {
-                mdViewer.setAttribute('src', './thanks_cp.md');
+                mdViewer.setAttribute('src', './thanks_sc.md');
                 langBtn.textContent = '切換至正體字';
                 pageTitle.textContent = '特别鸣谢 - 私立中山纪念堂';
                 document.documentElement.lang = 'zh-CN';
