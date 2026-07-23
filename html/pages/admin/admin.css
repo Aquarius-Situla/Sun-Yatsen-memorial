@@ -1,0 +1,354 @@
+/* ============================================================================
+ * iOS / macOS Style Admin Dashboard CSS
+ * ============================================================================ */
+
+:root {
+    /* Light Mode Variables (iOS System Colors) */
+    --bg-color: #f2f2f7;
+    --card-bg: #ffffff;
+    --text-primary: #000000;
+    --text-secondary: #8e8e93;
+    --separator: rgba(60, 60, 67, 0.29);
+    --blue: #007aff;
+    --blue-active: #0056b3;
+    --red: #ff3b30;
+    --red-active: #d63026;
+    --header-bg: rgba(255, 255, 255, 0.85);
+    --input-bg: rgba(118, 118, 128, 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Dark Mode Variables */
+        --bg-color: #000000;
+        --card-bg: #1c1c1e;
+        --text-primary: #ffffff;
+        --text-secondary: #ebebf599;
+        --separator: rgba(84, 84, 88, 0.65);
+        --blue: #0a84ff;
+        --blue-active: #006ee6;
+        --red: #ff453a;
+        --red-active: #ff2a1f;
+        --header-bg: rgba(28, 28, 30, 0.85);
+        --input-bg: rgba(118, 118, 128, 0.24);
+    }
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang TC", sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.screen {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.screen.active {
+    display: block;
+    opacity: 1;
+}
+
+#login-screen.active {
+    display: flex;
+}
+
+/* ============================================================================
+ * Login Screen
+ * ============================================================================ */
+#login-screen {
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.login-card {
+    background: var(--card-bg);
+    width: 100%;
+    max-width: 360px;
+    border-radius: 14px;
+    padding: 30px 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.login-header {
+    margin-bottom: 24px;
+}
+
+.login-header svg {
+    color: var(--blue);
+    margin-bottom: 12px;
+}
+
+.login-header h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+}
+
+.login-header p {
+    font-size: 15px;
+    color: var(--text-secondary);
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+input[type="password"] {
+    width: 100%;
+    background: var(--input-bg);
+    border: none;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 17px;
+    color: var(--text-primary);
+    outline: none;
+    transition: background 0.2s;
+    font-family: inherit;
+}
+
+input[type="password"]:focus {
+    background: rgba(0, 122, 255, 0.1);
+}
+
+/* ============================================================================
+ * Buttons
+ * ============================================================================ */
+.ios-btn {
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    -webkit-appearance: none;
+}
+
+.ios-btn.primary {
+    background-color: var(--blue);
+    color: #fff;
+}
+
+.ios-btn.primary:active {
+    background-color: var(--blue-active);
+    transform: scale(0.98);
+}
+
+.ios-btn.secondary {
+    background-color: var(--input-bg);
+    color: var(--blue);
+}
+
+.ios-btn.secondary:active {
+    background-color: rgba(118, 118, 128, 0.2);
+}
+
+.ios-btn.small {
+    padding: 6px 12px;
+    font-size: 14px;
+    width: auto;
+    border-radius: 8px;
+}
+
+.ios-btn.destructive {
+    background-color: transparent;
+    color: var(--red);
+    padding: 8px 14px;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 8px;
+    width: auto;
+}
+
+.ios-btn.destructive:hover {
+    background-color: rgba(255, 59, 48, 0.1);
+}
+
+.ios-btn.destructive:active {
+    background-color: rgba(255, 59, 48, 0.2);
+    transform: scale(0.96);
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: var(--blue);
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+}
+
+.icon-btn:active {
+    opacity: 0.5;
+}
+
+/* ============================================================================
+ * Dashboard Header
+ * ============================================================================ */
+.ios-header {
+    position: sticky;
+    top: 0;
+    background: var(--header-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 0.5px solid var(--separator);
+    z-index: 100;
+}
+
+.header-left h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* ============================================================================
+ * Dashboard Layout
+ * ============================================================================ */
+.dashboard-content {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.stats-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 13px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+/* ============================================================================
+ * List View (iOS Settings Style)
+ * ============================================================================ */
+.list-header h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    padding-left: 16px;
+}
+
+.ios-list {
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 0.5px solid var(--separator);
+    transition: background 0.2s;
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.item-content {
+    flex: 1;
+    min-width: 0;
+    padding-right: 16px;
+}
+
+.item-text {
+    font-size: 17px;
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+}
+
+.item-meta {
+    font-size: 13px;
+    color: var(--text-secondary);
+    display: flex;
+    gap: 12px;
+}
+
+.empty-state {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 15px;
+}
+
+/* ============================================================================
+ * Toast Notification
+ * ============================================================================ */
+.toast {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--header-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: var(--text-primary);
+    padding: 12px 24px;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: 500;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 0.5px solid var(--separator);
+    z-index: 9999;
+    transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.toast.show {
+    bottom: 40px;
+}

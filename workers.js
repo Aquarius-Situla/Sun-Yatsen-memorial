@@ -7,6 +7,7 @@
  * 3. All prose is written in English.
  * 4. No debugging notes, temporary workarounds, or console output in
  *    committed code.
+ * 5. Store temporary files under /temp/[feature_name]/.
  * ============================================================================
  */
 
@@ -140,10 +141,18 @@ async function handleRequest(request) {
       /* [DELETE] Retract a Danmaku message */
       if (request.method === "DELETE") {
         const body = await request.json();
-        const { id, fp } = body;
+        const { id, fp, admin_key } = body;
         
-        if (!id || !fp) {
-            return new Response(JSON.stringify({ error: "Missing required parameters." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        if (!id) {
+            return new Response(JSON.stringify({ error: "Missing message ID." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+
+        /* Check Admin Privileges */
+        const expectedSecret = typeof ADMIN_SECRET !== 'undefined' ? ADMIN_SECRET : "SunYatSen1911";
+        const isAdmin = admin_key === expectedSecret;
+
+        if (!isAdmin && !fp) {
+            return new Response(JSON.stringify({ error: "Missing required fingerprint." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
         }
 
         let danmakuData = await MEMORIAL_KV.get("DANMAKU_LIST");
@@ -151,7 +160,13 @@ async function handleRequest(request) {
         list = list.map(item => typeof item === 'string' ? { id: crypto.randomUUID(), text: item, fp: 'legacy', time: Date.now() } : item);
 
         const originalLength = list.length;
-        list = list.filter(item => !(item.id === id && item.fp === fp));
+        if (isAdmin) {
+            /* Admin can delete any message by ID */
+            list = list.filter(item => item.id !== id);
+        } else {
+            /* Normal users can only delete their own messages matching their fingerprint */
+            list = list.filter(item => !(item.id === id && item.fp === fp));
+        }
 
         if (list.length === originalLength) {
             return new Response(JSON.stringify({ error: "Message not found or unauthorized to retract." }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });

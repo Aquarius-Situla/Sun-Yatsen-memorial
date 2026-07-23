@@ -797,6 +797,100 @@ function showCloudflareToast(msg, type = 'info') {
  * than active ratelimiting, the lock is lifted early.
  * ============================================================================ */
 
+let consecutiveViolations = 0;
+let captchaLoaded = false;
+let captchaRoot = null;
+
+function loadCaptcha() {
+    return new Promise((resolve, reject) => {
+        if (captchaLoaded) return resolve();
+        
+        const css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = 'captcha/node_modules/playcaptcha/dist/clawcaptcha.css';
+        
+        // Insert before main/style.css so our dark mode overrides work
+        const mainStyle = document.querySelector('link[href*="main/style.css"]');
+        if (mainStyle) {
+            document.head.insertBefore(css, mainStyle);
+        } else {
+            document.head.appendChild(css);
+        }
+        
+        const react = document.createElement('script');
+        react.src = 'captcha/react-pkg/umd/react.production.min.js';
+        
+        const reactDom = document.createElement('script');
+        reactDom.src = 'captcha/react-dom-pkg/umd/react-dom.production.min.js';
+        
+        const bundled = document.createElement('script');
+        bundled.src = 'captcha/bundled.js';
+        
+        react.onload = () => {
+            document.head.appendChild(reactDom);
+        };
+        reactDom.onload = () => {
+            document.head.appendChild(bundled);
+        };
+        bundled.onload = () => {
+            captchaLoaded = true;
+            resolve();
+        };
+        bundled.onerror = reject;
+        
+        document.head.appendChild(react);
+    });
+}
+
+async function showCaptcha() {
+    messageModal.classList.remove('active');
+    submitMessageBtn.disabled = true;
+    messageInput.disabled = true;
+    
+    showCloudflareToast('偵測到連續異常活動，請進行人類驗證', 'error');
+    const overlay = document.getElementById('captcha-modal-overlay');
+    const rootEl = document.getElementById('captcha-root');
+    
+    if (overlay) overlay.classList.add('active');
+    
+    if (!captchaLoaded) {
+        rootEl.innerHTML = '<div style="color:var(--text-secondary);">載入驗證碼中...</div>';
+        await loadCaptcha();
+    }
+    
+    if (!captchaRoot) {
+        captchaRoot = window.ReactDOM.createRoot(rootEl);
+    }
+    
+    const App = () => {
+        return window.React.createElement(window.ClawCaptcha, {
+            onVerify: () => {
+                consecutiveViolations = 0;
+                if (overlay) overlay.classList.remove('active');
+                submitMessageBtn.disabled = false;
+                messageInput.disabled = false;
+                showCloudflareToast('人類驗證成功，發送功能已恢復', 'success');
+                // Unmount to reset state for next time
+                setTimeout(() => {
+                    captchaRoot.unmount();
+                    captchaRoot = null;
+                }, 500);
+            },
+            assetBase: 'captcha/assets/toys/' 
+        });
+    };
+    
+    captchaRoot.render(window.React.createElement(App));
+}
+
+function handleViolation(msg) {
+    showCloudflareToast(msg, 'error');
+    consecutiveViolations++;
+    if (consecutiveViolations >= 3) {
+        setTimeout(showCaptcha, 300);
+    }
+}
+
 submitMessageBtn.addEventListener('click', async () => {
     if (messageCooldown) return;
 
@@ -811,13 +905,16 @@ submitMessageBtn.addEventListener('click', async () => {
         return;
     }
     if (containsBannedWords(text)) {
-        showCloudflareToast('請勿包含敏感詞彙', 'error');
+        handleViolation('請勿包含敏感詞彙');
         return;
     }
     if (isSpam(text)) {
-        showCloudflareToast('請勿發送無意義的重複內容', 'error');
+        handleViolation('請勿發送無意義的重複內容');
         return;
     }
+
+    // Reset violations on successful legitimate submit
+    consecutiveViolations = 0;
 
     messageModal.classList.remove('active');
     messageCooldown = true;

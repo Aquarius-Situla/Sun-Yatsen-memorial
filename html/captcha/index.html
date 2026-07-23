@@ -19,12 +19,12 @@
             .clawcap {
                 --clawcap-bg: #1c1c1e;
                 --clawcap-ink: #ffffff;
-                --clawcap-muted: #a1a1a6;
+                --clawcap-muted: #c7c7cc;
                 --clawcap-accent: #ff5159;
                 
                 --cc-bg: #1c1c1e !important;
                 --cc-ink: #ffffff !important;
-                --cc-muted: #a1a1a6 !important;
+                --cc-muted: #c7c7cc !important;
                 --cc-line: rgba(255, 255, 255, 0.15) !important;
                 --cc-fill: #2c2c2e !important;
                 --cc-fill-2: #3a3a3c !important;
@@ -52,8 +52,7 @@
             }
             
             /* Fix active step number (white circle, black text) */
-            .clawcap-step--active .clawcap-step-n,
-            .clawcap-step[aria-current="step"] .clawcap-step-n {
+            .clawcap-steps li.is-active .clawcap-step-n {
                 background: #ffffff !important;
                 color: #1c1c1e !important;
             }
@@ -142,8 +141,12 @@
         function App() {
             return React.createElement(ClawCaptcha, {
                 onVerify: () => {
-                    alert('驗證成功！即将返回主页。');
-                    window.location.replace('../index.html');
+                    if (window.parent !== window) {
+                        window.parent.postMessage({ type: 'CAPTCHA_SUCCESS' }, '*');
+                    } else {
+                        alert('驗證成功！即将返回主页。');
+                        window.location.replace('../index.html');
+                    }
                 },
                 assetBase: 'assets/toys/' 
             });

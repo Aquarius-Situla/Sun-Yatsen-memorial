@@ -4,6 +4,7 @@
  * 2. Section dividers use the === banner format.
  * 3. All prose is written in English.
  * 4. No debugging notes or temporary workarounds in committed code.
+ * 5. Store temporary files under /temp/[feature_name]/.
  ========================================================================== -->
 <!DOCTYPE html>
 <html lang="zh-TW">
@@ -18,9 +19,10 @@
     <link rel="preload" href="webapp/icon/icon-mobile.png" as="image">    
     <link rel="apple-touch-icon" href="webapp/icon/icon-mobile.png">
     
-    <link rel="stylesheet" href="main/style.css?v=1097">
+    <link rel="stylesheet" href="main/style.css?v=1044">
 
     <!-- System Dark/Light theme-color -->
+    <meta name="color-scheme" content="light dark">
     <meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)">
     <meta name="theme-color" content="#f5f0e8" media="(prefers-color-scheme: light)">
 
@@ -74,7 +76,7 @@
     <div class="top-hover-trigger">
         <div class="dropdown-nav-bar">
             <div class="nav-left">
-                <a href="https://www.yatsen.gov.tw/" target="_blank" class="nav-link">🏛️ 國立國父紀念館</a>
+                <a href="https://www.yatsen.gov.tw/" target="_blank" class="nav-link">🏛️ 國父紀念館</a>
             </div>
             
             <div id="nav-festival-banner" class="nav-festival-banner"></div>
@@ -156,8 +158,14 @@
         </div>
     </div>
 
+    <div id="captcha-modal-overlay" class="modal-overlay">
+        <div class="captcha-modal-content" id="captcha-root">
+            <!-- React will mount here -->
+        </div>
+    </div>
+
     <audio id="bg-music" src="main/anthem/anthem.m4a"></audio>
     <script src="api/env.js"></script>
-    <script src="main/script.js?v=1039"></script>
+    <script src="main/script.js?v=1044"></script>
 </body>
 </html>

@@ -46,6 +46,7 @@ sys-memorial/
 │   │   └── thanks/             # Credits
 │   └── webapp/                 # PWA manifest, icons, and iOS splash screens
 ├── docker-compose.yml
+├── temp/                       # Temporary files generated during agent development
 ├── workers.js                  # Cloudflare Worker source
 └── README.md
 ```
@@ -67,6 +68,38 @@ The compose file mounts `./html` as a read-only volume served by Nginx.
 3. Deploy `workers.js` to the Worker.
 4. Copy `html/api/env.example.js` to `html/api/env.js` and set `WORKER_API` to your Worker URL.
 
+## PlayCaptcha Integration
+
+The project uses a heavily customized version of `playcaptcha` to prevent spam (e.g., Danmaku abuse). It has been tailored for optimal responsive display across all viewports (including iPhone 12 mini) and features a highly specific deep dark mode overlay that respects system settings even within restricted WebViews.
+
+To integrate this popup Captcha into other HTML pages, follow these requirements:
+
+### 1. HTML Structure
+Insert the following modal wrapper at the bottom of the `<body>`:
+
+```html
+<div id="captcha-modal-overlay" class="modal-overlay">
+    <div class="captcha-modal-content" id="captcha-root"></div>
+</div>
+```
+
+### 2. Dependencies
+Ensure the target page includes the core stylesheet and environment script, and sets the color-scheme meta tag to enforce proper dark mode rendering in iOS WebViews:
+
+```html
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="main/style.css?v=1044">
+<script src="api/env.js"></script>
+<script src="main/script.js?v=1044"></script>
+```
+
+### 3. Invocation
+The captcha operates as an independent module. Trigger it via JavaScript by calling:
+```javascript
+showCaptcha();
+```
+Upon successful human verification, the module automatically unmounts itself to cleanly reset its state and fires `window.onCaptchaSuccess()`. Define this global callback to handle your post-verification logic (e.g., restoring suspended UI elements).
+
 ## AI Agent Instructions
 
 When maintaining this project, AI assistants and agents **must** adhere to the following rules:
@@ -74,6 +107,7 @@ When maintaining this project, AI assistants and agents **must** adhere to the f
 - **Block Comments Only**: The use of inline/single-line comments (like `//`) is strictly prohibited. You must use standard block comments (`/* ... */` for JavaScript/CSS and `<!-- ... -->` for HTML).
 - **Format Integrity**: Do not translate or alter any strings intended for user display (e.g. Traditional Chinese UI text, banners, toasts) unless explicitly instructed to do so.
 - **No Temporary Notes**: Do not commit debugging notes, temporary workarounds, or informal remarks into the codebase. Keep comments professional, focusing on architecture and module boundaries.
+- **Temporary Files Management**: Whenever an agent generates temporary files (such as test scripts, data extraction scripts, or debugging outputs), these files MUST be placed under `/temp/[feature_name]/` to keep the root directory clean and manageable.
 
 
 ## Licensing
