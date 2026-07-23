@@ -27,7 +27,7 @@
  *   festivalPage — URL path for the festival detail page.
  * ============================================================================ */
 
-const DEFAULT_MUSIC = { src: 'main/anthem/anthem.m4a', title: '三民主義歌', artist: '孫文' };
+const DEFAULT_MUSIC = { src: 'main/anthem/anthem.flac', title: '三民主義歌', artist: '孫文' };
 
 const SPECIAL_MEMORIAL_DAYS = [
     {
