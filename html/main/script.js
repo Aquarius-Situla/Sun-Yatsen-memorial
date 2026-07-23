@@ -27,32 +27,32 @@
  *   festivalPage — URL path for the festival detail page.
  * ============================================================================ */
 
-const DEFAULT_MUSIC = { src: 'main/anthem/anthem.m4a', title: '中華民國國歌', artist: '孫中山' };
+const DEFAULT_MUSIC = { src: 'main/anthem/anthem.m4a', title: '三民主義歌', artist: '孫文' };
 
 const SPECIAL_MEMORIAL_DAYS = [
     {
-        urlKeyword:  'events/whampoa',
+        urlKeyword:  'whampoa',
         dates:       [ { month: 6, date: 16 } ],
-        config:      { src: 'events/whampoa/whampoa.mp3', title: '黃埔軍校校歌', artist: '戴季陶' },
+        config:      { src: 'events/whampoa/whampoa.mp3', title: '黃埔組曲', artist: '戴季陶' },
         getBanner:   (year) => `黃埔建軍 ${year - 1924} 週年`,
         festivalPage: 'events/whampoa/whampoa.html'
     },
     {
-        urlKeyword:  'events/militaries',
+        urlKeyword:  'militaries',
         dates:       [ { month: 9, date: 3 } ],
-        config:      { src: 'events/militaries/militaries.mp3', title: '國軍建軍歌', artist: '何志浩' },
+        config:      { src: 'events/militaries/militaries.mp3', title: '三軍軍歌組曲', artist: '何志浩' },
         getBanner:   (year) => `抗戰勝利 ${year - 1945} 週年`,
         festivalPage: 'events/militaries/militaries.html'
     },
     {
-        urlKeyword:  'events/yatsen-passing',
+        urlKeyword:  'yatsen-passing',
         dates:       [ { month: 3,  date: 12 } ],
         config:      { src: 'events/yatsen/yatsen.mp3', title: '國父紀念歌', artist: '戴季陶' },
         getBanner:   (year) => `國父逝世 ${year - 1925} 週年`,
         festivalPage: 'events/yatsen/yatsen-passing.html'
     },
     {
-        urlKeyword:  'events/yatsen-birth',
+        urlKeyword:  'yatsen-birth',
         dates:       [ { month: 11, date: 12 } ],
         config:      { src: 'events/yatsen/yatsen.mp3', title: '國父紀念歌', artist: '戴季陶' },
         getBanner:   (year) => `國父誕辰 ${year - 1866} 週年`,
@@ -947,3 +947,27 @@ async function fetchAndPlayDanmaku() {
         /* Fails silently on network errors, relying on the next polling interval */
     }
 }
+
+/* ============================================================================
+ * Celebration Fireworks Easter Egg Initialization
+ * ============================================================================
+ * Conditionally loads the fireworks module based on date or testing hash.
+ * ============================================================================ */
+(function initFireworksEasterEgg() {
+    const cb = Date.now(); // Cache-buster
+    const script = document.createElement('script');
+    script.src = `events/celebration/lunar-check.js?v=${cb}`;
+    script.onload = () => {
+        if (window.isFireworksFestival && window.isFireworksFestival()) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = `events/celebration/fireworks.css?v=${cb}`;
+            document.head.appendChild(link);
+
+            const fwScript = document.createElement('script');
+            fwScript.src = `events/celebration/fireworks.js?v=${cb}`;
+            document.body.appendChild(fwScript);
+        }
+    };
+    document.body.appendChild(script);
+})();

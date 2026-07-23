@@ -18,7 +18,7 @@
     <link rel="preload" href="webapp/icon/icon-mobile.png" as="image">    
     <link rel="apple-touch-icon" href="webapp/icon/icon-mobile.png">
     
-    <link rel="stylesheet" href="main/style.css?v=1096">
+    <link rel="stylesheet" href="main/style.css?v=1097">
 
     <!-- System Dark/Light theme-color -->
     <meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)">
@@ -55,6 +55,10 @@
                 }
             }
         })();
+
+        if (window.location.hash === '#captcha') {
+            window.location.replace('captcha/index.html');
+        }
     </script>
 </head>
 <body>
@@ -154,6 +158,6 @@
 
     <audio id="bg-music" src="main/anthem/anthem.m4a"></audio>
     <script src="api/env.js"></script>
-    <script src="main/script.js?v=1038"></script>
+    <script src="main/script.js?v=1039"></script>
 </body>
 </html>

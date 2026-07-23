@@ -12,6 +12,7 @@
 - **Let's Encrypt**：提供全站 SSL 安全证书支持。
 - **zero-md**：本站子页面之核心 Markdown 渲染引擎。依据 MIT 授权条款开源 (Copyright © 2018 Jason Lee)。
 - **github-markdown-css**：提供优雅且具高可读性之 Markdown 样式表。依据 MIT 授权条款开源 (Copyright © Sindre Sorhus)。
+- **playcaptcha**：提供互动式娃娃机验证码组件。依据 MIT 授权条款开源 (Copyright © 2026 iisac)。
 - **Docker & Nginx**：提供强大、稳定且高度容器化之底层网页服务器运行环境。
 - **Gemini**：为项目提供代码优化与架构重构之深度建议。
 - **Claude**：协助完成节日介绍页面与横幅互动功能之全栈实现。
@@ -23,4 +24,4 @@
 - **[SHA-256: `3e21b8ef86f5ad4459a50984c5c92fcc6de3f920546cfb567a26264f40b217b9`]**：为项目提供宝贵之灵感来源。
 
 ---
-> 项目启动：民国 115 年 6 月
+> 项目启动：2026 年 6 月

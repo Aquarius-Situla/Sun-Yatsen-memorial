@@ -423,7 +423,7 @@
                     isAllShown = !isAllShown;
                     sanminChartInstance.data.datasets.forEach((ds, i) => {
                         if (!isAllShown) {
-                            sanminChartInstance.setDatasetVisibility(i, i === 2); // 仅显示辛亥革命
+                            sanminChartInstance.setDatasetVisibility(i, false); // 完全隐藏
                         } else {
                             sanminChartInstance.setDatasetVisibility(i, true);
                         }
