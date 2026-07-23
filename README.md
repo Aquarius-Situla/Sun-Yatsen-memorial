@@ -114,7 +114,7 @@ When maintaining this project, AI assistants and agents **must** adhere to the f
 
 This project uses a dual-license model:
 
-- **Source code** — Released under the [MIT License](LICENSE).
+- **Source code** — Released under the [GNU Affero General Public License v3.0 (AGPLv3)](LICENSE).
 - **Audiovisual assets** — Music, portraits, and other media remain the property of their respective rights holders. Unauthorized commercial or inappropriate use is strictly prohibited. See [html/pages/about/about_tc.md](html/pages/about/about_tc.md) for the full statement (Traditional Chinese) or [html/pages/about/about_sc.md](html/pages/about/about_sc.md) (Simplified Chinese).
 
 ---
