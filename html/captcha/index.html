@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Captcha</title>
+    <!-- Use the locally downloaded CSS -->
+    <link rel="stylesheet" href="./node_modules/playcaptcha/dist/clawcaptcha.css">
+    <style>
+        :root {
+            --page-bg: #f5f0e8;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --page-bg: #111111;
+            }
+            
+            /* Deep Dark Mode for PlayCaptcha */
+            .clawcap {
+                --clawcap-bg: #1c1c1e;
+                --clawcap-ink: #ffffff;
+                --clawcap-muted: #a1a1a6;
+                --clawcap-accent: #ff5159;
+                
+                --cc-bg: #1c1c1e !important;
+                --cc-ink: #ffffff !important;
+                --cc-muted: #a1a1a6 !important;
+                --cc-line: rgba(255, 255, 255, 0.15) !important;
+                --cc-fill: #2c2c2e !important;
+                --cc-fill-2: #3a3a3c !important;
+                --cc-accent: #ff5159 !important;
+            }
+            
+            /* Override hardcoded backgrounds in clawcaptcha.css */
+            .clawcap-glass {
+                background: linear-gradient(180deg, #242426 0%, #1c1c1e 100%) !important;
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 8px rgba(0, 0, 0, 0.5) !important;
+            }
+            
+            /* Remove the diagonal glass reflection which is too bright on dark background */
+            .cc-glass-shine {
+                display: none !important;
+            }
+            
+            .clawcap-panel {
+                background: linear-gradient(180deg, #2a2a2c 0%, #202022 100%) !important;
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+            }
+            .clawcap-steps-pill {
+                background: #4a4a4c !important;
+                box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+            }
+            
+            /* Fix active step number (white circle, black text) */
+            .clawcap-step--active .clawcap-step-n,
+            .clawcap-step[aria-current="step"] .clawcap-step-n {
+                background: #ffffff !important;
+                color: #1c1c1e !important;
+            }
+            
+            /* Fix Help overlay numbers (prevent white-on-white) */
+            .clawcap-info-n {
+                background: #ffffff !important;
+                color: #1c1c1e !important;
+            }
+            
+            /* User requested the 'Got it' button to be white-on-black in dark mode */
+            .clawcap-info-done {
+                background: #ffffff !important;
+                color: #1c1c1e !important;
+            }
+            
+            /* Fix "Drop here" box (cc-tray) which is hardcoded white */
+            .cc-tray-door, .cc-tray-skin {
+                background: linear-gradient(180deg, #3a3a3c 0%, #2c2c2e 100%) !important;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -10px 13px -10px rgba(0, 0, 0, 0.5) !important;
+            }
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--page-bg);
+            font-family: sans-serif;
+            overflow: hidden; /* Prevent scrolling when interacting */
+        }
+        .captcha-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        /* Automatically scale down the captcha on small screens */
+        @media (max-width: 460px) {
+            .captcha-wrapper {
+                transform: scale(0.85);
+            }
+        }
+        @media (max-width: 390px) {
+            .captcha-wrapper {
+                transform: scale(0.75);
+            }
+        }
+        @media (max-width: 340px) {
+            .captcha-wrapper {
+                transform: scale(0.65);
+            }
+        }
+        /* Fallback text before React boots */
+        #root:empty::before {
+            content: '載入中...';
+            color: #8a8a8e;
+        }
+    </style>
+    
+    <!-- 1. Load React and ReactDOM from local UMD -->
+    <script src="./react-pkg/umd/react.production.min.js"></script>
+    <script src="./react-dom-pkg/umd/react-dom.production.min.js"></script>
+    
+    <!-- 2. Load the bundled PlayCaptcha + Framer Motion -->
+    <script src="./bundled.js"></script>
+</head>
+<body>
+    <div id="root" class="captcha-wrapper"></div>
+    
+    <!-- Pure JavaScript entry point (No ES Modules, no importmap, fully works on file:///) -->
+    <script>
+        const rootElement = document.getElementById('root');
+        
+        // Use global variables directly
+        const React = window.React;
+        const createRoot = window.ReactDOM.createRoot;
+        const ClawCaptcha = window.ClawCaptcha;
+
+        const root = createRoot(rootElement);
+
+        function App() {
+            return React.createElement(ClawCaptcha, {
+                onVerify: () => {
+                    alert('驗證成功！即将返回主页。');
+                    window.location.replace('../index.html');
+                },
+                assetBase: 'assets/toys/' 
+            });
+        }
+
+        root.render(React.createElement(App));
+    </script>
+</body>
+</html>
