@@ -1,5 +1,5 @@
 # Track node_modules because we have localized modifications (魔改)
 # node_modules/
-dist/
+/dist/
 *.log
 .DS_Store
