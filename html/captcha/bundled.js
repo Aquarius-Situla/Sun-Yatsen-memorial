@@ -8448,7 +8448,7 @@
                 } else {
                   const m = machineEl.current?.getBoundingClientRect();
                   const tr = trayEl.current?.getBoundingClientRect();
-                  if (m && tr) s.mouthY = tr.top - m.top + 2;
+                  if (m && tr) s.mouthY = (tr.top - m.top) / (m.width ? m.width / 440 : 1) + 2;
                   s.fallV = 30;
                 }
               } else {
@@ -8465,12 +8465,19 @@
             const w = pile[s.carried].w;
             const sunk = s.carry.y + w / 2 - s.mouthY;
             if (sunk > 0 && carriedEl.current) {
-              carriedEl.current.style.clipPath = `inset(0 0 ${sunk.toFixed(1)}px 0)`;
+              const lW = s.carry.x - w / 2;
+              const clipL = Math.max(0, 94 - lW);
+              const clipR = Math.min(w, 286 - lW);
+              const yL = Math.max(0, w - sunk);
+              const clipStr = `polygon(0px 0px, ${w.toFixed(1)}px 0px, ${w.toFixed(1)}px ${yL.toFixed(1)}px, ${clipR.toFixed(1)}px ${yL.toFixed(1)}px, ${clipR.toFixed(1)}px ${w.toFixed(1)}px, ${clipL.toFixed(1)}px ${w.toFixed(1)}px, ${clipL.toFixed(1)}px ${yL.toFixed(1)}px, 0px ${yL.toFixed(1)}px)`;
+              carriedEl.current.style.webkitClipPath = clipStr;
+              carriedEl.current.style.clipPath = clipStr;
               carriedEl.current.style.filter = `brightness(${Math.max(0.4, 1 - sunk / w * 0.75).toFixed(3)})`;
             }
             if (sunk >= w + 4) {
               if (carriedEl.current) {
                 carriedEl.current.style.visibility = "hidden";
+                carriedEl.current.style.webkitClipPath = "";
                 carriedEl.current.style.clipPath = "";
                 carriedEl.current.style.filter = "";
               }
@@ -8529,6 +8536,7 @@
               if (carriedEl.current) {
                 carriedEl.current.style.visibility = "hidden";
                 carriedEl.current.style.opacity = "";
+                carriedEl.current.style.webkitClipPath = "";
                 carriedEl.current.style.clipPath = "";
                 carriedEl.current.style.filter = "";
               }

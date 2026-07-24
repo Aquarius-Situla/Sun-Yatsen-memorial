@@ -59,9 +59,138 @@
                 </div>
             </div>
 
+            <div class="settings-card">
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <span class="setting-title">白名單模式</span>
+                        <span class="setting-desc">開啟後，僅允許發送預設的致敬語。</span>
+                    </div>
+                    <label class="ios-switch">
+                        <input type="checkbox" id="whitelist-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <div class="list-header" style="padding: 16px 20px 0; border-bottom: none;">
+                    <h2>過濾名單管理</h2>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <span class="setting-title">基礎黑名單 (.json)</span>
+                        <span class="setting-desc">目前詞彙數：<strong id="base-count-display">0</strong></span>
+                    </div>
+                    <div class="upload-wrapper">
+                        <input type="file" id="base-upload-input" accept=".json" style="display: none;">
+                        <button class="ios-btn secondary small" onclick="document.getElementById('base-upload-input').click()">上傳取代</button>
+                    </div>
+                </div>
+
+                <div class="setting-item" style="border-top: 1px solid var(--border);">
+                    <div class="setting-info">
+                        <span class="setting-title">隱私黑名單 (.json)</span>
+                        <span class="setting-desc">目前詞彙數：<strong id="private-count-display">0</strong></span>
+                    </div>
+                    <div class="upload-wrapper">
+                        <input type="file" id="private-upload-input" accept=".json" style="display: none;">
+                        <button class="ios-btn secondary small" onclick="document.getElementById('private-upload-input').click()">上傳取代</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <div class="list-header" style="padding: 16px 20px 0; border-bottom: none; display: flex; justify-content: space-between; align-items: center;">
+                    <h2>AI 矩陣審查 (Async Mode)</h2>
+                    <button id="add-ai-btn" title="新增 AI 節點" style="background: none; border: none; cursor: pointer; color: var(--primary); padding: 4px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <span class="setting-title">啟用 AI 矩陣</span>
+                        <span class="setting-desc">隨機負載平衡，若違規會自動進入自學黑名單。</span>
+                    </div>
+                    <label class="ios-switch">
+                        <input type="checkbox" id="ai-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <span class="setting-title">中國區特供審查 (China Censor Mode)</span>
+                        <span class="setting-desc">啟用後，AI 將加強攔截特定地區的政治敏感與爭議詞彙。</span>
+                    </div>
+                    <label class="ios-switch">
+                        <input type="checkbox" id="ai-china-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div id="ai-list-container" class="ios-list" style="margin: 0; padding-bottom: 12px; border-bottom: none;">
+                    <!-- AI Models will be injected here -->
+                </div>
+
+                <div id="add-ai-form" class="setting-item" style="display: none; border-top: 1px solid var(--border); flex-direction: column; align-items: flex-start; gap: 12px; background: var(--hover-color);">
+                    <div style="width: 100%;">
+                        <label style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; display: block;">API Endpoint URL</label>
+                        <input type="text" id="ai-endpoint" class="ios-input" placeholder="https://api.openai.com/v1/chat/completions" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--header-bg); color: var(--text-primary);">
+                    </div>
+                    <div style="width: 100%;">
+                        <label style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; display: block;">Model Name</label>
+                        <input type="text" id="ai-model" class="ios-input" placeholder="gpt-4o-mini" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--header-bg); color: var(--text-primary);">
+                    </div>
+                    <div style="width: 100%;">
+                        <label style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; display: block;">API Keys (一行一個)</label>
+                        <textarea id="ai-keys" class="ios-input" rows="3" placeholder="sk-xxxxxxx..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--header-bg); color: var(--text-primary); resize: vertical;"></textarea>
+                    </div>
+                    <button class="ios-btn primary" id="save-ai-btn" style="width: 100%;">儲存並加入矩陣</button>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <div class="list-header" style="padding: 16px 20px 0; border-bottom: none;">
+                    <h2>自學黑名單紀錄</h2>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <span class="setting-title">LLM Blacklist</span>
+                        <span class="setting-desc">已自動攔截了 <span id="llm-count-display" style="font-weight: 600; color: var(--primary);">0</span> 個新詞彙</span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button id="download-llm-btn" title="下載審查記錄" style="background: none; border: none; cursor: pointer; color: var(--primary); padding: 4px; display: flex; align-items: center; justify-content: center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </button>
+                        <button id="clear-llm-btn" title="一鍵清空" style="background: none; border: none; cursor: pointer; color: var(--red); padding: 4px; display: flex; align-items: center; justify-content: center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div class="list-container">
-                <div class="list-header">
+                <div class="list-header" style="display: flex; justify-content: space-between; align-items: center; padding-right: 16px;">
                     <h2>近期彈幕</h2>
+                    <button id="download-json-btn" title="下載彈幕樣本 (.json)" style="background: none; border: none; cursor: pointer; color: var(--primary); padding: 4px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </button>
                 </div>
                 <div id="danmaku-list" class="ios-list">
                     <!-- Items will be injected here -->

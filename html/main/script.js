@@ -572,15 +572,15 @@ const portraitImg       = document.querySelector('.portrait-img');
 /* Banned words are dynamically loaded from the server */
 let bannedWordsList = [];
 
-/* Fetch banned words from static JSON on load */
-fetch('api/banned_words.json')
+/* Fetch public banned words from backend API on load */
+fetch(WORKER_API + '/danmaku?action=get_banned_words')
     .then(res => res.json())
     .then(data => {
         if (Array.isArray(data)) {
             bannedWordsList = data;
         }
     })
-    .catch(err => console.error("Failed to load banned words library:", err));
+    .catch(err => console.error("Failed to load dynamic banned words:", err));
 
 let isDanmakuEnabled = false;
 let messageCooldown  = false;
@@ -824,7 +824,7 @@ function loadCaptcha() {
         reactDom.src = 'captcha/react-dom-pkg/umd/react-dom.production.min.js';
         
         const bundled = document.createElement('script');
-        bundled.src = 'captcha/bundled.js';
+        bundled.src = 'captcha/bundled.js?v=2';
         
         react.onload = () => {
             document.head.appendChild(reactDom);
@@ -867,9 +867,26 @@ async function showCaptcha() {
             onVerify: () => {
                 consecutiveViolations = 0;
                 if (overlay) overlay.classList.remove('active');
-                submitMessageBtn.disabled = false;
-                messageInput.disabled = false;
-                showCloudflareToast('人類驗證成功，發送功能已恢復', 'success');
+                
+                let cd = 10;
+                messageCooldown = true;
+                submitMessageBtn.disabled = true;
+                messageInput.disabled = true;
+                submitMessageBtn.innerText = `請稍候(${cd}s)`;
+                showCloudflareToast('人類驗證成功，請稍候...', 'success');
+                
+                const cdTimer = setInterval(() => {
+                    if (--cd <= 0) {
+                        clearInterval(cdTimer);
+                        submitMessageBtn.disabled = false;
+                        messageInput.disabled = false;
+                        submitMessageBtn.innerText = '發送';
+                        messageCooldown = false;
+                    } else {
+                        submitMessageBtn.innerText = `請稍候(${cd}s)`;
+                    }
+                }, 1000);
+
                 // Unmount to reset state for next time
                 setTimeout(() => {
                     captchaRoot.unmount();
@@ -920,8 +937,8 @@ submitMessageBtn.addEventListener('click', async () => {
     messageCooldown = true;
     submitMessageBtn.disabled = true;
 
-    /* 10-second anti-spam lock */
-    let countdown = 10;
+    /* 3-second anti-spam lock for normal messages */
+    let countdown = 3;
     const timer = setInterval(() => {
         if (--countdown <= 0) {
             clearInterval(timer);
@@ -955,10 +972,13 @@ submitMessageBtn.addEventListener('click', async () => {
             if (isDanmakuEnabled) createDanmaku(text); /* Local immediate preview */
         } else {
             const err = await response.json();
-            showCloudflareToast(err.error || '發送失敗，請稍後再試。', 'error');
+            showCloudflareToast(err.error || '發送失敗，請稍候再試。', 'error');
 
-            /* Lift cooldown early if the server rejected for reasons other than spam */
-            if (!err.error || !err.error.includes('ratelimit')) {
+            if (err.error && err.error.includes('ratelimit')) {
+                clearInterval(timer);
+                showCaptcha();
+            } else {
+                /* Lift cooldown early if the server rejected for reasons other than spam */
                 clearInterval(timer);
                 messageCooldown = false;
                 submitMessageBtn.disabled = false;

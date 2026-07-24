@@ -1536,7 +1536,24 @@ body.banner-active .dropdown-nav-bar {
 }
 
 @media (max-width: 450px) {
-    #captcha-modal-overlay.active .captcha-modal-content { transform: scale(0.9); }
+    #captcha-modal-overlay.active .captcha-modal-content {
+        transform: scale(min(1, calc(100vw / 460)));
+    }
+}
+
+/* Fix iOS Safari bug where overflow: hidden with border-radius fails to clip transformed children */
+.cc-glass {
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+    mask-image: radial-gradient(white, black);
+    transform: translateZ(0);
+}
+
+/* Disable native iOS image drag, magnifying glass, and callout menus */
+.clawcap-machine img {
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+    user-select: none;
+    pointer-events: none;
 }
 @media (max-width: 410px) {
     #captcha-modal-overlay.active .captcha-modal-content { transform: scale(0.85); }

@@ -19,7 +19,167 @@
     <link rel="preload" href="webapp/icon/icon-mobile.png" as="image">    
     <link rel="apple-touch-icon" href="webapp/icon/icon-mobile.png">
     
-    <link rel="stylesheet" href="main/style.css?v=1044">
+    <link rel="stylesheet" href="main/style.css?v=1045">
+
+    <!-- System Dark/Light theme-color -->
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f5f0e8" media="(prefers-color-scheme: light)">
+
+    <link rel="manifest" href="webapp/manifest.json">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="國父紀念堂">
+    
+    <!-- iOS Splash Screens (Unified Neutral Light Gray Background) -->
+    <link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1290x2796.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1179x2556.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1284x2778.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1170x2532.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1125x2436.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1242x2688.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" href="webapp/splash/splash-828x1792.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1242x2208.png">
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="webapp/splash/splash-750x1334.png">
+
+    <script>
+        /* Dynamically preload the iOS splash screen for the current device to prevent animation loss when added to the home screen */
+        (function() {
+            var links = document.querySelectorAll('link[rel="apple-touch-startup-image"]');
+            for (var i = 0; i < links.length; i++) {
+                if (window.matchMedia(links[i].getAttribute('media')).matches) {
+                    var preload = document.createElement('link');
+                    preload.rel = 'preload';
+                    preload.as = 'image';
+                    preload.href = links[i].getAttribute('href');
+                    document.head.appendChild(preload);
+                }
+            }
+        })();
+
+        if (window.location.hash === '#captcha') {
+            window.location.replace('captcha/index.html');
+        }
+    </script>
+</head>
+<body>
+    <div id="danmaku-container" class="hidden"></div>
+    <div id="memorial-banner" class="memorial-banner hidden">
+        請向國父遺像行三鞠躬禮
+    </div>
+
+    <div id="sit-down-banner" class="status-banner">
+        請坐下
+    </div>
+
+    <div class="top-hover-trigger">
+        <div class="dropdown-nav-bar">
+            <div class="nav-left">
+                <a href="https://www.yatsen.gov.tw/" target="_blank" class="nav-link">🏛️ 國父紀念館</a>
+            </div>
+            
+            <div id="nav-festival-banner" class="nav-festival-banner"></div>
+
+            <div class="nav-right">
+                <span id="minguo-date-display">⏳ 正在讀取曆法...</span>
+            </div>
+        </div>
+        <div class="mobile-arrow-hint" id="mobile-arrow-btn">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="frame-container" id="portrait-btn">
+            <div class="wood-frame">
+                <img src="main/portrait.jpg" alt="國父遺像" class="portrait-img">
+            </div>
+        </div>
+
+        <div class="attendance-box">
+            <span class="attendance-label">總參典人次：</span>
+            <span class="attendance-count" id="attendanceCount">0</span><span class="attendance-unit">人次</span>
+        </div>
+
+        <div class="testament-box">
+            <div class="testament-text" id="testament-content">
+             余致力國民革命，凡四十年，其目的在求中國之自由平等。積四十年之經驗，深知欲達到此目的，必須喚起民眾及聯合世界上以平等待我之民族，共同奮鬥。現在革命尚未成功，凡我同志，務須依照余所著建國方略、建國大綱、三民主義及第一次全國代表大會宣言，繼續努力，以求貫徹。最近主張開國民會議及廢除不平等條約，尤須於最短期間，促其實現。是所至囑！
+            </div>
+        </div>
+    </div>
+
+    <div class="stealth-footer">
+        <a href="pages/announcement/announcement.html">公告</a>
+        <span>|</span>
+        <a href="pages/biography/biography.html">國父生平</a>
+        <span>|</span>
+        <a href="pages/about/about.html">關於與聲明</a>
+        <span>|</span>
+        <a href="pages/thanks/thanks.html">特別鳴謝</a>
+        <span>|</span>
+        <a href="javascript:void(0);" id="open-message-btn">留言</a>
+    </div>
+
+    <!-- Message Modal (iOS 18 App Store Style) -->
+    <div id="message-modal" class="modal-overlay">
+        <div class="modal-sheet">
+            <div class="sheet-header">
+                <h2 class="sheet-title">留言</h2>
+                <button id="history-message-btn" class="sheet-close-btn">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="8" y1="6" x2="21" y2="6"></line>
+                        <line x1="8" y1="12" x2="21" y2="12"></line>
+                        <line x1="8" y1="18" x2="21" y2="18"></line>
+                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                    </svg>
+                </button>
+                <div id="history-popover" class="history-popover">
+                    <h4>我的歷史留言</h4>
+                    <div id="history-list">
+                        <div class="empty-history">暫無留言紀錄</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sheet-content">
+                <textarea id="message-input" class="ios-textarea" maxlength="50"></textarea>
+                <div class="char-counter"><span id="char-count">0</span>/50</div>
+            </div>
+            
+            <div class="sheet-footer">
+                <button id="desktop-cancel-btn" class="macos-cancel-btn">取消</button>
+                <button id="submit-message-btn" class="ios-submit-btn">發送</button>
+            </div>
+        </div>
+    </div>
+
+<!-- ==========================================================================
+ * COMMENTING STANDARDS
+ * 1. Block comments only. Use HTML comments for DOM and /* */ for inline scripts.
+ * 2. Section dividers use the === banner format.
+ * 3. All prose is written in English.
+ * 4. No debugging notes or temporary workarounds in committed code.
+ * 5. Store temporary files under /temp/[feature_name]/.
+ ========================================================================== -->
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>私立中山紀念堂</title>
+
+    <link rel="icon" href="main/favicon/favicon.svg" type="image/svg+xml">
+    <link rel="alternate icon" href="main/favicon/favicon.ico" type="image/x-icon" sizes="any">
+
+    <link rel="preload" href="webapp/icon/icon-mobile.png" as="image">    
+    <link rel="apple-touch-icon" href="webapp/icon/icon-mobile.png">
+    
+    <link rel="stylesheet" href="main/style.css?v=1047">
 
     <!-- System Dark/Light theme-color -->
     <meta name="color-scheme" content="light dark">
@@ -164,8 +324,8 @@
         </div>
     </div>
 
-    <audio id="bg-music" src="main/sanmin/sanmin.flac"></audio>
+    <audio id="bg-music" src="main/anthem/anthem.m4a"></audio>
     <script src="api/env.js"></script>
-    <script src="main/script.js?v=1044"></script>
+    <script src="main/script.js?v=1047"></script>
 </body>
 </html>
