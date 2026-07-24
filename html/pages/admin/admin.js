@@ -6,6 +6,18 @@ const loginScreen = document.getElementById('login-screen');
 const dashboardScreen = document.getElementById('dashboard-screen');
 const loginForm = document.getElementById('login-form');
 const passwordInput = document.getElementById('admin-password');
+
+// SHA-256 Helper function for secure transport
+async function hashSHA256(message) {
+    if (!window.crypto || !window.crypto.subtle) {
+        throw new Error("INSECURE_CONTEXT");
+    }
+    const msgBuffer = new TextEncoder().encode(message);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 const danmakuList = document.getElementById('danmaku-list');
 const totalCount = document.getElementById('total-count');
 const refreshBtn = document.getElementById('refresh-btn');
@@ -491,19 +503,58 @@ async function deleteDanmaku(id, element) {
 }
 
 // Event Listeners
-loginForm.addEventListener('submit', (e) => {
+loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    adminKey = passwordInput.value.trim();
-    if (adminKey) {
-        localStorage.setItem('danmaku_admin_key', adminKey);
-        showDashboard();
+    const plaintextKey = passwordInput.value.trim();
+    if (!plaintextKey) return;
+
+    const submitBtn = loginForm.querySelector('button');
+    const oldText = submitBtn.textContent;
+    submitBtn.textContent = '登入中...';
+    submitBtn.disabled = true;
+
+    try {
+        const tempKey = await hashSHA256(plaintextKey);
+        
+        const res = await fetch(WORKER_API + '/admin/config?admin_key=' + encodeURIComponent(tempKey));
+        if (res.ok) {
+            adminKey = tempKey;
+            localStorage.setItem('danmaku_admin_key', adminKey);
+            showDashboard();
+        } else {
+            showToast('密碼錯誤');
+            passwordInput.value = '';
+            passwordInput.focus();
+        }
+    } catch (err) {
+        if (err.message === "INSECURE_CONTEXT") {
+            showToast('瀏覽器安全限制：非 HTTPS 環境無法執行加密，請使用 localhost 或綁定 SSL');
+        } else {
+            showToast('網路連線失敗，請稍後再試');
+        }
+    } finally {
+        submitBtn.textContent = oldText;
+        submitBtn.disabled = false;
     }
 });
 
 refreshBtn.addEventListener('click', loadDanmaku);
 logoutBtn.addEventListener('click', showLogin);
 
-// Init
+// Init: verify existing token
 if (adminKey) {
-    showDashboard();
+    fetch(WORKER_API + '/admin/config?admin_key=' + encodeURIComponent(adminKey))
+        .then(res => {
+            if (res.ok) {
+                showDashboard();
+            } else {
+                localStorage.removeItem('danmaku_admin_key');
+                adminKey = '';
+                showLogin();
+            }
+        })
+        .catch(() => {
+            // If network fails on init, still try to show login screen
+            showLogin();
+        });
 }

@@ -332,9 +332,11 @@ input[type="password"]:focus {
  * ============================================================================ */
 .toast {
     position: fixed;
-    bottom: -100px;
+    bottom: 40px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, 150%);
+    opacity: 0;
+    pointer-events: none;
     background: var(--header-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -346,11 +348,15 @@ input[type="password"]:focus {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     border: 0.5px solid var(--separator);
     z-index: 9999;
-    transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
+    text-align: center;
+    max-width: 90vw;
 }
 
 .toast.show {
-    bottom: 40px;
+    transform: translate(-50%, 0);
+    opacity: 1;
+    pointer-events: auto;
 }
 
 /* ============================================================================
@@ -435,7 +441,7 @@ input[type="password"]:focus {
 }
 
 input:checked + .slider {
-    background-color: var(--primary); /* iOS Green */
+    background-color: var(--blue); /* iOS Blue theme for admin */
 }
 
 input:checked + .slider:before {

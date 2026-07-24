@@ -220,12 +220,20 @@ async function handleRequest(request, event) {
             return new Response(JSON.stringify({ error: "Missing message ID." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
         }
 
-        /* Check Admin Privileges */
+        /* Check Admin Privileges using SHA-256 Hash */
         const expectedSecret = typeof ADMIN_SECRET !== 'undefined' ? ADMIN_SECRET : "SunYatSen1911";
-        const isAdmin = admin_key === expectedSecret;
+        
+        // Helper function for SHA-256 inside worker
+        async function hashSecret(secret) {
+            const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(secret));
+            return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        
+        const expectedHash = await hashSecret(expectedSecret);
+        const isAdmin = admin_key === expectedHash;
 
         if (!isAdmin && !fp) {
-            return new Response(JSON.stringify({ error: "Missing required fingerprint." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+            return new Response(JSON.stringify({ error: "Missing required fingerprint or unauthorized." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
         }
 
         let danmakuData = await MEMORIAL_KV.get("DANMAKU_LIST");
@@ -259,9 +267,20 @@ async function handleRequest(request, event) {
      * ============================================================================ */
     if (url.pathname === '/admin/config') {
         const expectedSecret = typeof ADMIN_SECRET !== 'undefined' ? ADMIN_SECRET : "SunYatSen1911";
+        
+        async function hashSecret(secret) {
+            const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(secret));
+            return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        const expectedHash = await hashSecret(expectedSecret);
 
         /* [GET] Retrieve current config */
         if (request.method === "GET") {
+            const adminKeyParam = url.searchParams.get('admin_key');
+            if (adminKeyParam !== expectedHash) {
+                return new Response(JSON.stringify({ error: "Unauthorized." }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+            }
+
             const whitelistMode = await MEMORIAL_KV.get("WHITELIST_MODE_ENABLED");
             
             let baseWordsCount = FALLBACK_BANNED_WORDS.length;
@@ -314,7 +333,7 @@ async function handleRequest(request, event) {
             const body = await request.json();
             const { admin_key, whitelistMode, baseBannedWords, privateBannedWords, aiConfig, clearLlmBlacklist } = body;
 
-            if (admin_key !== expectedSecret) {
+            if (admin_key !== expectedHash) {
                 return new Response(JSON.stringify({ error: "Unauthorized." }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
             }
 
