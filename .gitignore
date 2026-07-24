@@ -1,4 +1,4 @@
 html/api/env.js
 html/env.js
 /temp/
-private_blacklist.json
+html/api/private_blacklist.json
