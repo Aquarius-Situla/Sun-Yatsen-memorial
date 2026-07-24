@@ -27,7 +27,7 @@
  *   festivalPage — URL path for the festival detail page.
  * ============================================================================ */
 
-const DEFAULT_MUSIC = { src: 'main/anthem/anthem.flac', title: '三民主義歌', artist: '孫文' };
+const DEFAULT_MUSIC = { src: 'main/sanmin/sanmin.flac', title: '三民主義歌', artist: '孫文' };
 
 const SPECIAL_MEMORIAL_DAYS = [
     {
@@ -229,7 +229,7 @@ function setupMediaSession(config) {
         title:   config.title,
         artist:  config.artist,
         album:   '私立中山紀念堂',
-        artwork: [ { src: 'main/anthem/album-cover.png', sizes: '1254x1254', type: 'image/png' } ]
+        artwork: [ { src: 'main/sanmin/album-cover.png', sizes: '1254x1254', type: 'image/png' } ]
     });
 
     navigator.mediaSession.setActionHandler('play',  () => { audio.play(); isPlaying = true; });
