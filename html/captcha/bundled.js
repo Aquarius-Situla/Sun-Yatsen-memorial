@@ -8448,7 +8448,7 @@
                 } else {
                   const m = machineEl.current?.getBoundingClientRect();
                   const tr = trayEl.current?.getBoundingClientRect();
-                  if (m && tr) s.mouthY = (tr.top - m.top) / (m.width ? m.width / 440 : 1) + 2;
+                  if (m && tr) s.mouthY = (tr.top - m.top) / (m.width ? m.width / 380 : 1) + 2;
                   s.fallV = 30;
                 }
               } else {
