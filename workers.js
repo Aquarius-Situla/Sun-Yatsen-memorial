@@ -221,7 +221,7 @@ async function handleRequest(request, event) {
         }
 
         /* Check Admin Privileges using SHA-256 Hash */
-        const expectedSecret = typeof ADMIN_SECRET !== 'undefined' ? ADMIN_SECRET : "SunYatSen1911";
+        const expectedSecret = typeof ADMIN_SECRET !== 'undefined' ? String(ADMIN_SECRET).trim() : "SunYatSen1911";
         
         // Helper function for SHA-256 inside worker
         async function hashSecret(secret) {
@@ -266,7 +266,7 @@ async function handleRequest(request, event) {
      * Route: /admin/config (GET / POST handlers for Admin Config)
      * ============================================================================ */
     if (url.pathname === '/admin/config') {
-        const expectedSecret = typeof ADMIN_SECRET !== 'undefined' ? ADMIN_SECRET : "SunYatSen1911";
+        const expectedSecret = typeof ADMIN_SECRET !== 'undefined' ? String(ADMIN_SECRET).trim() : "SunYatSen1911";
         
         async function hashSecret(secret) {
             const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(secret));
@@ -324,7 +324,11 @@ async function handleRequest(request, event) {
                 llmBannedWordsList: llmBannedWordsList
             }), {
                 status: 200,
-                headers: { ...corsHeaders, "Content-Type": "application/json" }
+                headers: { 
+                    ...corsHeaders, 
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate"
+                }
             });
         }
 

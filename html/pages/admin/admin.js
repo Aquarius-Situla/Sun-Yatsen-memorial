@@ -113,7 +113,7 @@ function showDashboard() {
 
 async function loadConfig() {
     try {
-        const res = await fetch(WORKER_API + '/admin/config');
+        const res = await fetch(WORKER_API + '/admin/config?admin_key=' + encodeURIComponent(adminKey), { cache: 'no-store' });
         if (res.ok) {
             const data = await res.json();
             whitelistToggle.checked = data.whitelistMode;
@@ -325,7 +325,13 @@ function handleFileUpload(inputElement, configKey) {
                 const data = await res.json();
                 if (data.success) {
                     showToast('上傳成功！');
-                    loadConfig(); // Refresh counts
+                    // Optimistically update UI to bypass KV propagation delay
+                    if (configKey === 'baseBannedWords' && baseCountDisplay) {
+                        baseCountDisplay.textContent = arr.length;
+                    }
+                    if (configKey === 'privateBannedWords' && privateCountDisplay) {
+                        privateCountDisplay.textContent = arr.length;
+                    }
                 } else {
                     showToast('上傳失敗：' + (data.error || '權限不足'));
                 }
@@ -516,7 +522,9 @@ loginForm.addEventListener('submit', async (e) => {
     try {
         const tempKey = await hashSHA256(plaintextKey);
         
-        const res = await fetch(WORKER_API + '/admin/config?admin_key=' + encodeURIComponent(tempKey));
+        const res = await fetch(WORKER_API + '/admin/config?admin_key=' + encodeURIComponent(tempKey), {
+            cache: 'no-store'
+        });
         if (res.ok) {
             adminKey = tempKey;
             localStorage.setItem('danmaku_admin_key', adminKey);
@@ -538,7 +546,10 @@ loginForm.addEventListener('submit', async (e) => {
     }
 });
 
-refreshBtn.addEventListener('click', loadDanmaku);
+refreshBtn.addEventListener('click', () => {
+    loadDanmaku();
+    loadConfig();
+});
 logoutBtn.addEventListener('click', showLogin);
 
 // Init: verify existing token
