@@ -1,3 +1,15 @@
+# ============================================================================
+# Private Sun Yat-sen Memorial Hall — Docker Compose (docker-compose.yml)
+# ============================================================================
+# COMMENTING STANDARDS
+# 1. Block-style comments only (full line `#`). Inline comments are strictly
+#    prohibited.
+# 2. Section dividers use the === banner format.
+# 3. All prose is written in English.
+# 4. No debugging notes or temporary workarounds in committed code.
+# 5. Store temporary files under /temp/[feature_name]/.
+# ============================================================================
+
 services:
   sys-memorial:
     image: nginx:alpine
@@ -5,12 +17,22 @@ services:
     restart: always
     volumes:
       - ./html:/usr/share/nginx/html:ro
-    #ports:
-    #  - "8085:80" # VPS 对外暴露的端口（保留此端口方便你直接通过 IP:8085 测试访问）
+    # ========================================================================
+    # Uncomment the ports mapping below for direct IP testing without a proxy.
+    # ========================================================================
+    # ports:
+    #   - "8085:80"
     networks:
-      - npm_default # 将容器加入到你的 npm_default 网络中
+      - npm_default
 
+# ============================================================================
+# Network Configuration
+# ============================================================================
+# Connects the container to an existing external network. 
+# `npm_default` is the default internal Docker network automatically created 
+# when deploying Nginx Proxy Manager. This allows the proxy to route traffic
+# directly to this container without exposing ports to the host machine.
+# ============================================================================
 networks:
   npm_default:
-    external: true # 声明这是一个外部已经存在的网络
-
+    external: true

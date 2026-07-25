@@ -68,37 +68,82 @@ The compose file mounts `./html` as a read-only volume served by Nginx.
 3. Deploy `workers.js` to the Worker.
 4. Copy `html/api/env.example.js` to `html/api/env.js` and set `WORKER_API` to your Worker URL.
 
+## Admin Dashboard
+
+The project includes a centralized Admin Dashboard for managing platform data, moderation, and AI settings. It features an iOS/macOS-inspired frosted glass aesthetic with deep dark mode support.
+
+- **URL Path**: `/#admin` (Shortcut) or `/pages/admin/index.html` (Full path)
+- **Authentication**: Secured by a client-side SHA-256 hashed `admin_key` matching the backend environment variable. Also protected by PlayCaptcha to prevent brute-force attacks.
+- **Key Features**:
+  - **Danmaku Management**: View, delete, and filter all live comments. Upload and sync `public.json` and `private.json` prohibited word lists directly to the Cloudflare KV store.
+  - **AI Matrix Management**: Configure, edit, and delete backend AI personalities.
+  - **Platform Settings**: Toggle site-wide announcements, maintenance modes, and other configuration flags.
+
 ## PlayCaptcha Integration
 
-The project uses a heavily customized version of `playcaptcha` to prevent spam (e.g., Danmaku abuse). It has been tailored for optimal responsive display across all viewports (including iPhone 12 mini) and features a highly specific deep dark mode overlay that respects system settings even within restricted WebViews.
+The project uses a heavily customized version of `playcaptcha` to prevent spam and automated attacks (e.g., Danmaku abuse, brute-force logins). It has been tailored for optimal responsive display and features a highly specific deep dark mode overlay that respects system settings even within restricted WebViews.
 
-To integrate this popup Captcha into other HTML pages, follow these requirements:
+To ensure maximum stability and avoid script loading conflicts, the Captcha must be integrated using the **isolated iframe method**. 
+
+To add the Captcha to any new page, follow these steps:
 
 ### 1. HTML Structure
-Insert the following modal wrapper at the bottom of the `<body>`:
+Insert the following modal wrapper at the bottom of the `<body>`. Ensure the `src` path correctly points to the `html/captcha/index.html` file relative to your page.
 
 ```html
-<div id="captcha-modal-overlay" class="modal-overlay">
-    <div class="captcha-modal-content" id="captcha-root"></div>
+<div id="captcha-modal-overlay" class="modal-overlay" style="display: none; align-items: center; justify-content: center; z-index: 9999;">
+    <div class="captcha-modal-content" style="background: transparent; width: 440px; height: 620px; display: flex; justify-content: center; align-items: center;">
+        <iframe id="captcha-iframe" src="../../captcha/index.html" style="border: none; width: 100%; height: 100%; border-radius: 14px; background: transparent;" allowtransparency="true"></iframe>
+    </div>
 </div>
 ```
 
-### 2. Dependencies
-Ensure the target page includes the core stylesheet and environment script, and sets the color-scheme meta tag to enforce proper dark mode rendering in iOS WebViews:
+### 2. Invocation & Event Listener
+In your page's JavaScript, you do not need to dynamically load any React scripts. Simply show the overlay, reload the iframe (to reset the game state), and listen for the `CAPTCHA_SUCCESS` message.
 
-```html
-<meta name="color-scheme" content="light dark">
-<link rel="stylesheet" href="main/style.css?v=1044">
-<script src="api/env.js"></script>
-<script src="main/script.js?v=1044"></script>
-```
-
-### 3. Invocation
-The captcha operates as an independent module. Trigger it via JavaScript by calling:
 ```javascript
-showCaptcha();
+let captchaSuccessCallback = null;
+
+// 1. Listen for the success signal from the iframe
+window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'CAPTCHA_SUCCESS') {
+        const overlay = document.getElementById('captcha-modal-overlay');
+        if (overlay) overlay.style.display = 'none';
+        
+        // Execute callback
+        if (captchaSuccessCallback) {
+            const cb = captchaSuccessCallback;
+            captchaSuccessCallback = null;
+            setTimeout(cb, 300);
+        }
+    }
+});
+
+// 2. Trigger the Captcha
+function showCaptcha(onSuccess) {
+    const overlay = document.getElementById('captcha-modal-overlay');
+    const iframe = document.getElementById('captcha-iframe');
+    if (!overlay || !iframe) return;
+    
+    captchaSuccessCallback = onSuccess;
+    
+    // Reload the iframe to ensure a fresh Captcha session
+    iframe.src = iframe.src;
+    overlay.style.display = 'flex';
+}
 ```
-Upon successful human verification, the module automatically unmounts itself to cleanly reset its state and fires `window.onCaptchaSuccess()`. Define this global callback to handle your post-verification logic (e.g., restoring suspended UI elements).
+
+## Danmaku Filter (Prohibited Words)
+
+The Danmaku system uses a robust backend filter to prevent inappropriate content. The prohibited words are managed via two JSON files: `public.json` and `private.json`.
+
+> [!WARNING]
+> Placing or modifying these `.json` files inside the local `/html/api/prohibited_words/` directory **has no effect on the live system**. The local directory is strictly for archival and reference purposes.
+
+To enforce the prohibited words filter, the lists must be synchronized with the Cloudflare Worker KV store. You must manually upload these files via the Admin Dashboard:
+1. Log into the Memorial Admin Dashboard.
+2. Navigate to the **Danmaku Management** (彈幕管理) section.
+3. Use the upload interface to upload your latest `public.json` and `private.json` files to the backend KV namespace.
 
 ## AI Agent Instructions
 
@@ -108,7 +153,16 @@ When maintaining this project, AI assistants and agents **must** adhere to the f
 - **Format Integrity**: Do not translate or alter any strings intended for user display (e.g. Traditional Chinese UI text, banners, toasts) unless explicitly instructed to do so.
 - **No Temporary Notes**: Do not commit debugging notes, temporary workarounds, or informal remarks into the codebase. Keep comments professional, focusing on architecture and module boundaries.
 - **Temporary Files Management**: Whenever an agent generates temporary files (such as test scripts, data extraction scripts, or debugging outputs), these files MUST be placed under `/temp/[feature_name]/` to keep the root directory clean and manageable.
+- **Captcha Integration (CRITICAL)**: **NEVER** attempt to dynamically inject React/ReactDOM UMD scripts to render the Captcha on a page, as it causes severe dependency conflicts, styling bugs, and race conditions. **ALWAYS** use the isolated `iframe` method exactly as documented in the `PlayCaptcha Integration` section above. Do not alter the `captcha/index.html` file unless specifically requested.
 
+
+## Open Source Acknowledgements
+
+This project utilizes the following open-source libraries licensed under the MIT License:
+
+- **zero-md**: Sub-page Markdown rendering engine. Copyright (c) 2018 Jason Lee.
+- **github-markdown-css**: Elegant and readable Markdown stylesheet. Copyright (c) Sindre Sorhus.
+- **playcaptcha**: Interactive claw machine captcha component. Copyright (c) 2026 iisac.
 
 ## Licensing
 

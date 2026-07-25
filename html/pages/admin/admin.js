@@ -7,6 +7,101 @@ const dashboardScreen = document.getElementById('dashboard-screen');
 const loginForm = document.getElementById('login-form');
 const passwordInput = document.getElementById('admin-password');
 
+let captchaSuccessCallback = null;
+
+// Listen for iframe success message
+window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'CAPTCHA_SUCCESS') {
+        const overlay = document.getElementById('captcha-modal-overlay');
+        if (overlay) overlay.style.display = 'none';
+        
+        if (captchaSuccessCallback) {
+            const cb = captchaSuccessCallback;
+            captchaSuccessCallback = null;
+            setTimeout(cb, 300);
+        }
+    }
+});
+
+function showCaptcha(onSuccessCallback) {
+    const overlay = document.getElementById('captcha-modal-overlay');
+    const iframe = document.getElementById('captcha-iframe');
+    if (!overlay || !iframe) return;
+    
+    captchaSuccessCallback = onSuccessCallback;
+    
+    // Reload iframe to get a fresh Captcha
+    iframe.src = iframe.src;
+    overlay.style.display = 'flex';
+}
+
+// --- Login Logic ---
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Trigger Captcha before actual login attempt
+        const submitBtn = loginForm.querySelector('button');
+        const oldText = submitBtn.textContent;
+        submitBtn.textContent = '安全驗證中...';
+        submitBtn.disabled = true;
+
+        showCaptcha(async () => {
+            const pwd = passwordInput.value.trim();
+            if (!pwd) {
+                showToast('請輸入密碼');
+                submitBtn.textContent = oldText;
+                submitBtn.disabled = false;
+                return;
+            }
+            
+            // Hash password and attempt login
+            try {
+                submitBtn.textContent = '登入中...';
+                const tempKey = await hashSHA256(pwd);
+                
+                const res = await fetch(WORKER_API + '/admin/config?admin_key=' + encodeURIComponent(tempKey), {
+                    cache: 'no-store'
+                });
+                
+                if (res.ok) {
+                    adminKey = tempKey;
+                    localStorage.setItem('danmaku_admin_key', adminKey);
+                    showDashboard();
+                } else {
+                    showToast('密碼錯誤');
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            } catch (err) {
+                if (err.message === "INSECURE_CONTEXT") {
+                    showToast('瀏覽器安全限制：非 HTTPS 環境無法執行加密，請使用 localhost 或綁定 SSL');
+                } else {
+                    showToast('網路連線失敗，請稍後再試');
+                }
+            } finally {
+                submitBtn.textContent = oldText;
+                submitBtn.disabled = false;
+            }
+        });
+        
+        // If user closes captcha without solving (if supported by playcaptcha), we should ideally reset the button, 
+        // but since playcaptcha doesn't have an onClose callback out of the box, we reset it if overlay is hidden manually
+        const overlay = document.getElementById('captcha-modal-overlay');
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'style') {
+                    if (overlay.style.display === 'none') {
+                        submitBtn.textContent = oldText;
+                        submitBtn.disabled = false;
+                    }
+                }
+            });
+        });
+        if (overlay) observer.observe(overlay, { attributes: true });
+    });
+}
+
 // SHA-256 Helper function for secure transport
 async function hashSHA256(message) {
     if (!window.crypto || !window.crypto.subtle) {
@@ -163,10 +258,17 @@ whitelistToggle.addEventListener('change', async (e) => {
 });
 
 // Add AI Button Toggle
+let editingAiIndex = -1;
+
 if (addAiBtn) {
     addAiBtn.addEventListener('click', () => {
         if (addAiForm.style.display === 'none') {
             addAiForm.style.display = 'flex';
+            editingAiIndex = -1;
+            if (aiEndpoint) aiEndpoint.value = '';
+            if (aiModel) aiModel.value = '';
+            if (aiKeys) aiKeys.value = '';
+            if (saveAiBtn) saveAiBtn.textContent = '儲存並加入矩陣';
         } else {
             addAiForm.style.display = 'none';
         }
@@ -186,14 +288,38 @@ function renderAiModels() {
                 <div class="item-meta"><span>${model.endpoint}</span></div>
                 <div class="item-meta"><span>綁定 ${model.keys ? model.keys.split('\\n').length : 0} 把 Keys</span></div>
             </div>
-            <button class="ios-btn destructive" onclick="deleteAiModel(${index})">刪除</button>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button style="background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 4px; display: flex; align-items: center; justify-content: center;" onclick="editAiModel(${index})" title="設定">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                </button>
+                <button class="ios-btn destructive" onclick="deleteAiModel(${index})">刪除</button>
+            </div>
         `;
         aiListContainer.appendChild(div);
     });
 }
 
+window.editAiModel = function(index) {
+    editingAiIndex = index;
+    const model = currentAiModels[index];
+    if (aiEndpoint) aiEndpoint.value = model.endpoint || '';
+    if (aiModel) aiModel.value = model.model || '';
+    if (aiKeys) aiKeys.value = model.keys || '';
+    if (addAiForm) addAiForm.style.display = 'flex';
+    if (saveAiBtn) saveAiBtn.textContent = '更新此模型設定';
+    // Scroll to form smoothly
+    if (addAiForm) addAiForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+};
+
 window.deleteAiModel = function(index) {
     currentAiModels.splice(index, 1);
+    if (editingAiIndex === index) {
+        editingAiIndex = -1;
+        if (addAiForm) addAiForm.style.display = 'none';
+    }
     renderAiModels();
     saveConfig(true);
 };
@@ -243,17 +369,30 @@ if (saveAiBtn) {
             showToast('請填寫完整資訊');
             return;
         }
-        currentAiModels.push({
-            id: Date.now().toString(),
-            endpoint: ep,
-            model: mod,
-            keys: ks
-        });
-        renderAiModels();
+        
+        if (editingAiIndex >= 0 && editingAiIndex < currentAiModels.length) {
+            // Update existing
+            currentAiModels[editingAiIndex].endpoint = ep;
+            currentAiModels[editingAiIndex].model = mod;
+            currentAiModels[editingAiIndex].keys = ks;
+        } else {
+            // Add new
+            currentAiModels.push({
+                id: Date.now().toString(),
+                endpoint: ep,
+                model: mod,
+                keys: ks
+            });
+        }
+        
         aiEndpoint.value = '';
         aiModel.value = '';
         aiKeys.value = '';
         addAiForm.style.display = 'none';
+        editingAiIndex = -1;
+        if (saveAiBtn) saveAiBtn.textContent = '儲存並加入矩陣';
+        
+        renderAiModels();
         saveConfig(false);
     });
 }
@@ -509,42 +648,7 @@ async function deleteDanmaku(id, element) {
 }
 
 // Event Listeners
-loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const plaintextKey = passwordInput.value.trim();
-    if (!plaintextKey) return;
-
-    const submitBtn = loginForm.querySelector('button');
-    const oldText = submitBtn.textContent;
-    submitBtn.textContent = '登入中...';
-    submitBtn.disabled = true;
-
-    try {
-        const tempKey = await hashSHA256(plaintextKey);
-        
-        const res = await fetch(WORKER_API + '/admin/config?admin_key=' + encodeURIComponent(tempKey), {
-            cache: 'no-store'
-        });
-        if (res.ok) {
-            adminKey = tempKey;
-            localStorage.setItem('danmaku_admin_key', adminKey);
-            showDashboard();
-        } else {
-            showToast('密碼錯誤');
-            passwordInput.value = '';
-            passwordInput.focus();
-        }
-    } catch (err) {
-        if (err.message === "INSECURE_CONTEXT") {
-            showToast('瀏覽器安全限制：非 HTTPS 環境無法執行加密，請使用 localhost 或綁定 SSL');
-        } else {
-            showToast('網路連線失敗，請稍後再試');
-        }
-    } finally {
-        submitBtn.textContent = oldText;
-        submitBtn.disabled = false;
-    }
-});
+// Login event listener removed (now handled at the top of the file with Captcha)
 
 refreshBtn.addEventListener('click', () => {
     loadDanmaku();

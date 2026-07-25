@@ -82,7 +82,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: var(--page-bg);
+            background: transparent !important;
             font-family: sans-serif;
             overflow: hidden; /* Prevent scrolling when interacting */
         }
@@ -114,6 +114,58 @@
         #root:empty::before {
             content: '載入中...';
             color: #8a8a8e;
+        }
+
+        /* Deep Dark Mode for PlayCaptcha (Match Main App) */
+        @media (prefers-color-scheme: dark) {
+            #root .clawcap {
+                --clawcap-bg: #1c1c1e;
+                --clawcap-ink: #ffffff;
+                --clawcap-muted: #c7c7cc;
+                --clawcap-accent: #ff5159;
+                
+                --cc-bg: #1c1c1e !important;
+                --cc-ink: #ffffff !important;
+                --cc-muted: #c7c7cc !important;
+                --cc-line: rgba(255, 255, 255, 0.15) !important;
+                --cc-fill: #2c2c2e !important;
+                --cc-fill-2: #3a3a3c !important;
+                --cc-accent: #ff5159 !important;
+            }
+            
+            #root .clawcap-glass {
+                background: linear-gradient(180deg, #242426 0%, #1c1c1e 100%) !important;
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 8px rgba(0, 0, 0, 0.5) !important;
+            }
+            
+            #root .cc-glass-shine {
+                display: none !important;
+            }
+            
+            #root .clawcap-panel {
+                background: linear-gradient(180deg, #2a2a2c 0%, #202022 100%) !important;
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+            }
+            
+            #root .clawcap-steps-pill {
+                background: #4a4a4c !important;
+                box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+            }
+            
+            #root .clawcap-steps li.is-active .clawcap-step-n {
+                background: #ffffff !important;
+                color: #1c1c1e !important;
+            }
+            
+            #root .clawcap-info-n, #root .clawcap-info-done {
+                background: #ffffff !important;
+                color: #1c1c1e !important;
+            }
+            
+            #root .cc-tray-door, #root .cc-tray-skin {
+                background: linear-gradient(180deg, #3a3a3c 0%, #2c2c2e 100%) !important;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -10px 13px -10px rgba(0, 0, 0, 0.5) !important;
+            }
         }
     </style>
     

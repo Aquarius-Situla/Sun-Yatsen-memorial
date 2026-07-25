@@ -978,6 +978,7 @@ body.banner-active .dropdown-nav-bar {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
+    position: relative;
 }
 
 .sheet-title {
@@ -1109,7 +1110,7 @@ body.banner-active .dropdown-nav-bar {
 /* History Popover (MacOS Spotlight Style) */
 .history-popover {
     position: absolute;
-    top: 40px;
+    top: 25px; /* Moved up to partially overlap the button */
     right: 0;
     width: 260px;
     background: rgba(255, 255, 255, 0.85);
@@ -1144,7 +1145,7 @@ body.banner-active .dropdown-nav-bar {
 }
 
 #history-list {
-    max-height: 180px;
+    max-height: 130px; /* Restrict height so it stops around half of the send button */
     overflow-y: auto;
     font-size: 0.85rem;
 }
@@ -1233,7 +1234,7 @@ body.banner-active .dropdown-nav-bar {
 
 @media (prefers-color-scheme: dark) {
     .ios-submit-btn {
-        background: #007AFF; /* Revert to App Store Blue in dark mode */
+        background: #0a84ff; /* Revert to App Store Blue in dark mode */
         color: #ffffff;
     }
 }
@@ -1337,6 +1338,17 @@ body.banner-active .dropdown-nav-bar {
     .sheet-title {
         font-size: 1.15rem;
         font-weight: 700;
+    }
+
+    .history-popover {
+        top: 25px;
+        bottom: auto;
+        transform-origin: top right;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    #history-list {
+        max-height: 200px; /* More space on desktop */
     }
 
     /* Make the history button appear on desktop in the top right, same as mobile */

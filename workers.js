@@ -18,7 +18,7 @@ addEventListener('fetch', event => {
 /* Server-Side Banned Word Dictionary will be dynamically loaded from KV when possible.
  * This is a minimal fallback list if KV fetch fails or is empty.
  */
-const FALLBACK_BANNED_WORDS = ['測試敏感詞', '法轮功', '台独', '共匪', '下台', '台湾'];
+// The base banned words list is now entirely managed via KV and the Admin Dashboard.
 const WHITELIST_PHRASES = ['孫先生萬歲！', '中國萬歲！', '中華萬歲！', '萬歲！', '萬歲'];
 
 async function handleRequest(request, event) {
@@ -58,7 +58,7 @@ async function handleRequest(request, event) {
       if (request.method === "GET") {
         /* Add a sub-route to get the public banned words list for the frontend soft-filter */
         if (url.searchParams.get('action') === 'get_banned_words') {
-            let serverBannedWords = FALLBACK_BANNED_WORDS;
+            let serverBannedWords = [];
             try {
                 const kvBannedWords = await MEMORIAL_KV.get("BANNED_WORDS_DICT");
                 if (kvBannedWords) {
@@ -126,7 +126,7 @@ async function handleRequest(request, event) {
         }
 
         /* 2. Server-side Profanity Filter: Mask banned words with *** */
-        let serverBannedWords = FALLBACK_BANNED_WORDS;
+        let serverBannedWords = [];
         try {
             const kvBannedWords = await MEMORIAL_KV.get("BANNED_WORDS_DICT");
             if (kvBannedWords) {
@@ -136,7 +136,7 @@ async function handleRequest(request, event) {
                 }
             }
         } catch (e) {
-            /* Silently fallback to FALLBACK_BANNED_WORDS if JSON parse fails */
+            /* Silently fallback to [] if JSON parse fails */
         }
 
         /* 2.5 Private Blacklist Filter */
@@ -167,10 +167,14 @@ async function handleRequest(request, event) {
 
         const allBannedWords = [...serverBannedWords, ...privateBannedWords, ...llmBannedWords];
 
+        const originalText = text;
         for (let word of allBannedWords) {
-            const regex = new RegExp(word, 'gi');
+            // Escape special characters in the banned word to prevent regex parsing errors
+            const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(escapedWord, 'gi');
             text = text.replace(regex, '***');
         }
+        const isMasked = text !== originalText;
 
         /* 3. Retrieve and update the Danmaku array (Capped at 50 to prevent KV bloat) */
         let danmakuData = await MEMORIAL_KV.get("DANMAKU_LIST");
@@ -192,8 +196,8 @@ async function handleRequest(request, event) {
         timestamps.push(now);
         await MEMORIAL_KV.put(lockKey, JSON.stringify(timestamps), { expirationTtl: 60 });
 
-        /* 5. Async AI Moderation check */
-        if (event && event.waitUntil) {
+        /* 5. Async AI Moderation check (Skip if already flagged by static blacklists or if in Whitelist mode) */
+        if (event && event.waitUntil && !isMasked && whitelistMode !== "true") {
             try {
                 const aiConfigStr = await MEMORIAL_KV.get("AI_CONFIG");
                 if (aiConfigStr) {
@@ -283,7 +287,7 @@ async function handleRequest(request, event) {
 
             const whitelistMode = await MEMORIAL_KV.get("WHITELIST_MODE_ENABLED");
             
-            let baseWordsCount = FALLBACK_BANNED_WORDS.length;
+            let baseWordsCount = 0;
             const kvBannedWords = await MEMORIAL_KV.get("BANNED_WORDS_DICT");
             if (kvBannedWords) {
                 try {
@@ -332,6 +336,17 @@ async function handleRequest(request, event) {
             });
         }
 
+        /* ============================================================================
+         * [FUTURE UPGRADE] Cloudflare Zero Trust (Access) / 2FA & Passkey
+         * ============================================================================
+         * To enable hardware Passkeys (YubiKey, FaceID, TouchID) or TOTP 2FA,
+         * DO NOT write custom crypto logic here. Instead:
+         * 1. Go to Cloudflare Dashboard -> Zero Trust -> Access -> Applications.
+         * 2. Create an Application protecting the path `*/admin/*`.
+         * 3. Set up an Access Policy requiring specific emails or Identity Providers.
+         * 4. Zero Trust will automatically intercept requests BEFORE they hit this Worker,
+         *    providing enterprise-grade 2FA/Passkey verification and WAF protection.
+         * ============================================================================ */
         /* [POST] Update config */
         if (request.method === "POST") {
             const body = await request.json();
