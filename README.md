@@ -47,6 +47,7 @@ sys-memorial/
 │   └── webapp/                 # PWA manifest, icons, and iOS splash screens
 ├── docker-compose.yml
 ├── temp/                       # Temporary files generated during agent development
+├── bugfix/                     # Archive of epic bug post-mortems and lessons learned
 ├── workers.js                  # Cloudflare Worker source
 └── README.md
 ```

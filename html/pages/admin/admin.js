@@ -245,6 +245,15 @@ whitelistToggle.addEventListener('change', async (e) => {
         const data = await res.json();
         if (data.success) {
             showToast(isEnabled ? '白名單模式已開啟' : '白名單模式已關閉');
+            
+            // If Whitelist Mode is enabled, force AI Mode off
+            if (isEnabled && typeof aiToggle !== 'undefined' && aiToggle) {
+                if (aiToggle.checked) {
+                    aiToggle.checked = false;
+                    if (typeof saveConfig === 'function') saveConfig(false);
+                    showToast('已自動關閉 AI (白名單模式互斥)');
+                }
+            }
         } else {
             showToast('設定失敗：' + (data.error || '權限不足'));
             e.target.checked = !isEnabled; // Revert
@@ -353,7 +362,14 @@ async function saveConfig(silent = false) {
 
 // AI Toggle onChange
 if (aiToggle) {
-    aiToggle.addEventListener('change', () => saveConfig(false));
+    aiToggle.addEventListener('change', (e) => {
+        if (e.target.checked && whitelistToggle && whitelistToggle.checked) {
+            e.target.checked = false;
+            showToast('白名單模式下無法啟用 AI！');
+            return;
+        }
+        saveConfig(false);
+    });
 }
 if (aiChinaToggle) {
     aiChinaToggle.addEventListener('change', () => saveConfig(false));

@@ -342,15 +342,26 @@ async function handleRequest(request, event) {
          * To enable hardware Passkeys (YubiKey, FaceID, TouchID) or TOTP 2FA,
          * DO NOT write custom crypto logic here. Instead:
          * 1. Go to Cloudflare Dashboard -> Zero Trust -> Access -> Applications.
-         * 2. Create an Application protecting the path `*/admin/*`.
+         * 2. Create an Application protecting the path `/admin/*` or similar.
          * 3. Set up an Access Policy requiring specific emails or Identity Providers.
          * 4. Zero Trust will automatically intercept requests BEFORE they hit this Worker,
          *    providing enterprise-grade 2FA/Passkey verification and WAF protection.
          * ============================================================================ */
         /* [POST] Update config */
         if (request.method === "POST") {
-            const body = await request.json();
-            const { admin_key, whitelistMode, baseBannedWords, privateBannedWords, aiConfig, clearLlmBlacklist } = body;
+            let body = {};
+            try {
+                body = await request.json();
+            } catch (err) {
+                return new Response(JSON.stringify({ error: "Invalid JSON format." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+            }
+            
+            const admin_key = body.admin_key;
+            const whitelistMode = body.whitelistMode;
+            const baseBannedWords = body.baseBannedWords;
+            const privateBannedWords = body.privateBannedWords;
+            const aiConfig = body.aiConfig;
+            const clearLlmBlacklist = body.clearLlmBlacklist;
 
             if (admin_key !== expectedHash) {
                 return new Response(JSON.stringify({ error: "Unauthorized." }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
