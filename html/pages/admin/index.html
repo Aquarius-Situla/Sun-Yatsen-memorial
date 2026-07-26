@@ -7,7 +7,7 @@
     
     <link rel="icon" href="../../main/favicon/favicon.svg" type="image/svg+xml">
     
-    <link rel="stylesheet" href="admin.css?v=1053">
+    <link rel="stylesheet" href="admin.css?v=1058">
     
     <!-- System Dark/Light theme-color -->
     <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
@@ -243,7 +243,10 @@
         <div class="modal-sheet">
             <div class="sheet-header">
                 <h2 class="sheet-title">AI 監督學習</h2>
-                <button id="learn-help-btn" class="sheet-close-btn" title="什麼是監督學習？"></button>
+                <div class="sheet-actions">
+                    <button id="learn-help-btn" class="sheet-action-btn" title="什麼是監督學習？">?</button>
+                    <button id="learn-close-btn" class="sheet-action-btn" title="關閉"><div class="sheet-close-icon"></div></button>
+                </div>
                 <div id="learn-help-popover" class="history-popover">
                     <h4>AI 監督學習功能</h4>
                     <div style="font-size: 0.85rem; color: var(--text-secondary, #555); line-height: 1.4; white-space: normal;">
@@ -265,6 +268,6 @@
 
     <!-- Environment variables to locate the worker -->
     <script src="../../api/env.js"></script>
-    <script src="admin.js?v=1054"></script>
+    <script src="admin.js?v=1055"></script>
 </body>
 </html>

@@ -751,6 +751,7 @@ if (adminKey) {
 const aiLearnModal = document.getElementById('ai-learn-modal');
 const learnHelpBtn = document.getElementById('learn-help-btn');
 const learnCancelBtn = document.getElementById('learn-cancel-btn');
+const learnCloseBtn = document.getElementById('learn-close-btn');
 const learnSubmitBtn = document.getElementById('learn-submit-btn');
 const learnReasonInput = document.getElementById('learn-reason-input');
 
@@ -780,6 +781,9 @@ if (learnHelpBtn) {
             learnHelpPopover.classList.toggle('show');
         }
     });
+}
+if (learnCloseBtn) {
+    learnCloseBtn.addEventListener('click', closeAiLearnModal);
 }
 
 // Close popover when clicking anywhere else

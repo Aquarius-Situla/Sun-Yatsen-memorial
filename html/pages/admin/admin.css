@@ -518,7 +518,7 @@ input:checked + .slider:before {
 }
 .modal-sheet {
     position: relative;
-    background: #faf7f2;
+    background: var(--card-bg);
     width: 100%; max-width: 500px;
     border-radius: 14px 14px 0 0;
     padding: 20px 16px 32px 16px;
@@ -543,24 +543,45 @@ input:checked + .slider:before {
     margin: 0;
     font-size: 1.3rem;
     font-weight: 700;
-    color: #000;
+    color: var(--text-primary);
 }
-.sheet-close-btn {
-    background: rgba(0, 0, 0, 0.08);
+.sheet-actions {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.sheet-action-btn {
+    background: var(--input-bg);
     border: none; border-radius: 50%;
     width: 30px; height: 30px;
     display: flex; justify-content: center; align-items: center;
-    color: #3c3c43; cursor: pointer;
+    cursor: pointer;
     transition: background 0.2s;
 }
-.sheet-close-btn:hover { background: rgba(0, 0, 0, 0.12); }
-.sheet-close-btn::before {
-    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%233c3c43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>');
-    display: block; width: 16px; height: 16px;
+.sheet-action-btn:hover { background: rgba(128, 128, 128, 0.25); }
+
+/* Mobile default: show close, hide help */
+#learn-help-btn { 
+    display: none; 
+    font-size: 16px;
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text-secondary);
+}
+#learn-close-btn { display: flex; }
+
+.sheet-close-icon {
+    width: 18px; height: 18px;
+    background-color: var(--text-secondary);
+    -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>') no-repeat center;
 }
 
 .sheet-content {
-    background: #ffffff;
+    background: var(--input-bg);
     border-radius: 14px;
     margin-bottom: 28px;
     overflow: hidden;
@@ -568,31 +589,54 @@ input:checked + .slider:before {
 .ios-textarea {
     width: 100%; height: 90px;
     background: transparent; border: none; border-radius: 0;
-    padding: 14px 16px; color: #000; font-size: 1rem;
+    padding: 14px 16px; color: var(--text-primary); font-size: 1rem;
     resize: none; font-family: inherit; box-sizing: border-box;
 }
 .ios-textarea:focus { outline: none; }
 
 .sheet-footer { display: flex; justify-content: center; padding: 0; gap: 12px; }
 .macos-cancel-btn {
-    display: flex; flex: 1; height: 36px; background: #e4e4e6;
-    border-radius: 8px; font-size: 1rem; font-weight: 500; color: #000;
-    border: 1px solid rgba(0,0,0,0.05);
+    display: flex; flex: 1; height: 36px; background: var(--input-bg);
+    border-radius: 8px; font-size: 1rem; font-weight: 500; color: var(--text-primary);
+    border: 1px solid var(--separator);
     justify-content: center; align-items: center; cursor: pointer;
 }
 .ios-submit-btn {
-    flex: 1; height: 36px; background: linear-gradient(180deg, #b8860b 0%, #8a6400 100%);
+    flex: 1; height: 36px; background: var(--blue);
     border-radius: 8px; font-size: 1rem; font-weight: 500; color: #fff;
     border: none; display: flex; justify-content: center; align-items: center; cursor: pointer;
 }
 
+/* Mobile override for footer buttons */
+@media (max-width: 599px) {
+    .macos-cancel-btn {
+        display: none !important;
+    }
+    .ios-submit-btn {
+        flex: none;
+        width: 110px;
+        height: 34px;
+        border-radius: 17px;
+        background: var(--blue);
+        color: #fff;
+        font-weight: 600;
+        transition: filter 0.2s;
+    }
+    .ios-submit-btn:active {
+        filter: brightness(0.85);
+    }
+}
+
 /* Desktop override */
 @media (min-width: 600px) {
+    #learn-help-btn { display: flex; }
+    #learn-close-btn { display: none; }
+    
     .modal-overlay { align-items: center; }
     .modal-sheet {
         width: clamp(280px, 35vw, 360px);
         border-radius: 16px; padding: 24px;
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--header-bg);
         backdrop-filter: blur(20px);
         transform: scale(0.9);
     }
