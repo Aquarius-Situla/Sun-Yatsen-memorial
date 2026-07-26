@@ -59,12 +59,13 @@ async function handleRequest(request, event) {
         /* Add a sub-route to get the public banned words list for the frontend soft-filter */
         if (url.searchParams.get('action') === 'get_banned_words') {
             let serverBannedWords = [];
+            const normalizeWords = (arr) => arr.map(x => typeof x === 'object' && x !== null ? x.word : x).filter(x => typeof x === 'string');
             try {
                 const kvBannedWords = await MEMORIAL_KV.get("BANNED_WORDS_DICT");
                 if (kvBannedWords) {
                     const parsedWords = JSON.parse(kvBannedWords);
                     if (Array.isArray(parsedWords)) {
-                        serverBannedWords = parsedWords;
+                        serverBannedWords = serverBannedWords.concat(normalizeWords(parsedWords));
                     }
                 }
             } catch (e) {}
@@ -89,6 +90,7 @@ async function handleRequest(request, event) {
       if (request.method === "POST") {
         const body = await request.json();
         const fp = body.fp || "unknown_fp";
+        const isDevMode = body.devMode === true;
         let text = body.text || "";
         
         if (!text.trim()) {
@@ -107,23 +109,67 @@ async function handleRequest(request, event) {
         }
 
         /* Whitelist Mode Check */
-        const whitelistMode = await MEMORIAL_KV.get("WHITELIST_MODE_ENABLED");
+        let whitelistMode = await MEMORIAL_KV.get("WHITELIST_MODE_ENABLED");
+        
+        // Auto-Whitelist Date Check
+        if (whitelistMode !== "true") {
+            const autoConfigStr = await MEMORIAL_KV.get("AUTO_WHITELIST_CONFIG");
+            if (autoConfigStr) {
+                try {
+                    const autoConfig = JSON.parse(autoConfigStr);
+                    if (autoConfig.enabled && autoConfig.datesStr) {
+                        const now = new Date();
+                        const gmt8Time = now.getTime() + (8 * 60 * 60 * 1000); // Shift to GMT+8
+                        const d = new Date(gmt8Time);
+                        const month = (d.getUTCMonth() + 1).toString().padStart(2, '0');
+                        const day = d.getUTCDate().toString().padStart(2, '0');
+                        const mmdd = `${month}-${day}`;
+                        
+                        const datesArray = autoConfig.datesStr.split(',').map(s => s.trim()).filter(s => s);
+                        if (datesArray.includes(mmdd)) {
+                            whitelistMode = "true";
+                        }
+                    }
+                } catch(e) {}
+            }
+        }
+        
+        const inWhitelist = WHITELIST_PHRASES.includes(text);
+        
         if (whitelistMode === "true") {
-            if (!WHITELIST_PHRASES.includes(text)) {
+            if (!inWhitelist) {
+                const failKey = `whitelist_fail_${fp}`;
+                let failData = await MEMORIAL_KV.get(failKey);
+                let fails = failData ? parseInt(failData) : 0;
+                fails++;
+                // Lock them out for 60 seconds if they fail 3 times
+                await MEMORIAL_KV.put(failKey, fails.toString(), { expirationTtl: 60 });
+                
+                if (fails >= 3) {
+                    return new Response(JSON.stringify({ error: "連續發送非白名單內容，請完成驗證 (ratelimit active)" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+                }
+                
                 return new Response(JSON.stringify({ error: "目前為白名單模式，僅允許發送特定的致敬語。" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+            } else {
+                await MEMORIAL_KV.delete(`whitelist_fail_${fp}`);
             }
         }
 
-        /* 1. Server-side Rate Limiting: 3 messages per minute */
+        /* 1. Server-side Rate Limiting: 1 message per minute */
         const lockKey = `msg_lock_${fp}`;
-        let lockData = await MEMORIAL_KV.get(lockKey);
-        let timestamps = lockData ? JSON.parse(lockData) : [];
+        let timestamps = [];
         const now = Date.now();
-        timestamps = timestamps.filter(t => now - t < 60000);
-        
-        if (timestamps.length >= 3) {
-            return new Response(JSON.stringify({ error: "發送過於頻繁，請完成人類驗證後再試 (ratelimit active)" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        if (!isDevMode) {
+            let lockData = await MEMORIAL_KV.get(lockKey);
+            timestamps = lockData ? JSON.parse(lockData) : [];
+            timestamps = timestamps.filter(t => now - t < 60000); // 1 minute
+            
+            if (timestamps.length >= 1) {
+                return new Response(JSON.stringify({ error: "為維護紀念堂莊嚴，每分鐘僅能發送一次留言，請稍後再試。" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+            }
         }
+
+        const normalizeWords = (arr) => arr.map(x => typeof x === 'object' && x !== null ? x.word : x).filter(x => typeof x === 'string');
 
         /* 2. Server-side Profanity Filter: Mask banned words with *** */
         let serverBannedWords = [];
@@ -132,7 +178,7 @@ async function handleRequest(request, event) {
             if (kvBannedWords) {
                 const parsedWords = JSON.parse(kvBannedWords);
                 if (Array.isArray(parsedWords)) {
-                    serverBannedWords = parsedWords;
+                    serverBannedWords = normalizeWords(parsedWords);
                 }
             }
         } catch (e) {
@@ -146,7 +192,7 @@ async function handleRequest(request, event) {
             if (kvPrivateWords) {
                 const parsedPrivateWords = JSON.parse(kvPrivateWords);
                 if (Array.isArray(parsedPrivateWords)) {
-                    privateBannedWords = parsedPrivateWords;
+                    privateBannedWords = normalizeWords(parsedPrivateWords);
                 }
             }
         } catch (e) {
@@ -160,7 +206,7 @@ async function handleRequest(request, event) {
             if (kvLlmWords) {
                 const parsedLlmWords = JSON.parse(kvLlmWords);
                 if (Array.isArray(parsedLlmWords)) {
-                    llmBannedWords = parsedLlmWords.map(x => x.word);
+                    llmBannedWords = normalizeWords(parsedLlmWords);
                 }
             }
         } catch (e) {}
@@ -168,13 +214,14 @@ async function handleRequest(request, event) {
         const allBannedWords = [...serverBannedWords, ...privateBannedWords, ...llmBannedWords];
 
         const originalText = text;
+        let isMasked = false;
         for (let word of allBannedWords) {
-            // Escape special characters in the banned word to prevent regex parsing errors
             const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regex = new RegExp(escapedWord, 'gi');
-            text = text.replace(regex, '***');
+            if (regex.test(text)) {
+                return new Response(JSON.stringify({ error: "請勿包含敏感詞彙" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+            }
         }
-        const isMasked = text !== originalText;
 
         /* 3. Retrieve and update the Danmaku array (Capped at 50 to prevent KV bloat) */
         let danmakuData = await MEMORIAL_KV.get("DANMAKU_LIST");
@@ -193,11 +240,13 @@ async function handleRequest(request, event) {
         /* 4. Write back to KV and update rate limit timestamps */
         await MEMORIAL_KV.put("DANMAKU_LIST", JSON.stringify(list));
         
-        timestamps.push(now);
-        await MEMORIAL_KV.put(lockKey, JSON.stringify(timestamps), { expirationTtl: 60 });
+        if (!isDevMode) {
+            timestamps.push(now);
+            await MEMORIAL_KV.put(lockKey, JSON.stringify(timestamps), { expirationTtl: 60 }); // 1 minute
+        }
 
-        /* 5. Async AI Moderation check (Skip if already flagged by static blacklists or if in Whitelist mode) */
-        if (event && event.waitUntil && !isMasked && whitelistMode !== "true") {
+        /* 5. Async AI Moderation check (Skip if already flagged by static blacklists, or in Whitelist mode, or if text is in whitelist) */
+        if (event && event.waitUntil && !isMasked && whitelistMode !== "true" && !inWhitelist) {
             try {
                 const aiConfigStr = await MEMORIAL_KV.get("AI_CONFIG");
                 if (aiConfigStr) {
@@ -287,6 +336,17 @@ async function handleRequest(request, event) {
 
             const whitelistMode = await MEMORIAL_KV.get("WHITELIST_MODE_ENABLED");
             
+            let autoWhitelistEnabled = false;
+            let autoWhitelistDatesStr = "";
+            const autoConfigStr = await MEMORIAL_KV.get("AUTO_WHITELIST_CONFIG");
+            if (autoConfigStr) {
+                try {
+                    const parsed = JSON.parse(autoConfigStr);
+                    autoWhitelistEnabled = !!parsed.enabled;
+                    autoWhitelistDatesStr = parsed.datesStr || "";
+                } catch(e) {}
+            }
+            
             let baseWordsCount = 0;
             const kvBannedWords = await MEMORIAL_KV.get("BANNED_WORDS_DICT");
             if (kvBannedWords) {
@@ -322,6 +382,8 @@ async function handleRequest(request, event) {
 
             return new Response(JSON.stringify({ 
                 whitelistMode: whitelistMode === "true",
+                autoWhitelistEnabled: autoWhitelistEnabled,
+                autoWhitelistDatesStr: autoWhitelistDatesStr,
                 baseWordsCount: baseWordsCount,
                 privateWordsCount: privateWordsCount,
                 aiConfig: aiConfig,
@@ -358,6 +420,8 @@ async function handleRequest(request, event) {
             
             const admin_key = body.admin_key;
             const whitelistMode = body.whitelistMode;
+            const autoWhitelistEnabled = body.autoWhitelistEnabled;
+            const autoWhitelistDatesStr = body.autoWhitelistDatesStr;
             const baseBannedWords = body.baseBannedWords;
             const privateBannedWords = body.privateBannedWords;
             const aiConfig = body.aiConfig;
@@ -369,6 +433,12 @@ async function handleRequest(request, event) {
 
             if (typeof whitelistMode === 'boolean') {
                 await MEMORIAL_KV.put("WHITELIST_MODE_ENABLED", whitelistMode ? "true" : "false");
+            }
+            if (typeof autoWhitelistEnabled === 'boolean') {
+                await MEMORIAL_KV.put("AUTO_WHITELIST_CONFIG", JSON.stringify({
+                    enabled: autoWhitelistEnabled,
+                    datesStr: autoWhitelistDatesStr || ""
+                }));
             }
             if (Array.isArray(baseBannedWords)) {
                 await MEMORIAL_KV.put("BANNED_WORDS_DICT", JSON.stringify(baseBannedWords));
@@ -387,6 +457,102 @@ async function handleRequest(request, event) {
                 status: 200,
                 headers: { ...corsHeaders, "Content-Type": "application/json" }
             });
+        }
+    }
+
+    /* ============================================================================
+     * Route: /admin/learn (POST) - AI Supervised Learning
+     * ============================================================================ */
+    if (url.pathname === '/admin/learn' && request.method === 'POST') {
+        const expectedSecret = typeof ADMIN_SECRET !== 'undefined' ? String(ADMIN_SECRET).trim() : "SunYatSen1911";
+        async function hashSecret(secret) {
+            const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(secret));
+            return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        const expectedHash = await hashSecret(expectedSecret);
+
+        let body = {};
+        try { body = await request.json(); } catch(e) { return new Response("Bad", {status: 400}); }
+        
+        if (body.admin_key !== expectedHash) {
+            return new Response(JSON.stringify({ error: "Unauthorized." }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+
+        const { id, text, reason } = body;
+        if (!text || !reason) {
+            return new Response(JSON.stringify({ error: "缺少必要參數" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+
+        try {
+            const aiConfigStr = await MEMORIAL_KV.get("AI_CONFIG");
+            if (!aiConfigStr) throw new Error("AI not configured");
+            const aiConfig = JSON.parse(aiConfigStr);
+            if (!aiConfig.models || aiConfig.models.length === 0) throw new Error("No AI models");
+
+            const modelObj = aiConfig.models[Math.floor(Math.random() * aiConfig.models.length)];
+            const keysArray = Array.isArray(modelObj.keys) ? modelObj.keys : modelObj.keys.split('\n').map(k => k.trim()).filter(k => k);
+            if (keysArray.length === 0) throw new Error("No API keys");
+            const key = keysArray[Math.floor(Math.random() * keysArray.length)];
+
+            const prompt = `Text flagged by admin. Reason: ${reason}. Text: "${text}".\nTask: Extract the exact, literal substring(s) from the Text acting as sensitive slang/cipher/meme.\nContext: Relate to Chinese political history or internet memes to understand hidden meanings.\nRules:\n1. Extract EXACT verbatim substring from Text (e.g., for "5月35日", extract "5月35日", NOT "六月四日").\n2. Do not extract the whole sentence.\nOutput JSON only: {"w":["exact_word"]}`;
+
+            const res = await fetch(modelObj.endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${key}`
+                },
+                body: JSON.stringify({
+                    model: modelObj.model,
+                    messages: [{ role: "user", content: prompt }],
+                    temperature: 0.1
+                })
+            });
+
+            if (res.ok) {
+                const aiData = await res.json();
+                let jsonStr = aiData.choices[0].message.content.trim();
+                if (jsonStr.startsWith('```json')) jsonStr = jsonStr.replace(/^```json\n?/, '').replace(/\n?```$/, '');
+                
+                const parsed = JSON.parse(jsonStr);
+                let bannedWordsToLearn = [];
+                if (Array.isArray(parsed.w)) bannedWordsToLearn = parsed.w;
+
+                if (bannedWordsToLearn.length > 0) {
+                    let kvLlmWords = await MEMORIAL_KV.get("LLM_BANNED_WORDS");
+                    let currentLlmWords = kvLlmWords ? JSON.parse(kvLlmWords) : [];
+                    
+                    let addedNew = false;
+                    for (let bw of bannedWordsToLearn) {
+                        if (!currentLlmWords.includes(bw)) {
+                            currentLlmWords.push(bw);
+                            addedNew = true;
+                        }
+                    }
+                    
+                    if (addedNew) {
+                        await MEMORIAL_KV.put("LLM_BANNED_WORDS", JSON.stringify(currentLlmWords));
+                    }
+                }
+
+                if (id) {
+                    let danmakuData = await MEMORIAL_KV.get("DANMAKU_LIST");
+                    if (danmakuData) {
+                        let list = JSON.parse(danmakuData);
+                        list = list.filter(msg => msg.id !== id);
+                        await MEMORIAL_KV.put("DANMAKU_LIST", JSON.stringify(list));
+                    }
+                }
+
+                return new Response(JSON.stringify({ success: true, learned: bannedWordsToLearn }), {
+                    status: 200,
+                    headers: { ...corsHeaders, "Content-Type": "application/json" }
+                });
+            } else {
+                return new Response(JSON.stringify({ error: "AI API 請求失敗" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+            }
+        } catch (err) {
+            return new Response(JSON.stringify({ error: "AI 學習過程發生錯誤: " + err.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
         }
     }
 
@@ -439,14 +605,14 @@ async function checkDanmakuWithAI(text, msgId, aiConfig) {
     try {
         if (!aiConfig.models || aiConfig.models.length === 0) return;
         const modelObj = aiConfig.models[Math.floor(Math.random() * aiConfig.models.length)];
-        const keysArray = Array.isArray(modelObj.keys) ? modelObj.keys : modelObj.keys.split('\\n').map(k => k.trim()).filter(k => k);
+        const keysArray = Array.isArray(modelObj.keys) ? modelObj.keys : modelObj.keys.split('\n').map(k => k.trim()).filter(k => k);
         if (keysArray.length === 0) return;
         const key = keysArray[Math.floor(Math.random() * keysArray.length)];
         
-        let prompt = "You are a strict content moderator for a public memorial message board. Your job is to strictly filter out offensive language, profanity, and spam. Return a valid JSON object EXACTLY in this format: {\\\"status\\\": \\\"SAFE\\\"} OR {\\\"status\\\": \\\"VIOLATION\\\", \\\"words\\\": [\\\"violating_word_1\\\", \\\"violating_word_2\\\"]}. Text to analyze: " + text;
+        let prompt = "Analyze text for a public memorial. Filter profanity, abuse, and spam. Detect homophones/slang for profanity (e.g., 出生 for 畜生), BUT strictly evaluate CONTEXT (e.g., literal 'born' is SAFE). Output ONLY JSON. If safe: {\"s\":0}. If violation, list words: {\"s\":1,\"w\":[\"bad_word\"]}. Text: " + text;
 
         if (aiConfig.chinaMode) {
-            prompt = "You are a strict content moderator for a public memorial message board. Your job is to strictly filter out offensive language, profanity, spam, and ANY sensitive political discussions, including terms related to 'June 4th', 'Tiananmen', 'Xi Jinping', or other regional political controversies. Return a valid JSON object EXACTLY in this format: {\\\"status\\\": \\\"SAFE\\\"} OR {\\\"status\\\": \\\"VIOLATION\\\", \\\"words\\\": [\\\"violating_word_1\\\", \\\"violating_word_2\\\"]}. Text to analyze: " + text;
+            prompt = "Analyze text for a public memorial. Filter profanity, abuse, spam, and Chinese political figures/events. Detect homophones/puns/shape substitutions/memes/satire for profanity (e.g., 出生 for 畜生) AND politics (e.g., 十里山路不换肩 for Xi, 刁 for 习, 远 for 近), BUT strictly evaluate CONTEXT (normal usage is SAFE). Output ONLY JSON. If safe: {\"s\":0}. If violation: {\"s\":1,\"w\":[\"bad_word\"]}. Text: " + text;
         }
         
         const res = await fetch(modelObj.endpoint, {
@@ -463,10 +629,21 @@ async function checkDanmakuWithAI(text, msgId, aiConfig) {
         });
         if (res.ok) {
             const data = await res.json();
-            const replyStr = data.choices?.[0]?.message?.content?.trim() || "{}";
-            const reply = JSON.parse(replyStr);
+            let replyStr = data.choices?.[0]?.message?.content?.trim() || "{}";
             
-            if (reply.status === "VIOLATION" && Array.isArray(reply.words) && reply.words.length > 0) {
+            // Strip markdown block if the LLM wraps the response in ```json ... ```
+            if (replyStr.startsWith("```")) {
+                replyStr = replyStr.replace(/^```json/i, "").replace(/^```/i, "").replace(/```$/, "").trim();
+            }
+            
+            let reply = {};
+            try {
+                reply = JSON.parse(replyStr);
+            } catch(e) {
+                console.error("JSON parse error:", e, replyStr);
+            }
+            
+            if (reply.s === 1 && Array.isArray(reply.w) && reply.w.length > 0) {
                 // Delete Danmaku
                 let danmakuData = await MEMORIAL_KV.get("DANMAKU_LIST");
                 let list = danmakuData ? JSON.parse(danmakuData) : [];
@@ -476,8 +653,11 @@ async function checkDanmakuWithAI(text, msgId, aiConfig) {
                 // Add to LLM Blacklist
                 let llmData = await MEMORIAL_KV.get("LLM_BANNED_WORDS");
                 let llmList = llmData ? JSON.parse(llmData) : [];
-                for (const word of reply.words) {
-                    llmList.push({ word: word, original_text: text, time: Date.now() });
+                for (const w of reply.w) {
+                    // Prevent pushing duplicate words
+                    if (!llmList.some(item => (typeof item === 'string' ? item : item.word) === w)) {
+                        llmList.push({ word: w, original_text: text, time: Date.now() });
+                    }
                 }
                 await MEMORIAL_KV.put("LLM_BANNED_WORDS", JSON.stringify(llmList));
             }

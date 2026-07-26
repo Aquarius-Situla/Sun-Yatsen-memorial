@@ -118,6 +118,9 @@ const totalCount = document.getElementById('total-count');
 const refreshBtn = document.getElementById('refresh-btn');
 const logoutBtn = document.getElementById('logout-btn');
 const whitelistToggle = document.getElementById('whitelist-toggle');
+const autoWhitelistToggle = document.getElementById('auto-whitelist-toggle');
+const autoWhitelistDatesContainer = document.getElementById('auto-whitelist-dates-container');
+const autoWhitelistDates = document.getElementById('auto-whitelist-dates');
 
 const baseCountDisplay = document.getElementById('base-count-display');
 const privateCountDisplay = document.getElementById('private-count-display');
@@ -134,6 +137,7 @@ const aiEndpoint = document.getElementById('ai-endpoint');
 const aiModel = document.getElementById('ai-model');
 const aiKeys = document.getElementById('ai-keys');
 const saveAiBtn = document.getElementById('save-ai-btn');
+const cancelAiBtn = document.getElementById('cancel-ai-btn');
 
 const llmCountDisplay = document.getElementById('llm-count-display');
 const downloadLlmBtn = document.getElementById('download-llm-btn');
@@ -212,6 +216,15 @@ async function loadConfig() {
         if (res.ok) {
             const data = await res.json();
             whitelistToggle.checked = data.whitelistMode;
+            
+            if (autoWhitelistToggle) {
+                autoWhitelistToggle.checked = !!data.autoWhitelistEnabled;
+                autoWhitelistDatesContainer.style.display = data.autoWhitelistEnabled ? 'flex' : 'none';
+                if (data.autoWhitelistDatesStr) {
+                    autoWhitelistDates.value = data.autoWhitelistDatesStr;
+                }
+            }
+            
             if (baseCountDisplay) baseCountDisplay.textContent = data.baseWordsCount || 0;
             if (privateCountDisplay) privateCountDisplay.textContent = data.privateWordsCount || 0;
             
@@ -239,21 +252,15 @@ whitelistToggle.addEventListener('change', async (e) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 admin_key: adminKey,
-                whitelistMode: isEnabled
+                whitelistMode: isEnabled,
+                autoWhitelistEnabled: autoWhitelistToggle ? autoWhitelistToggle.checked : false,
+                autoWhitelistDatesStr: autoWhitelistDates ? autoWhitelistDates.value : ""
             })
         });
         const data = await res.json();
         if (data.success) {
             showToast(isEnabled ? '白名單模式已開啟' : '白名單模式已關閉');
-            
-            // If Whitelist Mode is enabled, force AI Mode off
-            if (isEnabled && typeof aiToggle !== 'undefined' && aiToggle) {
-                if (aiToggle.checked) {
-                    aiToggle.checked = false;
-                    if (typeof saveConfig === 'function') saveConfig(false);
-                    showToast('已自動關閉 AI (白名單模式互斥)');
-                }
-            }
+
         } else {
             showToast('設定失敗：' + (data.error || '權限不足'));
             e.target.checked = !isEnabled; // Revert
@@ -292,12 +299,14 @@ function renderAiModels() {
         const div = document.createElement('div');
         div.className = 'list-item';
         div.innerHTML = `
-            <div class="item-content">
-                <div class="item-text" style="font-size: 14px; font-weight: 600;">${model.model || 'Unknown Model'}</div>
-                <div class="item-meta"><span>${model.endpoint}</span></div>
+            <div class="item-content" style="min-width: 0; overflow: hidden; padding-right: 8px;">
+                <div class="item-text" style="font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${model.model || 'Unknown Model'}</div>
+                <div class="item-meta" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">
+                    <span>${model.endpoint}</span>
+                </div>
                 <div class="item-meta"><span>綁定 ${model.keys ? model.keys.split('\\n').length : 0} 把 Keys</span></div>
             </div>
-            <div style="display: flex; gap: 8px; align-items: center;">
+            <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
                 <button style="background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 4px; display: flex; align-items: center; justify-content: center;" onclick="editAiModel(${index})" title="設定">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="3"></circle>
@@ -360,14 +369,56 @@ async function saveConfig(silent = false) {
     }
 }
 
+// Auto Whitelist toggle onChange
+if (autoWhitelistToggle) {
+    autoWhitelistToggle.addEventListener('change', (e) => {
+        autoWhitelistDatesContainer.style.display = e.target.checked ? 'flex' : 'none';
+        saveWhitelistConfig();
+    });
+}
+if (autoWhitelistDates) {
+    autoWhitelistDates.addEventListener('change', () => {
+        saveWhitelistConfig();
+    });
+}
+
+// Developer Mode toggle
+const devModeToggle = document.getElementById('dev-mode-toggle');
+if (devModeToggle) {
+    devModeToggle.checked = localStorage.getItem('developer_mode') === 'true';
+    devModeToggle.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            localStorage.setItem('developer_mode', 'true');
+            showToast('已開啟開發者模式 (解除頻率限制)');
+        } else {
+            localStorage.removeItem('developer_mode');
+            showToast('已關閉開發者模式');
+        }
+    });
+}
+
+async function saveWhitelistConfig() {
+    try {
+        await fetch(WORKER_API + '/admin/config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                admin_key: adminKey,
+                whitelistMode: whitelistToggle.checked,
+                autoWhitelistEnabled: autoWhitelistToggle.checked,
+                autoWhitelistDatesStr: autoWhitelistDates.value
+            })
+        });
+        showToast('自動白名單設定已儲存');
+    } catch(e) {
+        showToast('設定失敗，請檢查網路');
+    }
+}
+
 // AI Toggle onChange
 if (aiToggle) {
     aiToggle.addEventListener('change', (e) => {
-        if (e.target.checked && whitelistToggle && whitelistToggle.checked) {
-            e.target.checked = false;
-            showToast('白名單模式下無法啟用 AI！');
-            return;
-        }
+
         saveConfig(false);
     });
 }
@@ -410,6 +461,17 @@ if (saveAiBtn) {
         
         renderAiModels();
         saveConfig(false);
+    });
+}
+
+if (cancelAiBtn) {
+    cancelAiBtn.addEventListener('click', () => {
+        aiEndpoint.value = '';
+        aiModel.value = '';
+        aiKeys.value = '';
+        addAiForm.style.display = 'none';
+        editingAiIndex = -1;
+        if (saveAiBtn) saveAiBtn.textContent = '儲存並加入矩陣';
     });
 }
 
@@ -544,9 +606,28 @@ function renderList(list) {
         delBtn.className = 'ios-btn destructive';
         delBtn.textContent = '刪除';
         delBtn.onclick = () => deleteDanmaku(item.id, div);
+        const blacklistBtn = document.createElement('button');
+        blacklistBtn.className = 'ios-btn';
+        blacklistBtn.title = 'AI 監督學習 (提取並加入黑名單)';
+        blacklistBtn.style.padding = '0';
+        blacklistBtn.style.width = '32px';
+        blacklistBtn.style.height = '32px';
+        blacklistBtn.style.display = 'flex';
+        blacklistBtn.style.alignItems = 'center';
+        blacklistBtn.style.justifyContent = 'center';
+        blacklistBtn.style.background = 'transparent';
+        blacklistBtn.style.color = 'var(--text-secondary)';
+        blacklistBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>';
+        blacklistBtn.onclick = () => openAiLearnModal(item.id, item.text);
+        
+        const actionsDiv = document.createElement('div');
+        actionsDiv.style.display = 'flex';
+        actionsDiv.style.gap = '8px';
+        actionsDiv.appendChild(blacklistBtn);
+        actionsDiv.appendChild(delBtn);
         
         div.appendChild(content);
-        div.appendChild(delBtn);
+        div.appendChild(actionsDiv);
         
         danmakuList.appendChild(div);
     });
@@ -573,45 +654,7 @@ async function loadDanmaku() {
             return;
         }
 
-        danmakuList.innerHTML = '';
-        
-        // Show newest first
-        list.slice().reverse().forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'list-item';
-            
-            const content = document.createElement('div');
-            content.className = 'item-content';
-            
-            const text = document.createElement('div');
-            text.className = 'item-text';
-            text.textContent = item.text;
-            
-            const meta = document.createElement('div');
-            meta.className = 'item-meta';
-            
-            const timeSpan = document.createElement('span');
-            timeSpan.textContent = formatTime(item.time);
-            
-            const idSpan = document.createElement('span');
-            idSpan.textContent = `ID: ${item.id.split('-')[0]}`;
-            idSpan.style.fontFamily = 'monospace';
-            
-            meta.appendChild(timeSpan);
-            meta.appendChild(idSpan);
-            content.appendChild(text);
-            content.appendChild(meta);
-            
-            const delBtn = document.createElement('button');
-            delBtn.className = 'ios-btn destructive';
-            delBtn.textContent = '刪除';
-            delBtn.onclick = () => deleteDanmaku(item.id, div);
-            
-            div.appendChild(content);
-            div.appendChild(delBtn);
-            
-            danmakuList.appendChild(div);
-        });
+        renderList(list);
         
     } catch (e) {
         console.error(e);
@@ -688,4 +731,103 @@ if (adminKey) {
             // If network fails on init, still try to show login screen
             showLogin();
         });
+}
+
+/* ============================================================================
+ * AI Supervised Learning Modal Logic
+ * ============================================================================ */
+const aiLearnModal = document.getElementById('ai-learn-modal');
+const learnHelpBtn = document.getElementById('learn-help-btn');
+const learnCancelBtn = document.getElementById('learn-cancel-btn');
+const learnSubmitBtn = document.getElementById('learn-submit-btn');
+const learnReasonInput = document.getElementById('learn-reason-input');
+
+let currentLearnId = null;
+let currentLearnText = null;
+
+function openAiLearnModal(id, text) {
+    currentLearnId = id;
+    currentLearnText = text;
+    learnReasonInput.value = '';
+    aiLearnModal.classList.add('active');
+    setTimeout(() => learnReasonInput.focus(), 100);
+}
+
+function closeAiLearnModal() {
+    aiLearnModal.classList.remove('active');
+    currentLearnId = null;
+    currentLearnText = null;
+}
+
+const learnHelpPopover = document.getElementById('learn-help-popover');
+
+if (learnHelpBtn) {
+    learnHelpBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // prevent document click from immediately closing it
+        if (learnHelpPopover) {
+            learnHelpPopover.classList.toggle('show');
+        }
+    });
+}
+
+// Close popover when clicking anywhere else
+document.addEventListener('click', (e) => {
+    if (learnHelpPopover && learnHelpPopover.classList.contains('show')) {
+        if (!learnHelpPopover.contains(e.target) && e.target !== learnHelpBtn) {
+            learnHelpPopover.classList.remove('show');
+        }
+    }
+});
+
+if (learnCancelBtn) {
+    learnCancelBtn.addEventListener('click', closeAiLearnModal);
+}
+
+if (aiLearnModal) {
+    aiLearnModal.addEventListener('click', (e) => {
+        if (e.target === aiLearnModal) {
+            closeAiLearnModal();
+        }
+    });
+}
+
+if (learnSubmitBtn) {
+    learnSubmitBtn.addEventListener('click', async () => {
+        const reason = learnReasonInput.value.trim();
+        if (!reason) {
+            showToast('請輸入違規原因或指定敏感詞！');
+            return;
+        }
+
+        learnSubmitBtn.disabled = true;
+        learnSubmitBtn.textContent = '學習中...';
+
+        try {
+            const res = await fetch(WORKER_API + '/admin/learn', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    admin_key: adminKey,
+                    id: currentLearnId,
+                    text: currentLearnText,
+                    reason: reason
+                })
+            });
+
+            const data = await res.json();
+            if (res.ok && data.success) {
+                showToast(`已成功加入黑名單！提取詞彙：${data.learned.join(', ')}`);
+                closeAiLearnModal();
+                await loadConfig();
+                await loadDanmaku();
+            } else {
+                showToast('學習失敗：' + (data.error || '不明錯誤'));
+            }
+        } catch (e) {
+            showToast('連線失敗');
+        } finally {
+            learnSubmitBtn.disabled = false;
+            learnSubmitBtn.textContent = '提交';
+        }
+    });
 }

@@ -113,6 +113,30 @@ window.addEventListener('pageshow', function (event) {
 });
 
 /* ============================================================================
+ * Celebration Fireworks Trigger
+ * ============================================================================
+ * Dynamically loads and fires the celebration fireworks.
+ * ============================================================================ */
+window.loadAndTriggerFireworks = function() {
+    if (window.triggerFireworks) {
+        window.triggerFireworks();
+        return;
+    }
+    const cb = Date.now();
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = `events/celebration/fireworks.css?v=${cb}`;
+    document.head.appendChild(link);
+
+    const fwScript = document.createElement('script');
+    fwScript.src = `events/celebration/fireworks.js?v=${cb}`;
+    fwScript.onload = () => {
+        if (window.triggerFireworks) window.triggerFireworks();
+    };
+    document.body.appendChild(fwScript);
+};
+
+/* ============================================================================
  * Festival Banner Initialization
  * ============================================================================
  * Evaluates the current URL, followed by the date, to display a clickable
@@ -175,9 +199,16 @@ window.addEventListener('pageshow', function (event) {
                 }
             });
         }
+        
+        window.loadAndTriggerFireworks();
     } else {
         navFestivalBanner.innerText = '';
         document.body.classList.remove('has-festival');
+    }
+    
+    // Developer backdoor for testing
+    if (window.location.hash.includes('celebration')) {
+        window.loadAndTriggerFireworks();
     }
 })();
 
@@ -310,9 +341,13 @@ async function autoRegisterAttendance() {
             body:    JSON.stringify({ fp: fingerprint })
         });
 
-        attendanceCountEl.innerText = response.ok
-            ? ((await response.json()).count || 0)
-            : '0';
+        const count = response.ok ? ((await response.json()).count || 0) : 0;
+        attendanceCountEl.innerText = count || '0';
+        
+        // 100-visitor milestone trigger
+        if (count > 0 && count % 100 === 0) {
+            window.loadAndTriggerFireworks();
+        }
     } catch (e) {
         attendanceCountEl.innerText = '0';
     }
@@ -668,7 +703,15 @@ async function retractMessage(id) {
             showCloudflareToast('留言已撤回', 'success');
         } else {
             const err = await response.json();
-            showCloudflareToast(err.error || '撤回失敗', 'error');
+            // If 403/404, the message is already gone on the server (deleted by AI, Admin, or fell out of the 50 limit)
+            if (response.status === 403 || response.status === 404) {
+                mySentMessages = mySentMessages.filter(m => m.id !== id);
+                localStorage.setItem('mySentMessages', JSON.stringify(mySentMessages));
+                renderHistoryPopover();
+                showCloudflareToast('該留言已不存在或被系統攔截移除', 'system');
+            } else {
+                showCloudflareToast(err.error || '撤回失敗', 'error');
+            }
         }
     } catch (e) {
         showCloudflareToast('網路連線異常，請檢查網路。', 'error');
@@ -882,7 +925,7 @@ async function showCaptcha() {
                 consecutiveViolations = 0;
                 if (overlay) overlay.classList.remove('active');
                 
-                let cd = 10;
+                let cd = 60;
                 messageCooldown = true;
                 submitMessageBtn.disabled = true;
                 messageInput.disabled = true;
@@ -923,7 +966,8 @@ function handleViolation(msg) {
 }
 
 submitMessageBtn.addEventListener('click', async () => {
-    if (messageCooldown) return;
+    const isDevMode = localStorage.getItem('developer_mode') === 'true';
+    if (messageCooldown && !isDevMode) return;
 
     const text = messageInput.value.trim();
 
@@ -948,18 +992,22 @@ submitMessageBtn.addEventListener('click', async () => {
     consecutiveViolations = 0;
 
     messageModal.classList.remove('active');
-    messageCooldown = true;
-    submitMessageBtn.disabled = true;
+    
+    let timer = null;
+    if (!isDevMode) {
+        messageCooldown = true;
+        submitMessageBtn.disabled = true;
 
-    /* 3-second anti-spam lock for normal messages */
-    let countdown = 3;
-    const timer = setInterval(() => {
-        if (--countdown <= 0) {
-            clearInterval(timer);
-            messageCooldown = false;
-            submitMessageBtn.disabled = false;
-        }
-    }, 1000);
+        /* 3-second anti-spam lock for normal messages */
+        let countdown = 3;
+        timer = setInterval(() => {
+            if (--countdown <= 0) {
+                clearInterval(timer);
+                messageCooldown = false;
+                submitMessageBtn.disabled = false;
+            }
+        }, 1000);
+    }
 
     showCloudflareToast('傳送中...', 'info');
 
@@ -968,7 +1016,7 @@ submitMessageBtn.addEventListener('click', async () => {
         const response    = await fetch(WORKER_API + '/danmaku', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ fp: fingerprint, text })
+            body:    JSON.stringify({ fp: fingerprint, text: text, devMode: isDevMode })
         });
 
         if (response.ok) {
@@ -989,18 +1037,18 @@ submitMessageBtn.addEventListener('click', async () => {
             showCloudflareToast(err.error || '發送失敗，請稍候再試。', 'error');
 
             if (err.error && err.error.includes('ratelimit')) {
-                clearInterval(timer);
+                if (timer) clearInterval(timer);
                 showCaptcha();
             } else {
                 /* Lift cooldown early if the server rejected for reasons other than spam */
-                clearInterval(timer);
+                if (timer) clearInterval(timer);
                 messageCooldown = false;
                 submitMessageBtn.disabled = false;
             }
         }
     } catch (e) {
         showCloudflareToast('網路連線異常，請檢查網路。', 'error');
-        clearInterval(timer);
+        if (timer) clearInterval(timer);
         messageCooldown = false;
         submitMessageBtn.disabled = false;
     }
@@ -1080,25 +1128,5 @@ async function fetchAndPlayDanmaku() {
 }
 
 /* ============================================================================
- * Celebration Fireworks Easter Egg Initialization
- * ============================================================================
- * Conditionally loads the fireworks module based on date or testing hash.
+ * Celebration Fireworks Trigger was hoisted to loadAndTriggerFireworks()
  * ============================================================================ */
-(function initFireworksEasterEgg() {
-    const cb = Date.now(); // Cache-buster
-    const script = document.createElement('script');
-    script.src = `events/celebration/lunar-check.js?v=${cb}`;
-    script.onload = () => {
-        if (window.isFireworksFestival && window.isFireworksFestival()) {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = `events/celebration/fireworks.css?v=${cb}`;
-            document.head.appendChild(link);
-
-            const fwScript = document.createElement('script');
-            fwScript.src = `events/celebration/fireworks.js?v=${cb}`;
-            document.body.appendChild(fwScript);
-        }
-    };
-    document.body.appendChild(script);
-})();

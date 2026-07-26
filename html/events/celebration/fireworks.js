@@ -5,7 +5,9 @@
  * Self-destructs gracefully after 6 seconds to free up resources.
  * ============================================================================ */
 
-(function initFireworks() {
+window.triggerFireworks = function() {
+    if (document.getElementById('fireworks-canvas')) return; // Prevent multiple overlapping triggers
+
     // 1. Create and inject canvas
     const canvas = document.createElement('canvas');
     canvas.id = 'fireworks-canvas';
@@ -25,31 +27,24 @@
 
     // 2. Particle System Physics
     const particles = [];
-    const colors = [
-        [255, 60, 150],  // Neon Pink
-        [60, 255, 200],  // Neon Cyan
-        [255, 220, 50],  // Neon Yellow
-        [100, 255, 100], // Neon Green
-        [150, 100, 255], // Neon Purple
-        [255, 100, 50]   // Neon Orange
-    ];
 
     class Particle {
-        constructor(x, y, color) {
+        constructor(x, y, hsl, finalSpeed, angle) {
             this.x = x;
             this.y = y;
-            const angle = Math.random() * Math.PI * 2;
-            // WatchOS fireworks have a strong burst velocity
-            const speed = (Math.random() * 8 + 4) * (window.devicePixelRatio || 1);
+            
+            // Scale up on larger screens (PC)
+            const scale = window.innerWidth > 768 ? 1.8 : 1;
+            
+            const speed = finalSpeed * (window.devicePixelRatio || 1) * scale;
             this.vx = Math.cos(angle) * speed;
             this.vy = Math.sin(angle) * speed;
             this.friction = 0.93; // Smooth deceleration
-            this.gravity = 0.15 * (window.devicePixelRatio || 1);
+            this.gravity = 0.15 * (window.devicePixelRatio || 1) * scale;
             this.alpha = 1;
             this.decay = Math.random() * 0.015 + 0.015;
-            this.color = color; // [r,g,b]
-            // Randomly pick a spark radius
-            this.radius = (Math.random() * 2.5 + 1.5) * (window.devicePixelRatio || 1);
+            this.hsl = hsl; // [hue, saturation, lightness]
+            this.radius = (Math.random() * 2.5 + 1.5) * (window.devicePixelRatio || 1) * scale;
         }
 
         update() {
@@ -64,21 +59,53 @@
         draw() {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(${this.color[0]}, ${this.color[1]}, ${this.color[2]}, ${this.alpha})`;
+            
+            let l = this.hsl[2];
+            
+            if (this.alpha > 0.8) {
+                // Flash white initially for ignition
+                l += (this.alpha - 0.8) * 200;
+            }
+            
+            ctx.fillStyle = `hsla(${this.hsl[0]}, ${this.hsl[1]}%, ${l}%, ${this.alpha})`;
             ctx.fill();
         }
     }
 
     // 3. Explosion Logic
     function explode(x, y) {
-        // Pick one primary color and a secondary chance
-        const baseColor = colors[Math.floor(Math.random() * colors.length)];
-        const particleCount = Math.floor(Math.random() * 50 + 90);
+        // Pick THREE base hues for a richer radial gradient (e.g. Center -> Middle -> Edge)
+        const hueA = Math.random() * 360;
+        const hueB = hueA + (Math.random() * 60 + 30) * (Math.random() > 0.5 ? 1 : -1);
+        const hueC = hueB + (Math.random() * 60 + 30) * (Math.random() > 0.5 ? 1 : -1);
         
-        for (let i = 0; i < particleCount; i++) {
-            // 20% chance to mix a white spark for that glossy Apple look
-            const col = Math.random() > 0.8 ? [255, 255, 255] : baseColor;
-            particles.push(new Particle(x, y, col));
+        // Single cohesive explosion
+        const count = Math.floor(Math.random() * 100 + 120);
+        
+        for (let i = 0; i < count; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            
+            // Bias the distribution towards the outer edge using Math.pow
+            const normalizedRadius = Math.pow(Math.random(), 0.6); 
+            
+            // Map the normalized radius to a speed (from 1 to 10)
+            const finalSpeed = 1 + normalizedRadius * 9;
+            
+            // Interpolate hue across 3 colors based on radius
+            let h;
+            if (normalizedRadius < 0.5) {
+                const t = normalizedRadius * 2; // 0 to 1
+                h = hueA * (1 - t) + hueB * t;
+            } else {
+                const t = (normalizedRadius - 0.5) * 2; // 0 to 1
+                h = hueB * (1 - t) + hueC * t;
+            }
+            
+            h += (Math.random() - 0.5) * 10; // Tiny organic variance
+            
+            // 10% chance of pure white spark
+            const hsl = Math.random() > 0.9 ? [0, 0, 100] : [h % 360, 100, 60];
+            particles.push(new Particle(x, y, hsl, finalSpeed, angle));
         }
     }
 
@@ -126,7 +153,7 @@
         // We use destination-out or rgba(0,0,0,0.2) based on composite needs.
         // For standard glow, transparent dark is best.
         ctx.globalCompositeOperation = 'destination-out';
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
         ctx.fillRect(0, 0, width, height);
         
         ctx.globalCompositeOperation = 'lighter'; // Glow effect
@@ -178,4 +205,4 @@
     }
 
     start();
-})();
+};

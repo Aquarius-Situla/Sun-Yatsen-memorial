@@ -1315,7 +1315,7 @@ body.banner-active .dropdown-nav-bar {
     }
 
     .modal-sheet {
-        width: clamp(300px, 40vw, 420px);
+        width: clamp(280px, 35vw, 360px);
         border-radius: 16px;
         padding: 24px;
         background: rgba(255, 255, 255, 0.95);
@@ -1351,12 +1351,13 @@ body.banner-active .dropdown-nav-bar {
         max-height: 200px; /* More space on desktop */
     }
 
-    /* Make the history button appear on desktop in the top right, same as mobile */
+    /* Make the history button appear on desktop in the top right of the header */
     .sheet-close-btn {
         display: flex;
         position: absolute;
-        right: 16px;
-        top: 20px;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
     }
 
     /* Sunken field emulation */
@@ -1365,12 +1366,12 @@ body.banner-active .dropdown-nav-bar {
         border: 1px solid rgba(0, 0, 0, 0.1);
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
         border-radius: 8px;
-        padding: 14px;
+        padding: 0;
         margin-bottom: 24px;
     }
 
     .ios-textarea {
-        height: 100px;
+        height: 120px;
         font-size: 1rem;
     }
 

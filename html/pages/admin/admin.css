@@ -505,3 +505,205 @@ input:checked + .slider:before {
     user-select: none;
     pointer-events: none;
 }
+/* ============================================================================
+ * AI Supervised Learning Modal Styles
+ * ============================================================================ */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    z-index: 30000;
+    visibility: hidden;
+    pointer-events: none;
+    transition: background-color 0.1s linear, visibility 0.1s linear;
+}
+.modal-overlay.active {
+    background-color: rgba(0, 0, 0, 0.65);
+    visibility: visible;
+    pointer-events: auto;
+}
+.modal-sheet {
+    position: relative;
+    background: #faf7f2;
+    width: 100%; max-width: 500px;
+    border-radius: 14px 14px 0 0;
+    padding: 20px 16px 32px 16px;
+    box-sizing: border-box;
+    transform: translateY(100%);
+    transition: transform 0.1s linear;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1);
+}
+.modal-overlay.active .modal-sheet {
+    transform: translateY(0) scale(1);
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    position: relative;
+}
+.sheet-title {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #000;
+}
+.sheet-close-btn {
+    background: rgba(0, 0, 0, 0.08);
+    border: none; border-radius: 50%;
+    width: 30px; height: 30px;
+    display: flex; justify-content: center; align-items: center;
+    color: #3c3c43; cursor: pointer;
+    transition: background 0.2s;
+}
+.sheet-close-btn:hover { background: rgba(0, 0, 0, 0.12); }
+.sheet-close-btn::before {
+    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%233c3c43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>');
+    display: block; width: 16px; height: 16px;
+}
+
+.sheet-content {
+    background: #ffffff;
+    border-radius: 14px;
+    margin-bottom: 28px;
+    overflow: hidden;
+}
+.ios-textarea {
+    width: 100%; height: 90px;
+    background: transparent; border: none; border-radius: 0;
+    padding: 14px 16px; color: #000; font-size: 1rem;
+    resize: none; font-family: inherit; box-sizing: border-box;
+}
+.ios-textarea:focus { outline: none; }
+
+.sheet-footer { display: flex; justify-content: center; padding: 0; gap: 12px; }
+.macos-cancel-btn {
+    display: flex; flex: 1; height: 36px; background: #e4e4e6;
+    border-radius: 8px; font-size: 1rem; font-weight: 500; color: #000;
+    border: 1px solid rgba(0,0,0,0.05);
+    justify-content: center; align-items: center; cursor: pointer;
+}
+.ios-submit-btn {
+    flex: 1; height: 36px; background: linear-gradient(180deg, #b8860b 0%, #8a6400 100%);
+    border-radius: 8px; font-size: 1rem; font-weight: 500; color: #fff;
+    border: none; display: flex; justify-content: center; align-items: center; cursor: pointer;
+}
+
+/* Desktop override */
+@media (min-width: 600px) {
+    .modal-overlay { align-items: center; }
+    .modal-sheet {
+        width: clamp(280px, 35vw, 360px);
+        border-radius: 16px; padding: 24px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        transform: scale(0.9);
+    }
+    .modal-overlay.active .modal-sheet { transform: scale(1); }
+    .sheet-header { justify-content: center; margin-bottom: 16px; }
+    .sheet-title { font-size: 1.15rem; }
+    
+    /* Swap icon to question mark */
+    .sheet-close-btn {
+        position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+        width: 24px; height: 24px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.08); /* macOS gray circle */
+        display: flex; align-items: center; justify-content: center;
+    }
+    .sheet-close-btn::before {
+        content: '?';
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        line-height: 1;
+        margin-top: 1px; /* Center vertical alignment tweak */
+    }
+
+    .sheet-content {
+        background: rgba(0, 0, 0, 0.03);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 8px; padding: 0; margin-bottom: 24px;
+    }
+    .ios-textarea { height: 120px; }
+}
+
+@media (prefers-color-scheme: dark) {
+    .modal-sheet { background: #1c1c1e; }
+    .sheet-title { color: #fff; }
+    .sheet-close-btn { background: rgba(255, 255, 255, 0.12); }
+    .sheet-close-btn::before {
+        content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>');
+    }
+    .sheet-content { background: #2c2c2e; }
+    .ios-textarea { color: #fff; }
+    
+    @media (min-width: 600px) {
+        .modal-sheet { background: rgba(40, 40, 40, 0.85); border: 1px solid rgba(255,255,255,0.15); }
+        .sheet-close-btn {
+            background: rgba(255, 255, 255, 0.15); /* macOS dark gray circle */
+        }
+        .sheet-close-btn::before {
+            content: '?';
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            color: rgba(0, 0, 0, 0.5);
+        }
+        .sheet-content { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
+    }
+}
+
+/* ============================================================================
+ * History Popover
+ * ============================================================================ */
+.history-popover {
+    position: absolute;
+    top: 25px; /* Partially overlap the button */
+    right: 0;
+    width: 260px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 12px;
+    z-index: 100;
+    text-align: left;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.95);
+    transform-origin: top right;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.history-popover.show {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+.history-popover h4 {
+    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding-bottom: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .sheet-close-btn::before { color: rgba(255,255,255,0.6); }
+    @media (min-width: 600px) {
+        .sheet-close-btn { background: rgba(255,255,255,0.15); }
+    }
+    .history-popover { background: rgba(40,40,40,0.85); border: 1px solid rgba(255,255,255,0.1); }
+    .history-popover h4 { color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); }
+}
