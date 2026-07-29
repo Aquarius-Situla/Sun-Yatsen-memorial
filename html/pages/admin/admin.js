@@ -245,6 +245,15 @@ async function loadConfig() {
                 if (aiChinaToggle) aiChinaToggle.checked = !!data.aiConfig.chinaMode;
                 currentAiModels = data.aiConfig.models || [];
                 renderAiModels();
+        
+                if (data.aiLastLog) {
+                    document.getElementById('ai-debug-card').style.display = 'block';
+                    document.getElementById('ai-log-time').textContent = "時間: " + new Date(data.aiLastLog.time).toLocaleString();
+                    document.getElementById('ai-log-text').textContent = data.aiLastLog.text;
+                    document.getElementById('ai-log-reply').textContent = data.aiLastLog.reply;
+                } else {
+                    document.getElementById('ai-debug-card').style.display = 'none';
+                }
             }
             
             currentLlmBlacklist = data.llmBannedWordsList || [];

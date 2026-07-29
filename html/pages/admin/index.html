@@ -72,6 +72,24 @@
                 </div>
             </div>
 
+            <!-- AI Debug Log Card -->
+            <div class="settings-card" id="ai-debug-card" style="display: none;">
+                <div class="list-header" style="padding: 16px 20px 0; border-bottom: none;">
+                    <h2>AI 判斷除錯日誌 (最近一次)</h2>
+                </div>
+                <div style="padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 12px;">
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);" id="ai-log-time">時間: 無紀錄</div>
+                    <div style="background: var(--input-bg); padding: 12px; border-radius: 8px; font-size: 0.9rem; word-break: break-all; border: 1px solid var(--border);">
+                        <strong style="color: var(--text-secondary); display: block; margin-bottom: 6px;">原始留言</strong> 
+                        <span id="ai-log-text" style="color: var(--text-primary);"></span>
+                    </div>
+                    <div style="background: var(--input-bg); padding: 12px; border-radius: 8px; font-size: 0.9rem; word-break: break-all; border: 1px solid var(--border);">
+                        <strong style="color: var(--text-secondary); display: block; margin-bottom: 6px;">AI 輸出 (JSON)</strong>
+                        <span id="ai-log-reply" style="font-family: monospace; display: block; color: var(--text-primary); overflow-x: auto; white-space: pre-wrap;"></span>
+                    </div>
+                </div>
+            </div>
+            
             <div class="settings-card">
                 <div class="setting-item">
                     <div class="setting-info">
@@ -268,6 +286,6 @@
 
     <!-- Environment variables to locate the worker -->
     <script src="../../api/env.js"></script>
-    <script src="admin.js?v=1055"></script>
+    <script src="admin.js?v=1061"></script>
 </body>
 </html>
