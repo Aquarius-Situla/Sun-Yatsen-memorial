@@ -80,6 +80,52 @@ The project includes a centralized Admin Dashboard for managing platform data, m
   - **AI Matrix Management**: Configure, edit, and delete backend AI personalities.
   - **Platform Settings**: Toggle site-wide announcements, maintenance modes, and other configuration flags.
 
+## Situla Auth SSO Integration
+
+To protect the Admin Dashboard from unauthorized access and enable Single Sign-On (SSO), you can integrate this project with [Situla Auth](https://github.com/Aquarius-Situla/Situla-auth) via Nginx Proxy Manager (NPM).
+
+This setup uses a **Zero-File SSO Injection** technique. The password is injected directly through Nginx Proxy Manager on your protected domain, allowing you to safely deploy public mirrors (e.g., on Vercel or GitHub Pages) without exposing the password. Mirror sites will gracefully fall back to the standard password input screen.
+
+In your Nginx Proxy Manager **Advanced** configuration tab for this site, insert the following:
+
+```nginx
+# 1. Define Situla Auth endpoint
+location /_auth {
+    internal;
+    proxy_pass http://situla-auth:3000/verify;
+    proxy_pass_request_body off;
+    proxy_set_header Content-Length "";
+    proxy_set_header X-Original-URI $request_uri;
+}
+
+# 2. Redirect unauthenticated users to login
+error_page 401 = @error401;
+location @error401 {
+    # Replace with your actual Situla Auth domain
+    return 302 https://auth.example.com/?rd=https://$http_host$request_uri;
+}
+
+# 3. Virtual SSO Injection (Replace YOUR_PASSWORD with the actual admin password)
+location = /api/sso_key {
+    auth_request /_auth;
+    default_type application/json;
+    return 200 '{"key": "YOUR_PASSWORD"}';
+}
+
+# 4. Protect the admin dashboard files
+location /pages/admin/ {
+    auth_request /_auth;
+    proxy_pass $forward_scheme://$server:$port/pages/admin/;
+}
+
+# 5. Quick Shortcut: Redirect /admin to /pages/admin/
+location = /admin {
+    return 301 /pages/admin/;
+}
+```
+
+Once configured, accessing `/admin` will automatically redirect you to Situla Auth for verification. After logging in, the frontend will transparently fetch the injected SSO key and log you in instantly.
+
 ## PlayCaptcha Integration
 
 The project uses a heavily customized version of `playcaptcha` to prevent spam and automated attacks (e.g., Danmaku abuse, brute-force logins). It has been tailored for optimal responsive display and features a highly specific deep dark mode overlay that respects system settings even within restricted WebViews.
