@@ -752,6 +752,32 @@ if (adminKey) {
             // If network fails on init, still try to show login screen
             showLogin();
         });
+} else {
+    // [Situla Auth SSO Integration]
+    // Attempt to fetch the SSO key injected by Nginx Proxy Manager (Domain A).
+    // Mirror sites (Domain B) will return 404 and gracefully fallback to login.
+    fetch('/api/sso_key')
+        .then(res => res.ok ? res.json() : Promise.reject())
+        .then(async data => {
+            if (data && data.key) {
+                // If key is already a 64-char hex string (SHA-256), use it directly. Otherwise, hash it.
+                const tempKey = data.key.length === 64 ? data.key : await hashSHA256(data.key);
+                const res = await fetch(WORKER_API + '/admin/config?admin_key=' + encodeURIComponent(tempKey), { cache: 'no-store' });
+                if (res.ok) {
+                    adminKey = tempKey;
+                    localStorage.setItem('danmaku_admin_key', adminKey);
+                    showDashboard();
+                } else {
+                    showLogin();
+                }
+            } else {
+                showLogin();
+            }
+        })
+        .catch(() => {
+            // No SSO key found (Mirror site), show standard login
+            showLogin();
+        });
 }
 
 /* ============================================================================
