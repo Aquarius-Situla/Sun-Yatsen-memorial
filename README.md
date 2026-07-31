@@ -115,7 +115,11 @@ location = /api/sso_key {
 # 4. Protect the admin dashboard files
 location /pages/admin/ {
     auth_request /_auth;
-    proxy_pass $forward_scheme://$server:$port/pages/admin/;
+    proxy_pass $forward_scheme://$server:$port;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
 }
 
 # 5. Quick Shortcut: Redirect /admin to /pages/admin/
