@@ -130,6 +130,47 @@ location = /admin {
 
 Once configured, accessing `/admin` will automatically redirect you to Situla Auth for verification. After logging in, the frontend will transparently fetch the injected SSO key and log you in instantly.
 
+### Protecting the Entire Site (with PWA/Icon Whitelist)
+
+If you want to protect the **entire memorial site** with SSO but ensure iOS devices and browsers can still load the `apple-touch-icon`, splash screens, and `manifest.json` (so the app can be added to the home screen without being blocked), use this configuration in NPM's Advanced tab instead:
+
+```nginx
+# 1. Define Situla Auth endpoint
+location /_auth {
+    internal;
+    proxy_pass http://situla-auth:3000/verify;
+    proxy_pass_request_body off;
+    proxy_set_header Content-Length "";
+    proxy_set_header X-Original-URI $request_uri;
+}
+
+# 2. Redirect unauthenticated users to login
+error_page 401 = @error401;
+location @error401 {
+    # Replace auth.aquarius2009.me with your Situla Auth domain
+    return 302 https://auth.aquarius2009.me/?rd=$scheme://$http_host$request_uri;
+}
+
+# 3. Whitelist Apple icons, splash screens, and WebApp Manifest (Bypass Auth)
+location ~* ^/(webapp/|main/favicon/|favicon\.ico) {
+    proxy_pass $forward_scheme://$server:$port;
+    proxy_set_header Host $host;
+}
+
+# 4. Protect the rest of the entire site
+location / {
+    auth_request /_auth;
+    proxy_pass $forward_scheme://$server:$port;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+> [!NOTE]
+> Currently, Situla Auth relies on Zero-File SSO Injection via Nginx Proxy Manager headers. Future updates to Situla Auth will include native **OIDC (OpenID Connect)** support, offering an alternative standards-based integration method.
+
 ## PlayCaptcha Integration
 
 The project uses a heavily customized version of `playcaptcha` to prevent spam and automated attacks (e.g., Danmaku abuse, brute-force logins). It has been tailored for optimal responsive display and features a highly specific deep dark mode overlay that respects system settings even within restricted WebViews.
