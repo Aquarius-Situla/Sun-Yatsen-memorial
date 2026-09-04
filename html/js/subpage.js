@@ -70,9 +70,9 @@ function getMarkdownStyles(isLight) {
     }
 }
 
-import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=2022';
-import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=2022';
-import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=2022';
+import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=2023';
+import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=2023';
+import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=2023';
 
 /* ============================================================================
  * Subpage Initialization Engine

@@ -144,20 +144,6 @@ export function syncStandaloneTabBar() {
         return;
     }
 
-    /* Measure difference between physical screen height and WebKit layout viewport */
-    const isPortrait = window.innerHeight >= window.innerWidth;
-    const currentScreenH = isPortrait ? Math.max(window.screen.height, window.screen.width) : Math.min(window.screen.height, window.screen.width);
-
-    /* If WebKit is stuck in an unexpanded viewport on short pages (innerHeight < screen.height),
-     * force body to expand so WebKit snaps layout viewport to the full physical screen height */
-    if (window.innerHeight < currentScreenH) {
-        document.body.style.minHeight = `${currentScreenH + 1}px`;
-        window.scrollTo(0, 1);
-        requestAnimationFrame(() => {
-            window.scrollTo(0, 0);
-        });
-    }
-
     /* Ensure tab bar is cleanly anchored to bottom: 0 without negative offset clipping */
     document.documentElement.style.setProperty('--tab-bar-standalone-bottom', '0px');
     tabBar.style.removeProperty('bottom');
@@ -195,7 +181,6 @@ if (typeof window !== 'undefined') {
 
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', syncStandaloneTabBar);
-            window.visualViewport.addEventListener('scroll', syncStandaloneTabBar);
         }
 
         setTimeout(syncStandaloneTabBar, 50);
@@ -212,7 +197,18 @@ if (typeof window !== 'undefined') {
                     const targetUrl = new URL(anchor.href);
                     const targetFullPath = targetUrl.pathname + targetUrl.search;
 
-                    if (targetFullPath !== currentFullPath && !anchor.href.includes('javascript:')) {
+                    /* Normalize root path '/' and '/index.html' */
+                    const normCurrent = currentFullPath.replace(/\/index\.html$/, '/');
+                    const normTarget = targetFullPath.replace(/\/index\.html$/, '/');
+
+                    if (normCurrent === normTarget) {
+                        /* Active page tapped: smoothly scroll to top without full-page reload */
+                        e.preventDefault();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        return;
+                    }
+
+                    if (!anchor.href.includes('javascript:')) {
                         e.preventDefault();
                         window.location.href = anchor.href;
                     }

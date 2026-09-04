@@ -15,9 +15,9 @@ import { initDesktopParallax, initGyroscopeLighting } from './modules/motion.js'
 import { toggleDanmaku } from './modules/danmaku.js';
 import { setupMessageSheet } from './modules/message-sheet.js';
 import { loadAndTriggerFireworks } from './modules/fireworks.js';
-import { syncTabBarLabels } from './modules/i18n.js?v=2022';
-import { syncStandaloneTabBar } from './modules/tab-bar.js?v=2022';
-import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=2022';
+import { syncTabBarLabels } from './modules/i18n.js?v=2023';
+import { syncStandaloneTabBar } from './modules/tab-bar.js?v=2023';
+import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=2023';
 
 /* Expose fireworks loader globally for legacy triggers */
 window.loadAndTriggerFireworks = loadAndTriggerFireworks;
