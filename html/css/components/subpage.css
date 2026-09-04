@@ -599,6 +599,20 @@ body {
         box-sizing: border-box;
     }
 
+    @media all and (display-mode: standalone) {
+        html,
+        body {
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+        }
+    }
+
+    html.is-standalone,
+    html.is-standalone body {
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+    }
+
     /* Activate Apple Native Frosted Glass Navigation Bar */
     .apple-top-nav {
         display: flex !important;

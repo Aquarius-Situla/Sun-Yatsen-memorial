@@ -70,8 +70,8 @@ function getMarkdownStyles(isLight) {
     }
 }
 
-import { getCurrentLang, setGlobalLang } from './modules/i18n.js';
-import { initTabBar } from './modules/tab-bar.js';
+import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=2020';
+import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=2020';
 
 /* ============================================================================
  * Subpage Initialization Engine
@@ -93,6 +93,9 @@ export function initSubpage(options) {
             basePath: basePath
         });
     }
+
+    /* Synchronize standalone viewport to eliminate chin gap on short subpages */
+    syncStandaloneTabBar();
 
     const langBtn = document.getElementById('lang-btn');
     const mdViewer = document.getElementById('md-viewer');

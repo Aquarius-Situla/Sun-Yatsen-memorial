@@ -114,6 +114,9 @@ export function initTabBar(options = {}) {
         }
     });
 
+    /* Synchronize standalone positioning immediately after mounting or binding */
+    syncStandaloneTabBar();
+
     return tabBarEl;
 }
 
@@ -135,7 +138,11 @@ export function syncStandaloneTabBar() {
     document.documentElement.classList.add('is-standalone');
 
     const tabBar = document.querySelector('.apple-tab-bar');
-    if (!tabBar) return;
+    if (!tabBar) {
+        /* Retry when element is ready in DOM */
+        requestAnimationFrame(syncStandaloneTabBar);
+        return;
+    }
 
     /* Measure difference between physical screen height and WebKit layout viewport */
     const isPortrait = window.innerHeight >= window.innerWidth;
@@ -147,7 +154,7 @@ export function syncStandaloneTabBar() {
     if (diff >= 10 && diff <= 120) {
         document.documentElement.style.setProperty('--tab-bar-standalone-bottom', `-${diff}px`);
         tabBar.style.setProperty('bottom', `-${diff}px`, 'important');
-    } else if (diff <= 5) {
+    } else if (diff < 10) {
         document.documentElement.style.setProperty('--tab-bar-standalone-bottom', '0px');
         tabBar.style.removeProperty('bottom');
     }
