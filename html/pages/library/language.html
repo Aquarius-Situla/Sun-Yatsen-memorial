@@ -22,9 +22,9 @@
     <meta name="apple-mobile-web-app-title" content="國父紀念堂">
 
     <link rel="stylesheet" href="../../css/variables.css?v=2015">
-    <link rel="stylesheet" href="../../css/base.css?v=2015">
-    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=2015">
-    <link rel="stylesheet" href="../../css/components/subpage.css?v=2015">
+    <link rel="stylesheet" href="../../css/base.css?v=2016">
+    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=2016">
+    <link rel="stylesheet" href="../../css/components/subpage.css?v=2016">
 </head>
 <body>
 
@@ -56,9 +56,11 @@
         <div class="ios-section-header" id="section-header-lang">偏好語言 (PREFERRED LANGUAGES)</div>
         <div class="ios-card">
             <div class="ios-row ios-option-item" data-lang="tc" id="lang-row-tc">
-                <div class="ios-row-title">
-                    <span class="lang-primary-name">正體中文</span>
-                    <span class="lang-secondary-desc">（繁體）</span>
+                <div class="ios-row-title ios-lang-row-content">
+                    <div class="lang-text-group">
+                        <span class="lang-primary-name">正體中文</span>
+                        <span class="lang-secondary-desc">繁體字 · Traditional Chinese</span>
+                    </div>
                 </div>
                 <div class="ios-row-accessory">
                     <svg class="ios-checkmark" viewBox="0 0 24 24">
@@ -67,9 +69,11 @@
                 </div>
             </div>
             <div class="ios-row ios-option-item" data-lang="sc" id="lang-row-sc">
-                <div class="ios-row-title">
-                    <span class="lang-primary-name">简体中文</span>
-                    <span class="lang-secondary-desc">（简化字）</span>
+                <div class="ios-row-title ios-lang-row-content">
+                    <div class="lang-text-group">
+                        <span class="lang-primary-name">简体中文</span>
+                        <span class="lang-secondary-desc">简化字 · Simplified Chinese</span>
+                    </div>
                 </div>
                 <div class="ios-row-accessory">
                     <svg class="ios-checkmark" viewBox="0 0 24 24">
@@ -79,7 +83,7 @@
             </div>
         </div>
         <div class="ios-section-footer" id="lang-footer-text">
-            選擇在私立中山紀念堂中顯示的語言偏好。系統將自動保存您的偏好設置。
+            選擇在私立中山紀念堂中顯示的語言偏好。系統將自動保存您的偏好設定。
         </div>
     </div>
 
@@ -126,7 +130,7 @@
                 topTitle: '語言偏好',
                 backText: '資料庫',
                 sectionHeader: '偏好語言 (PREFERRED LANGUAGES)',
-                footer: '選擇在私立中山紀念堂中顯示的語言偏好。系統將自動保存您的偏好設置。',
+                footer: '選擇在私立中山紀念堂中顯示的語言偏好。系統將自動保存您的偏好設定。',
                 toggleBtn: '切换至简化字'
             },
             sc: {
@@ -134,7 +138,7 @@
                 topTitle: '语言偏好',
                 backText: '资料库',
                 sectionHeader: '偏好语言 (PREFERRED LANGUAGES)',
-                footer: '选择在私立中山纪念堂中显示的长远语言偏好。系统将自动保存您的偏好设置。',
+                footer: '选择在私立中山纪念堂中显示的语言偏好。系统将自动保存您的偏好设置。',
                 toggleBtn: '切換至正體字'
             }
         };
