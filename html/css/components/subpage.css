@@ -56,6 +56,39 @@ body {
     line-height: 44px;
 }
 
+/* Apple Native Blue Back Button (Image 2 Specification) */
+.apple-top-nav .nav-back-link {
+    position: absolute;
+    left: 12px;
+    bottom: 0;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: #0a84ff;
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: 400;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.apple-top-nav .nav-back-link svg {
+    width: 20px;
+    height: 20px;
+    stroke: #0a84ff;
+    stroke-width: 2.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.apple-top-nav .nav-back-link:active {
+    opacity: 0.5;
+}
+
 /* ============================================================================
  * Festival & Event Hero Banner
  * ============================================================================ */
@@ -337,10 +370,46 @@ body {
     font-weight: 400;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     color: var(--sys-text, #ffffff);
     font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", sans-serif;
     letter-spacing: 0.2px;
+}
+
+/* iOS Settings App Icon Badges (Image 2 Specification) */
+.ios-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ios-badge svg {
+    width: 17px;
+    height: 17px;
+    fill: currentColor;
+    stroke: none;
+}
+
+.ios-badge.badge-blue   { background-color: #007aff; color: #ffffff; }
+.ios-badge.badge-purple { background-color: #5856d6; color: #ffffff; }
+.ios-badge.badge-red    { background-color: #ff2d55; color: #ffffff; }
+.ios-badge.badge-orange { background-color: #ff9500; color: #ffffff; }
+.ios-badge.badge-green  { background-color: #34c759; color: #ffffff; }
+.ios-badge.badge-gray   { background-color: #8e8e93; color: #ffffff; }
+.ios-badge.badge-dark   { background-color: #3a3a3c; color: #ffffff; }
+
+.ios-row.has-badge:not(:last-child)::after {
+    left: 56px;
+}
+
+.ios-row-value {
+    color: #8e8e93;
+    font-size: 14.5px;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", sans-serif;
 }
 
 .ios-row-accessory {
@@ -517,6 +586,14 @@ body {
 
     .apple-top-nav .nav-title {
         color: #000000;
+    }
+
+    .apple-top-nav .nav-back-link {
+        color: #007aff;
+    }
+
+    .apple-top-nav .nav-back-link svg {
+        stroke: #007aff;
     }
 
     .festival-hero h1 {

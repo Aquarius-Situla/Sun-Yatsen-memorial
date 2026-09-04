@@ -212,12 +212,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }, WORKER_API);
 
     /* ========================================================================
-     * 7. Apple Native Bottom Tab Bar Synchronization
+     * 7. Apple Native Bottom Tab Bar Synchronization & Danmaku Trigger
      * ======================================================================== */
     syncTabBarLabels();
     window.addEventListener('sys-lang-change', () => {
         syncTabBarLabels();
     });
+
+    const danmakuTabBtn = document.querySelector('[data-tab-id="danmaku"]');
+    if (danmakuTabBtn && messageModal) {
+        danmakuTabBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            messageModal.classList.add('active');
+            if (messageInput) {
+                setTimeout(() => messageInput.focus(), 150);
+            }
+        });
+    }
+
+    /* Check URL query parameter for direct mobile danmaku trigger */
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('open') === 'danmaku' && messageModal) {
+        setTimeout(() => {
+            messageModal.classList.add('active');
+            if (messageInput) {
+                messageInput.focus();
+            }
+        }, 300);
+    }
 
     /* ========================================================================
      * 8. Mobile Navigation Dropdown Controls

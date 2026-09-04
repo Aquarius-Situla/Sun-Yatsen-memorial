@@ -1,0 +1,243 @@
+<!-- ==========================================================================
+ * Private Sun Yat-sen Memorial Hall — Library Hub (library.html)
+ * ==========================================================================
+ * COMMENTING STANDARDS
+ * 1. Block comments only. Use HTML comments for DOM and /* */ for inline scripts.
+ * 2. Section dividers use the === banner format.
+ * 3. All prose is written in English.
+ * ========================================================================== -->
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title id="page-title">資料庫 - 私立中山紀念堂</title>
+    <link rel="icon" href="../../main/favicon/favicon.svg" type="image/svg+xml">
+    <link rel="alternate icon" href="../../main/favicon/favicon.ico" type="image/x-icon" sizes="any">
+
+    <link rel="stylesheet" href="../../css/variables.css?v=2007">
+    <link rel="stylesheet" href="../../css/base.css?v=2007">
+    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=2007">
+    <link rel="stylesheet" href="../../css/components/subpage.css?v=2007">
+</head>
+<body>
+
+    <!-- Apple Native Frosted Glass Top Navigation Bar (Mobile Viewports) -->
+    <header class="apple-top-nav">
+        <h1 class="nav-title" id="top-nav-title">資料庫</h1>
+    </header>
+
+    <!-- Desktop Fallback Navigation Links -->
+    <a href="../../index.html?from=return" class="top-back-btn" aria-label="返回">
+        <svg class="icon-ios" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <svg class="icon-macos" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 17l-5-5 5-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>返回</span>
+    </a>
+
+    <!-- Desktop Fallback Language Toggle -->
+    <button id="lang-btn" class="lang-toggle-btn">切换至简化字</button>
+
+    <!-- iOS Inset Grouped Settings Container (Image 2 Specification) -->
+    <div class="ios-group-container">
+        <!-- Section 1: Archives & History -->
+        <div class="ios-section-header" id="section-archives-header">文獻與歷史 (ARCHIVES &amp; HISTORY)</div>
+        <div class="ios-card">
+            <a class="ios-row has-badge" href="../biography/biography.html">
+                <div class="ios-row-title">
+                    <div class="ios-badge badge-blue">
+                        <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                    </div>
+                    <span id="label-biography">國父生平傳記</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <span class="ios-row-value" id="val-biography">年譜與思想</span>
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </a>
+            <a class="ios-row has-badge" href="../about/about.html">
+                <div class="ios-row-title">
+                    <div class="ios-badge badge-purple">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L2 7v3h20V7L12 2zm8 9h-2v7h2v-7zm-6 0h-2v7h2v-7zm-6 0H6v7h2v-7zm-5 9v2h18v-2H3z"/></svg>
+                    </div>
+                    <span id="label-about">關於紀念館與聲明</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <span class="ios-row-value" id="val-about">館舍與法規</span>
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </a>
+            <a class="ios-row has-badge" href="../thanks/thanks.html">
+                <div class="ios-row-title">
+                    <div class="ios-badge badge-red">
+                        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    </div>
+                    <span id="label-thanks">特別鳴謝名單</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <span class="ios-row-value" id="val-thanks">開源與貢獻</span>
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </a>
+        </div>
+
+        <!-- Section 2: System Preferences -->
+        <div class="ios-section-header" id="section-prefs-header">偏好設定 (PREFERENCES)</div>
+        <div class="ios-card">
+            <div class="ios-row has-badge" id="lang-toggle-row">
+                <div class="ios-row-title">
+                    <div class="ios-badge badge-gray">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    </div>
+                    <span id="label-lang">全域語言 (Language)</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <span class="ios-row-value" id="current-lang-text">正體中文</span>
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Apple Native Bottom Tab Bar (Mobile Viewports Only) -->
+    <nav id="apple-tab-bar" class="apple-tab-bar" role="navigation" aria-label="底部主選單">
+        <a href="../../index.html" class="tab-item" data-tab-id="home" aria-label="主頁">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2.1a1.2 1.2 0 0 0-.85.35L2.6 10.9a1.2 1.2 0 0 0 .85 2.05H4v7.75c0 .66.54 1.2 1.2 1.2h13.6c.66 0 1.2-.54 1.2-1.2V12.95h.55a1.2 1.2 0 0 0 .85-2.05L12.85 2.45A1.2 1.2 0 0 0 12 2.1z"/></svg>
+            </div>
+            <div class="tab-label">主頁</div>
+        </a>
+        <a href="../announcement/announcement.html" class="tab-item" data-tab-id="announcement" aria-label="公告">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><rect x="2.5" y="2.5" width="8.5" height="8.5" rx="2.5"/><rect x="13" y="2.5" width="8.5" height="8.5" rx="2.5"/><rect x="2.5" y="13" width="8.5" height="8.5" rx="2.5"/><rect x="13" y="13" width="8.5" height="8.5" rx="2.5"/></svg>
+            </div>
+            <div class="tab-label">公告</div>
+        </a>
+        <a href="library.html" class="tab-item active" data-tab-id="library" aria-label="資料庫">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M7 2a1.2 1.2 0 0 0-1.2 1.2V4h12.4v-.8A1.2 1.2 0 0 0 17 2H7z"/><path d="M5 5.5A1.2 1.2 0 0 0 3.8 6.7V7.5h16.4v-.8A1.2 1.2 0 0 0 19 5.5H5z"/><path fill-rule="evenodd" clip-rule="evenodd" d="M3.4 9A1.4 1.4 0 0 0 2 10.45l1.15 9.2A2.4 2.4 0 0 0 5.53 21.8h12.94a2.4 2.4 0 0 0 2.38-2.15l1.15-9.2A1.4 1.4 0 0 0 20.6 9H3.4zm5.1 3.5a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5h-5.5a.75.75 0 0 1-.75-.75zm0 3a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5h-5.5a.75.75 0 0 1-.75-.75zm1.5 3a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75z"/></svg>
+            </div>
+            <div class="tab-label">資料庫</div>
+        </a>
+        <a href="../../index.html?open=danmaku" class="tab-item" data-tab-id="danmaku" aria-label="彈幕">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.43 3.86 7.02-.18.84-.71 2.33-1.63 3.2-.23.22-.05.61.27.58 2.33-.21 4.14-1.24 5.2-1.99.73.13 1.5.19 2.3.19 5.52 0 10-4.03 10-9s-4.48-9-10-9zm-5 6.5a1 1 0 1 1 0-2h10a1 1 0 1 1 0 2H7zm0 3.5a1 1 0 1 1 0-2h7a1 1 0 1 1 0 2H7zm0 3.5a1 1 0 1 1 0-2h10a1 1 0 1 1 0 2H7z"/></svg>
+            </div>
+            <div class="tab-label">彈幕</div>
+        </a>
+    </nav>
+
+    <script type="module">
+        /* ====================================================================
+         * Library Module Initialization & Dynamic Language Toggle
+         * ==================================================================== */
+        import { getCurrentLang, setGlobalLang, syncTabBarLabels } from '../../js/modules/i18n.js';
+
+        const i18nStrings = {
+            tc: {
+                pageTitle: '資料庫 - 私立中山紀念堂',
+                topNavTitle: '資料庫',
+                archivesHeader: '文獻與歷史 (ARCHIVES & HISTORY)',
+                prefsHeader: '偏好設定 (PREFERENCES)',
+                biography: '國父生平傳記',
+                valBiography: '年譜與思想',
+                about: '關於紀念館與聲明',
+                valAbout: '館舍與法規',
+                thanks: '特別鳴謝名單',
+                valThanks: '開源與貢獻',
+                lang: '全域語言 (Language)',
+                langText: '正體中文',
+                toggleBtn: '切换至简化字'
+            },
+            sc: {
+                pageTitle: '资料库 - 私立中山纪念堂',
+                topNavTitle: '资料库',
+                archivesHeader: '文献与历史 (ARCHIVES & HISTORY)',
+                prefsHeader: '偏好设置 (PREFERENCES)',
+                biography: '国父生平传记',
+                valBiography: '年谱与思想',
+                about: '关于纪念馆与声明',
+                valAbout: '馆舍与法规',
+                thanks: '特别鸣谢名单',
+                valThanks: '开源与贡献',
+                lang: '全局语言 (Language)',
+                langText: '简体中文',
+                toggleBtn: '切換至正體字'
+            }
+        };
+
+        function updateTexts(lang) {
+            const strings = i18nStrings[lang] || i18nStrings.tc;
+            document.title = strings.pageTitle;
+            const topNavTitle = document.getElementById('top-nav-title');
+            if (topNavTitle) topNavTitle.textContent = strings.topNavTitle;
+
+            const archivesHeader = document.getElementById('section-archives-header');
+            if (archivesHeader) archivesHeader.textContent = strings.archivesHeader;
+
+            const prefsHeader = document.getElementById('section-prefs-header');
+            if (prefsHeader) prefsHeader.textContent = strings.prefsHeader;
+
+            const labelBiography = document.getElementById('label-biography');
+            if (labelBiography) labelBiography.textContent = strings.biography;
+
+            const valBiography = document.getElementById('val-biography');
+            if (valBiography) valBiography.textContent = strings.valBiography;
+
+            const labelAbout = document.getElementById('label-about');
+            if (labelAbout) labelAbout.textContent = strings.about;
+
+            const valAbout = document.getElementById('val-about');
+            if (valAbout) valAbout.textContent = strings.valAbout;
+
+            const labelThanks = document.getElementById('label-thanks');
+            if (labelThanks) labelThanks.textContent = strings.thanks;
+
+            const valThanks = document.getElementById('val-thanks');
+            if (valThanks) valThanks.textContent = strings.valThanks;
+
+            const labelLang = document.getElementById('label-lang');
+            if (labelLang) labelLang.textContent = strings.lang;
+
+            const langText = document.getElementById('current-lang-text');
+            if (langText) langText.textContent = strings.langText;
+
+            const langBtn = document.getElementById('lang-btn');
+            if (langBtn) langBtn.textContent = strings.toggleBtn;
+
+            syncTabBarLabels();
+        }
+
+        const currentLang = getCurrentLang();
+        updateTexts(currentLang);
+
+        /* Bind Language Toggle Actions */
+        const langToggleRow = document.getElementById('lang-toggle-row');
+        if (langToggleRow) {
+            langToggleRow.addEventListener('click', () => {
+                const nextLang = getCurrentLang() === 'tc' ? 'sc' : 'tc';
+                setGlobalLang(nextLang);
+                updateTexts(nextLang);
+            });
+        }
+
+        const langBtn = document.getElementById('lang-btn');
+        if (langBtn) {
+            langBtn.addEventListener('click', () => {
+                const nextLang = getCurrentLang() === 'tc' ? 'sc' : 'tc';
+                setGlobalLang(nextLang);
+                updateTexts(nextLang);
+            });
+        }
+
+        window.addEventListener('sys-lang-change', (e) => {
+            if (e.detail && e.detail.lang) {
+                updateTexts(e.detail.lang);
+            }
+        });
+    </script>
+</body>
+</html>

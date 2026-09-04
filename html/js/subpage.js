@@ -191,15 +191,25 @@ export function initSubpage(options) {
             }
         }
 
+        /* Synchronize Apple Native Back Button Text */
+        const navBackText = document.getElementById('nav-back-text');
+        if (navBackText) {
+            navBackText.textContent = isTraditional ? '資料庫' : '资料库';
+        }
+
         /* Synchronize Apple Native Frosted Top Navigation Bar Title */
         const topNavTitle = document.getElementById('top-nav-title');
         if (topNavTitle) {
-            if (activeBottomTab === 'about') {
+            if (window.location.pathname.includes('/about/')) {
                 topNavTitle.textContent = isTraditional ? '關於與聲明' : '关于与声明';
-            } else if (activeBottomTab === 'announcement') {
-                topNavTitle.textContent = isTraditional ? '公告' : '公告';
-            } else if (activeBottomTab === 'thanks') {
+            } else if (window.location.pathname.includes('/thanks/')) {
                 topNavTitle.textContent = isTraditional ? '特別鳴謝' : '特别鸣谢';
+            } else if (window.location.pathname.includes('/biography/')) {
+                topNavTitle.textContent = isTraditional ? '國父生平' : '国父生平';
+            } else if (window.location.pathname.includes('/announcement/')) {
+                topNavTitle.textContent = isTraditional ? '公告' : '公告';
+            } else if (window.location.pathname.includes('/library/')) {
+                topNavTitle.textContent = isTraditional ? '資料庫' : '资料库';
             } else if (texts && texts[isTraditional ? 'tc' : 'sc'] && texts[isTraditional ? 'tc' : 'sc'].title) {
                 topNavTitle.textContent = texts[isTraditional ? 'tc' : 'sc'].title;
             }

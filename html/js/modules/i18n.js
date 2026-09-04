@@ -17,16 +17,14 @@ export const TAB_DEFINITIONS = {
     tc: [
         { id: 'home',         label: '主頁' },
         { id: 'announcement', label: '公告' },
-        { id: 'biography',    label: '生平' },
-        { id: 'about',        label: '關於' },
-        { id: 'thanks',       label: '鳴謝' }
+        { id: 'library',      label: '資料庫' },
+        { id: 'danmaku',      label: '彈幕' }
     ],
     sc: [
         { id: 'home',         label: '主页' },
         { id: 'announcement', label: '公告' },
-        { id: 'biography',    label: '生平' },
-        { id: 'about',        label: '关于' },
-        { id: 'thanks',       label: '鸣谢' }
+        { id: 'library',      label: '资料库' },
+        { id: 'danmaku',      label: '弹幕' }
     ]
 };
 
