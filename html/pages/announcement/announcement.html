@@ -10,7 +10,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title id="page-title">公告 - 私立中山紀念堂</title>
     <link rel="icon" href="../../main/favicon/favicon.svg" type="image/svg+xml">
     <link rel="alternate icon" href="../../main/favicon/favicon.ico" type="image/x-icon" sizes="any">
@@ -23,7 +23,7 @@
 </head>
 <body>
 
-    <a href="../../index.html?from=return" class="top-back-btn">
+    <a href="../../index.html?from=return" class="top-back-btn" aria-label="返回">
         <svg class="icon-ios" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M15 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -33,9 +33,72 @@
         <span>返回</span>
     </a>
 
+    <!-- Desktop Fallback Language Toggle -->
     <button id="lang-btn" class="lang-toggle-btn">切换至简化字</button>
 
-    <div class="tabs-container" id="tabs">
+    <!-- iOS Inset Grouped Settings Container (Image 3 Specification) -->
+    <div class="ios-group-container">
+        <!-- Section 1: Announcements -->
+        <div class="ios-section-header">堂務公告 (ANNOUNCEMENTS)</div>
+        <div class="ios-card">
+            <div class="ios-row expanded" data-tab="status">
+                <div class="ios-row-title">
+                    <span>網站狀態</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </div>
+            <div class="ios-row" data-tab="memorial">
+                <div class="ios-row-title">
+                    <span>紀念日</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </div>
+            <div class="ios-row" data-tab="Ukraine">
+                <div class="ios-row-title">
+                    <span>聲援烏克蘭</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Historical Memorial Exhibits -->
+        <div class="ios-section-header">歷史紀念特展 (EXHIBITS)</div>
+        <div class="ios-card">
+            <a class="ios-row" href="../../events/xinhai/xinhai.html">
+                <div class="ios-row-title">
+                    <span>辛亥革命紀念特刊</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </a>
+            <a class="ios-row" href="../../events/whampoa/whampoa.html">
+                <div class="ios-row-title">
+                    <span>黃埔建軍百年專頁</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </a>
+            <a class="ios-row" href="../../events/militaries/militaries.html">
+                <div class="ios-row-title">
+                    <span>三軍抗戰勝利紀念</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Desktop Pill Tab Switcher -->
+    <div class="tabs-container" id="tabs" style="display: none;">
         <button class="tab-btn active" data-tab="status">網站狀態</button>
         <button class="tab-btn" data-tab="memorial">紀念日</button>
         <button class="tab-btn" data-tab="Ukraine">聲援烏克蘭</button>
@@ -52,11 +115,47 @@
         </zero-md>
     </div>
 
+    <!-- Apple Native Bottom Tab Bar -->
+    <nav id="apple-tab-bar" class="apple-tab-bar" role="navigation" aria-label="底部主選單">
+        <a href="../../index.html" class="tab-item" data-tab-id="home" aria-label="主頁">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1v-9.5z"/></svg>
+            </div>
+            <div class="tab-label">主頁</div>
+        </a>
+        <a href="../announcement/announcement.html" class="tab-item active" data-tab-id="announcement" aria-label="公告">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
+            </div>
+            <div class="tab-label">公告</div>
+        </a>
+        <a href="../biography/biography.html" class="tab-item" data-tab-id="biography" aria-label="生平">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
+            </div>
+            <div class="tab-label">生平</div>
+        </a>
+        <a href="../about/about.html" class="tab-item" data-tab-id="about" aria-label="關於">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8" r="0.5" fill="currentColor"/></svg>
+            </div>
+            <div class="tab-label">關於</div>
+        </a>
+        <a href="../thanks/thanks.html" class="tab-item" data-tab-id="thanks" aria-label="鳴謝">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </div>
+            <div class="tab-label">鳴謝</div>
+        </a>
+    </nav>
+
     <script type="module">
         import { initSubpage } from '../../js/subpage.js';
 
         initSubpage({
             defaultTab: 'status',
+            activeBottomTab: 'announcement',
+            basePath: '../../',
             tabs: [
                 { id: 'status', labelTc: '網站狀態', labelSc: '网站状态', srcTc: './status_tc.md', srcSc: './status_sc.md' },
                 { id: 'memorial', labelTc: '紀念日', labelSc: '纪念日', srcTc: './memorial_tc.md', srcSc: './memorial_sc.md' },

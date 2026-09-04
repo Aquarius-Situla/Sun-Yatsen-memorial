@@ -68,6 +68,9 @@ function getMarkdownStyles(isLight) {
     }
 }
 
+import { getCurrentLang, setGlobalLang } from './modules/i18n.js';
+import { initTabBar } from './modules/tab-bar.js';
+
 /* ============================================================================
  * Subpage Initialization Engine
  * ============================================================================ */
@@ -76,8 +79,18 @@ export function initSubpage(options) {
         texts = null,
         tabs = null,
         defaultTab = null,
+        activeBottomTab = null,
+        basePath = '../../',
         onRendered = null
     } = options;
+
+    /* Initialize Apple Native Bottom Tab Bar if an active tab is specified */
+    if (activeBottomTab) {
+        initTabBar({
+            activeTab: activeBottomTab,
+            basePath: basePath
+        });
+    }
 
     const langBtn = document.getElementById('lang-btn');
     const mdViewer = document.getElementById('md-viewer');
@@ -86,14 +99,18 @@ export function initSubpage(options) {
     const heroDate = document.getElementById('hero-date');
     const pageTitle = document.getElementById('page-title');
     const tabBtns = document.querySelectorAll('.tab-btn');
+    const iosRows = document.querySelectorAll('.ios-row[data-tab]');
+    const iosOptionItems = document.querySelectorAll('.ios-option-item[data-lang]');
 
-    let isTraditional = true;
+    let isTraditional = getCurrentLang() === 'tc';
     let activeTabId = defaultTab;
 
-    /* Check URL param for language */
+    /* Check URL param for explicit override */
     const params = new URLSearchParams(window.location.search);
     if (params.get('lang') === 'sc') {
         isTraditional = false;
+    } else if (params.get('lang') === 'tc') {
+        isTraditional = true;
     }
 
     /* Initialize tab from URL if present */
@@ -111,6 +128,17 @@ export function initSubpage(options) {
             langBtn.textContent = isTraditional ? '切换至简化字' : '切換至正體字';
         }
 
+        /* Update iOS Inset Grouped Option Selection (e.g. Language Selector) */
+        iosOptionItems.forEach(opt => {
+            const optLang = opt.getAttribute('data-lang');
+            const isSelected = (isTraditional && optLang === 'tc') || (!isTraditional && optLang === 'sc');
+            if (isSelected) {
+                opt.classList.add('selected');
+            } else {
+                opt.classList.remove('selected');
+            }
+        });
+
         if (tabs && tabs.length > 0) {
             /* Tabbed layout handling */
             const currentTabObj = tabs.find(t => t.id === activeTabId) || tabs[0];
@@ -124,6 +152,23 @@ export function initSubpage(options) {
                     btn.classList.add('active');
                 } else {
                     btn.classList.remove('active');
+                }
+            });
+
+            /* Synchronize iOS Inset Grouped Rows */
+            iosRows.forEach(row => {
+                const tabId = row.getAttribute('data-tab');
+                const tabObj = tabs.find(t => t.id === tabId);
+                if (tabObj) {
+                    const titleEl = row.querySelector('.ios-row-title span') || row.querySelector('.ios-row-title');
+                    if (titleEl) {
+                        titleEl.textContent = isTraditional ? tabObj.labelTc : tabObj.labelSc;
+                    }
+                }
+                if (tabId === currentTabObj.id) {
+                    row.classList.add('expanded');
+                } else {
+                    row.classList.remove('expanded');
                 }
             });
 
@@ -147,9 +192,59 @@ export function initSubpage(options) {
         }
     }
 
+    /* Option Items Event Listeners (Global Language Click) */
+    iosOptionItems.forEach(opt => {
+        opt.addEventListener('click', () => {
+            const newLang = opt.getAttribute('data-lang');
+            if (newLang === 'tc' || newLang === 'sc') {
+                isTraditional = newLang === 'tc';
+                setGlobalLang(newLang);
+                updateContent();
+            }
+        });
+    });
+
+    /* General Accordion Row Click Handlers */
+    const allAccordionRows = document.querySelectorAll('.ios-row[data-accordion-target]');
+    allAccordionRows.forEach(row => {
+        row.addEventListener('click', () => {
+            const targetId = row.getAttribute('data-accordion-target');
+            const targetEl = document.getElementById(targetId);
+            const isExpanded = row.classList.contains('expanded');
+
+            if (isExpanded) {
+                row.classList.remove('expanded');
+                if (targetEl) targetEl.classList.remove('open');
+            } else {
+                row.classList.add('expanded');
+                if (targetEl) targetEl.classList.add('open');
+            }
+        });
+    });
+
+    /* Tab-switching iOS Rows */
+    iosRows.forEach(row => {
+        row.addEventListener('click', () => {
+            const targetTab = row.getAttribute('data-tab');
+            if (targetTab && targetTab !== activeTabId) {
+                activeTabId = targetTab;
+                updateContent();
+            }
+        });
+    });
+
+    /* Global Language Synchronization Listener */
+    window.addEventListener('sys-lang-change', (e) => {
+        if (e.detail && e.detail.lang) {
+            isTraditional = e.detail.lang === 'tc';
+            updateContent();
+        }
+    });
+
     if (langBtn) {
         langBtn.addEventListener('click', () => {
             isTraditional = !isTraditional;
+            setGlobalLang(isTraditional ? 'tc' : 'sc');
             updateContent();
         });
     }

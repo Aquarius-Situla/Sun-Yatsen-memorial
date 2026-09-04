@@ -22,6 +22,7 @@
     
 
     <link rel="stylesheet" href="main/style.css?v=1045">
+    <link rel="stylesheet" href="css/components/tab-bar.css">
 
     <!-- System Dark/Light theme-color -->
     <meta name="color-scheme" content="light dark">
@@ -136,6 +137,40 @@
         <span>|</span>
         <a href="javascript:void(0);" id="open-message-btn">留言</a>
     </div>
+
+    <!-- Apple Native Bottom Tab Bar (Mobile Viewports Only) -->
+    <nav id="apple-tab-bar" class="apple-tab-bar" role="navigation" aria-label="底部主選單">
+        <a href="index.html" class="tab-item active" data-tab-id="home" aria-label="主頁">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1v-9.5z"/></svg>
+            </div>
+            <div class="tab-label">主頁</div>
+        </a>
+        <a href="pages/announcement/announcement.html" class="tab-item" data-tab-id="announcement" aria-label="公告">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
+            </div>
+            <div class="tab-label">公告</div>
+        </a>
+        <a href="pages/biography/biography.html" class="tab-item" data-tab-id="biography" aria-label="生平">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
+            </div>
+            <div class="tab-label">生平</div>
+        </a>
+        <a href="pages/about/about.html" class="tab-item" data-tab-id="about" aria-label="關於">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8" r="0.5" fill="currentColor"/></svg>
+            </div>
+            <div class="tab-label">關於</div>
+        </a>
+        <a href="pages/thanks/thanks.html" class="tab-item" data-tab-id="thanks" aria-label="鳴謝">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </div>
+            <div class="tab-label">鳴謝</div>
+        </a>
+    </nav>
 
     <!-- Message Modal -->
     <div id="message-modal" class="modal-overlay">

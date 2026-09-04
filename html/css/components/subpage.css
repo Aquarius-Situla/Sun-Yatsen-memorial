@@ -11,6 +11,7 @@
 
 @import url("../variables.css");
 @import url("../base.css");
+@import url("./tab-bar.css");
 
 body {
     display: flex;
@@ -231,6 +232,171 @@ body {
 }
 
 /* ============================================================================
+ * iOS Inset Grouped Table View & Collapsible Cards (Image 3 Specification)
+ * ============================================================================ */
+.ios-group-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 10px auto 30px auto;
+    box-sizing: border-box;
+}
+
+.ios-section-header {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sys-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 22px 0 8px 16px;
+    font-family: var(--sys-font-family);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.ios-card {
+    background-color: var(--sys-card-bg);
+    border-radius: 14px;
+    border: 0.5px solid var(--sys-border);
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    box-sizing: border-box;
+}
+
+.ios-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 16px;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--sys-text);
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.15s ease, color 0.18s ease;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.ios-row:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 16px;
+    height: 0.5px;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.ios-row:active {
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+.ios-row-title {
+    font-size: 16px;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--sys-text);
+    font-family: var(--sys-font-family);
+    letter-spacing: 0.5px;
+}
+
+.ios-row-accessory {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--sys-text-muted);
+    font-size: 14px;
+    font-family: var(--sys-font-family);
+}
+
+.ios-chevron {
+    width: 14px;
+    height: 14px;
+    stroke: #8e8e93;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), stroke 0.2s ease;
+}
+
+.ios-row.expanded .ios-chevron {
+    transform: rotate(90deg);
+    stroke: var(--sys-accent-gold, #f1c40f);
+}
+
+.ios-row.expanded .ios-row-title {
+    color: var(--sys-accent-gold, #f1c40f);
+    font-weight: 500;
+}
+
+/* Accordion Smooth Grid Fold/Expand */
+.ios-accordion-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.ios-row.expanded + .ios-accordion-content,
+.ios-accordion-content.open {
+    grid-template-rows: 1fr;
+}
+
+.ios-accordion-inner {
+    overflow: hidden;
+    padding: 0 16px;
+    transition: padding 0.3s ease;
+}
+
+.ios-row.expanded + .ios-accordion-content .ios-accordion-inner,
+.ios-accordion-content.open .ios-accordion-inner {
+    padding: 16px 18px 20px 18px;
+    border-top: 0.5px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Radio Option Items (e.g. Language Selector) */
+.ios-option-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 4px;
+    cursor: pointer;
+    color: var(--sys-text);
+    font-size: 15px;
+    transition: color 0.15s ease;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.ios-option-item:not(:last-child) {
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.06);
+}
+
+.ios-option-item .ios-check-icon {
+    width: 18px;
+    height: 18px;
+    stroke: var(--sys-accent-gold, #f1c40f);
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+}
+
+.ios-option-item.selected {
+    color: var(--sys-accent-gold, #f1c40f);
+    font-weight: 500;
+}
+
+.ios-option-item.selected .ios-check-icon {
+    opacity: 1;
+}
+
+/* ============================================================================
  * Responsive Viewport Rules
  * ============================================================================ */
 @media (min-width: 769px) {
@@ -240,7 +406,7 @@ body {
 
 @media (max-width: 768px) {
     body {
-        padding: 65px 16px 40px 16px;
+        padding: 60px 16px calc(75px + env(safe-area-inset-bottom, 16px)) 16px !important;
     }
     .markdown-container {
         padding: 30px 25px;
@@ -249,7 +415,7 @@ body {
         padding: 22px 16px 18px;
     }
     .top-back-btn {
-        top: 20px;
+        top: 18px;
         left: 16px;
         font-size: 17px;
     }
@@ -258,10 +424,10 @@ body {
         height: 24px;
     }
     .lang-toggle-btn {
-        top: 20px;
-        right: 16px;
-        padding: 6px 12px;
-        font-size: 12px;
+        display: none !important;
+    }
+    .ios-section-header {
+        margin-left: 12px;
     }
     .icon-ios { display: block; }
     .icon-macos { display: none; }
@@ -287,6 +453,24 @@ body {
         color: var(--sys-accent-gold);
         border-color: var(--sys-accent-dark-gold);
         box-shadow: 0 0 10px rgba(184, 134, 11, 0.2);
+    }
+    .ios-card {
+        background-color: var(--sys-card-bg);
+        border-color: var(--sys-border);
+        box-shadow: 0 4px 20px rgba(80, 50, 10, 0.08);
+    }
+    .ios-row:not(:last-child)::after {
+        background-color: rgba(0, 0, 0, 0.08);
+    }
+    .ios-row:active {
+        background-color: rgba(0, 0, 0, 0.04);
+    }
+    .ios-row.expanded + .ios-accordion-content .ios-accordion-inner,
+    .ios-accordion-content.open .ios-accordion-inner {
+        border-top-color: rgba(0, 0, 0, 0.08);
+    }
+    .ios-option-item:not(:last-child) {
+        border-bottom-color: rgba(0, 0, 0, 0.06);
     }
     @media (hover: hover) and (pointer: fine) {
         .tab-btn:hover:not(.active) {

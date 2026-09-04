@@ -38,7 +38,30 @@
 
     <button id="lang-btn" class="lang-toggle-btn">切换至简化字</button>
 
-    <div class="tabs-container" id="tabs">
+    <!-- iOS Inset Grouped Navigation (Image 3 Specification) -->
+    <div class="ios-group-container">
+        <div class="ios-section-header">傳記與思想 (BIOGRAPHY &amp; THEORIES)</div>
+        <div class="ios-card">
+            <div class="ios-row expanded" data-tab="biography">
+                <div class="ios-row-title">
+                    <span id="tab-biography-text">生平傳記</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </div>
+            <div class="ios-row" data-tab="theories">
+                <div class="ios-row-title">
+                    <span id="tab-theories-text">思想與歷程</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabs-container" id="tabs" style="display: none;">
         <button class="tab-btn active" data-tab="biography">生平傳記</button>
         <button class="tab-btn" data-tab="theories">思想與歷程</button>
     </div>
@@ -96,18 +119,26 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { getCurrentLang, setGlobalLang } from '../../js/modules/i18n.js';
+        import { initTabBar } from '../../js/modules/tab-bar.js';
+
+        initTabBar({ activeTab: 'biography', basePath: '../../' });
+
         const langBtn = document.getElementById('lang-btn');
         const mdViewer = document.getElementById('md-viewer');
         const pageTitle = document.getElementById('page-title');
         const tabBtns = document.querySelectorAll('.tab-btn');
+        const iosRows = document.querySelectorAll('.ios-row[data-tab]');
         const mdSection = document.getElementById('md-section');
         const chartsSection = document.getElementById('charts-section');
         const chart1Title = document.getElementById('chart1-title');
         const chart2Title = document.getElementById('chart2-title');
         const showAllBtn = document.getElementById('show-all-btn');
+        const tabBioText = document.getElementById('tab-biography-text');
+        const tabTheoText = document.getElementById('tab-theories-text');
         
-        let isTraditional = true;
+        let isTraditional = getCurrentLang() === 'tc';
         let currentTab = 'biography';
         let influenceChartInstance = null;
         let sanminChartInstance = null;
@@ -119,7 +150,7 @@
                     isAllShown = !isAllShown;
                     sanminChartInstance.data.datasets.forEach((ds, i) => {
                         if (!isAllShown) {
-                            sanminChartInstance.setDatasetVisibility(i, false); // 完全隐藏
+                            sanminChartInstance.setDatasetVisibility(i, false); /* Fully hide dataset */
                         } else {
                             sanminChartInstance.setDatasetVisibility(i, true);
                         }
@@ -332,27 +363,64 @@
             }
         }
 
-        langBtn.addEventListener('click', () => {
-            isTraditional = !isTraditional;
-            
+        function applyLanguageLabels() {
             if (isTraditional) {
-                langBtn.textContent = '切换至简化字';
+                if (langBtn) langBtn.textContent = '切换至简化字';
                 document.documentElement.lang = 'zh-TW';
-                tabBtns[0].textContent = '生平傳記';
-                tabBtns[1].textContent = '思想與歷程';
+                if (tabBtns[0]) tabBtns[0].textContent = '生平傳記';
+                if (tabBtns[1]) tabBtns[1].textContent = '思想與歷程';
+                if (tabBioText) tabBioText.textContent = '生平傳記';
+                if (tabTheoText) tabTheoText.textContent = '思想與歷程';
                 chart1Title.textContent = '革命歷程影響力走勢';
                 chart2Title.textContent = '三民主義核心結構';
                 if (showAllBtn) showAllBtn.textContent = isAllShown ? '隱藏全部' : '顯示全部';
             } else {
-                langBtn.textContent = '切換至正體字';
+                if (langBtn) langBtn.textContent = '切換至正體字';
                 document.documentElement.lang = 'zh-CN';
-                tabBtns[0].textContent = '生平传记';
-                tabBtns[1].textContent = '思想与历程';
+                if (tabBtns[0]) tabBtns[0].textContent = '生平传记';
+                if (tabBtns[1]) tabBtns[1].textContent = '思想与历程';
+                if (tabBioText) tabBioText.textContent = '生平传记';
+                if (tabTheoText) tabTheoText.textContent = '思想与历程';
                 chart1Title.textContent = '革命历程影响力走势';
                 chart2Title.textContent = '三民主义核心结构';
                 if (showAllBtn) showAllBtn.textContent = isAllShown ? '隐藏全部' : '显示全部';
             }
-            updateContent();
+        }
+
+        applyLanguageLabels();
+
+        if (langBtn) {
+            langBtn.addEventListener('click', () => {
+                isTraditional = !isTraditional;
+                setGlobalLang(isTraditional ? 'tc' : 'sc');
+                applyLanguageLabels();
+                updateContent();
+            });
+        }
+
+        /* Synchronize when global language changes */
+        window.addEventListener('sys-lang-change', (e) => {
+            if (e.detail && e.detail.lang) {
+                isTraditional = e.detail.lang === 'tc';
+                applyLanguageLabels();
+                updateContent();
+            }
+        });
+
+        /* iOS Inset Grouped Rows Tab Switcher */
+        iosRows.forEach(row => {
+            row.addEventListener('click', () => {
+                const targetTab = row.getAttribute('data-tab');
+                if (targetTab === currentTab) return;
+                iosRows.forEach(r => r.classList.remove('expanded'));
+                row.classList.add('expanded');
+                tabBtns.forEach(b => {
+                    if (b.getAttribute('data-tab') === targetTab) b.classList.add('active');
+                    else b.classList.remove('active');
+                });
+                currentTab = targetTab;
+                updateContent();
+            });
         });
 
         tabBtns.forEach(btn => {
@@ -361,6 +429,10 @@
                 tabBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 currentTab = btn.getAttribute('data-tab');
+                iosRows.forEach(r => {
+                    if (r.getAttribute('data-tab') === currentTab) r.classList.add('expanded');
+                    else r.classList.remove('expanded');
+                });
                 updateContent();
             });
         });
@@ -390,12 +462,14 @@
             });
         }
 
-        // Re-render charts when color scheme changes
+        /* Re-render charts when color scheme changes */
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
             if (currentTab === 'theories') renderCharts();
         });
 
-        // ===== zero-md light/dark theme handler =====
+        /* ====================================================================
+         * Zero-MD Light/Dark Theme Handler
+         * ==================================================================== */
         const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: light)');
         function updateMarkdownTheme() {
             const isLight = colorSchemeQuery.matches;
@@ -464,6 +538,40 @@
         colorSchemeQuery.addEventListener('change', updateMarkdownTheme);
         if (colorSchemeQuery.matches) updateMarkdownTheme();
     </script>
+
+    <!-- Apple Native Bottom Tab Bar -->
+    <nav id="apple-tab-bar" class="apple-tab-bar" role="navigation" aria-label="底部主選單">
+        <a href="../../index.html" class="tab-item" data-tab-id="home" aria-label="主頁">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1v-9.5z"/></svg>
+            </div>
+            <div class="tab-label">主頁</div>
+        </a>
+        <a href="../announcement/announcement.html" class="tab-item" data-tab-id="announcement" aria-label="公告">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
+            </div>
+            <div class="tab-label">公告</div>
+        </a>
+        <a href="../biography/biography.html" class="tab-item active" data-tab-id="biography" aria-label="生平">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
+            </div>
+            <div class="tab-label">生平</div>
+        </a>
+        <a href="../about/about.html" class="tab-item" data-tab-id="about" aria-label="關於">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8" r="0.5" fill="currentColor"/></svg>
+            </div>
+            <div class="tab-label">關於</div>
+        </a>
+        <a href="../thanks/thanks.html" class="tab-item" data-tab-id="thanks" aria-label="鳴謝">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </div>
+            <div class="tab-label">鳴謝</div>
+        </a>
+    </nav>
 
 </body>
 </html>

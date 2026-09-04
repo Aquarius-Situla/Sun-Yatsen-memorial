@@ -15,6 +15,7 @@ import { initDesktopParallax, initGyroscopeLighting } from './modules/motion.js'
 import { toggleDanmaku } from './modules/danmaku.js';
 import { setupMessageSheet } from './modules/message-sheet.js';
 import { loadAndTriggerFireworks } from './modules/fireworks.js';
+import { syncTabBarLabels } from './modules/i18n.js';
 
 /* Expose fireworks loader globally for legacy triggers */
 window.loadAndTriggerFireworks = loadAndTriggerFireworks;
@@ -105,11 +106,88 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ========================================================================
-     * 5. Danmaku Comment Layer
+     * 5. Danmaku Comment Layer & Mobile Long-Press Trigger
      * ======================================================================== */
     if (testamentBox) {
         testamentBox.style.cursor = 'pointer';
-        testamentBox.addEventListener('click', () => {
+
+        let longPressTimer = null;
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let isLongPressTriggered = false;
+        const testamentContent = document.getElementById('testament-content');
+
+        /* Touch Gestures for Mobile (Long-Press to Open Danmaku Sheet) */
+        testamentBox.addEventListener('touchstart', (e) => {
+            if (e.touches.length !== 1) return;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            isLongPressTriggered = false;
+
+            if (testamentContent) {
+                testamentContent.classList.add('testament-pressing');
+            }
+
+            if (longPressTimer) clearTimeout(longPressTimer);
+            longPressTimer = setTimeout(() => {
+                isLongPressTriggered = true;
+                if (testamentContent) {
+                    testamentContent.classList.remove('testament-pressing');
+                }
+
+                /* Haptic vibration feedback on compatible devices */
+                if (navigator.vibrate) {
+                    try { navigator.vibrate(25); } catch (err) { /* No-op */ }
+                }
+
+                /* Open Message / Danmaku Sheet */
+                if (messageModal) {
+                    messageModal.classList.add('active');
+                    if (messageInput) {
+                        setTimeout(() => messageInput.focus(), 150);
+                    }
+                }
+            }, 500);
+        }, { passive: true });
+
+        testamentBox.addEventListener('touchmove', (e) => {
+            if (!longPressTimer) return;
+            const deltaX = Math.abs(e.touches[0].clientX - touchStartX);
+            const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
+
+            /* Cancel long-press if user scrolls or moves finger > 10px */
+            if (deltaX > 10 || deltaY > 10) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+                if (testamentContent) {
+                    testamentContent.classList.remove('testament-pressing');
+                }
+            }
+        }, { passive: true });
+
+        const cancelLongPress = () => {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+            if (testamentContent) {
+                testamentContent.classList.remove('testament-pressing');
+            }
+        };
+
+        testamentBox.addEventListener('touchend', cancelLongPress, { passive: true });
+        testamentBox.addEventListener('touchcancel', cancelLongPress, { passive: true });
+
+        /* Desktop Click & Regular Tap Handler */
+        testamentBox.addEventListener('click', (e) => {
+            if (isLongPressTriggered) {
+                isLongPressTriggered = false;
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+
+            /* On desktop mouse click, maintain original toggle functionality */
             toggleDanmaku(WORKER_API, danmakuContainer, portraitImg, (isEnabled) => {
                 showToast(isEnabled ? '彈幕已開啟' : '彈幕已關閉', 'system');
             });
@@ -134,7 +212,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }, WORKER_API);
 
     /* ========================================================================
-     * 7. Mobile Navigation Dropdown Controls
+     * 7. Apple Native Bottom Tab Bar Synchronization
+     * ======================================================================== */
+    syncTabBarLabels();
+    window.addEventListener('sys-lang-change', () => {
+        syncTabBarLabels();
+    });
+
+    /* ========================================================================
+     * 8. Mobile Navigation Dropdown Controls
      * ======================================================================== */
     let navHideTimeout = null;
 
