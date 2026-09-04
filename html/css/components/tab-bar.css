@@ -32,7 +32,6 @@
     .apple-tab-bar {
         position: fixed;
         bottom: 0;
-        bottom: clamp(-65px, calc(100dvh - 100lvh), 0px);
         left: 0;
         right: 0;
         width: 100%;
@@ -54,17 +53,15 @@
         -webkit-user-select: none;
     }
 
-    /* Standalone WebApp CSS: Lock cleanly to physical device bottom across WebKit viewport expansion */
+    /* Standalone WebApp CSS: Anchor cleanly to device bottom */
     @media all and (display-mode: standalone) {
         .apple-tab-bar {
             bottom: 0;
-            bottom: clamp(-65px, calc(100dvh - 100lvh), 0px);
         }
     }
 
     html.is-standalone .apple-tab-bar {
         bottom: 0;
-        bottom: clamp(-65px, calc(100dvh - 100lvh), 0px);
     }
 
     /* Individual Tab Button Item (Anchored to top 49-52px content zone) */
