@@ -147,17 +147,20 @@ export function syncStandaloneTabBar() {
     /* Measure difference between physical screen height and WebKit layout viewport */
     const isPortrait = window.innerHeight >= window.innerWidth;
     const currentScreenH = isPortrait ? Math.max(window.screen.height, window.screen.width) : Math.min(window.screen.height, window.screen.width);
-    const diff = currentScreenH - window.innerHeight;
 
-    /* In WebKit standalone bug, diff equals status bar height (approx 44px - 64px).
-     * When keyboard opens, diff is much larger (>200px), which must not be touched. */
-    if (diff >= 10 && diff <= 120) {
-        document.documentElement.style.setProperty('--tab-bar-standalone-bottom', `-${diff}px`);
-        tabBar.style.setProperty('bottom', `-${diff}px`, 'important');
-    } else if (diff < 10) {
-        document.documentElement.style.setProperty('--tab-bar-standalone-bottom', '0px');
-        tabBar.style.removeProperty('bottom');
+    /* If WebKit is stuck in an unexpanded viewport on short pages (innerHeight < screen.height),
+     * force body to expand so WebKit snaps layout viewport to the full physical screen height */
+    if (window.innerHeight < currentScreenH) {
+        document.body.style.minHeight = `${currentScreenH + 1}px`;
+        window.scrollTo(0, 1);
+        requestAnimationFrame(() => {
+            window.scrollTo(0, 0);
+        });
     }
+
+    /* Ensure tab bar is cleanly anchored to bottom: 0 without negative offset clipping */
+    document.documentElement.style.setProperty('--tab-bar-standalone-bottom', '0px');
+    tabBar.style.removeProperty('bottom');
 }
 
 /* ============================================================================

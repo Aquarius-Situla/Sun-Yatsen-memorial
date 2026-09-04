@@ -55,29 +55,15 @@
         -webkit-user-select: none;
     }
 
-    /* Seamless bottom backdrop extension to prevent any gap underneath */
-    .apple-tab-bar::after {
-        content: "";
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        height: 120px;
-        background: inherit;
-        pointer-events: none;
-    }
-
-    /* Standalone WebApp CSS Fallback:
-     * When WebKit layout viewport is offset by status bar height (100vh - 100%),
-     * pull bottom downward by the difference so it pins to physical device bottom */
+    /* Standalone WebApp CSS: Anchor cleanly to device bottom */
     @media all and (display-mode: standalone) {
         .apple-tab-bar {
-            bottom: var(--tab-bar-standalone-bottom, calc(100% - 100vh));
+            bottom: var(--tab-bar-standalone-bottom, 0);
         }
     }
 
     html.is-standalone .apple-tab-bar {
-        bottom: var(--tab-bar-standalone-bottom, calc(100% - 100vh));
+        bottom: var(--tab-bar-standalone-bottom, 0);
     }
 
     /* Individual Tab Button Item (Anchored to top 49-52px content zone) */
