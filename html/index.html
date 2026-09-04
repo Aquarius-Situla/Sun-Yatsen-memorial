@@ -11,7 +11,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>私立中山紀念堂</title>
 
     <link rel="icon" href="main/favicon/favicon.svg" type="image/svg+xml">
@@ -21,8 +21,8 @@
     <link rel="apple-touch-icon" href="webapp/icon/icon-mobile.png">
     
 
-    <link rel="stylesheet" href="main/style.css?v=1045">
-    <link rel="stylesheet" href="css/components/tab-bar.css?v=2008">
+    <link rel="stylesheet" href="main/style.css?v=2015">
+    <link rel="stylesheet" href="css/components/tab-bar.css?v=2015">
 
     <!-- System Dark/Light theme-color -->
     <meta name="color-scheme" content="light dark">
@@ -102,7 +102,7 @@
                 <span id="minguo-date-display">⏳ 正在讀取曆法...</span>
             </div>
         </div>
-        <div class="mobile-arrow-hint" id="mobile-arrow-btn">
+        <div class="mobile-arrow-hint" id="mobile-arrow-btn" onclick="window.handleMobileArrowClick && window.handleMobileArrowClick(event)" role="button" tabindex="0" aria-label="展開導航欄">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
@@ -110,7 +110,7 @@
     </div>
 
     <div class="container">
-        <div class="frame-container" id="portrait-btn">
+        <div class="frame-container" id="portrait-btn" role="button" tabindex="0" onclick="window.handlePortraitClick && window.handlePortraitClick()" aria-label="點擊行禮奏樂">
             <div class="wood-frame">
                 <img src="main/portrait.jpg" alt="國父遺像" class="portrait-img">
             </div>
@@ -160,9 +160,9 @@
             </div>
             <div class="tab-label">資料庫</div>
         </a>
-        <a href="javascript:void(0);" class="tab-item" data-tab-id="danmaku" aria-label="彈幕">
+        <a href="javascript:void(0);" class="tab-item" data-tab-id="danmaku" onclick="window.openDanmakuModal && window.openDanmakuModal(event)" aria-label="彈幕">
             <div class="tab-icon">
-                <svg viewBox="0 0 24 24"><path d="M16 3.5c3.86 0 7 2.69 7 6 0 1.73-.85 3.28-2.21 4.32.14.79.6 1.86 1.29 2.45.1.09.05.26-.1.28-1.56.17-2.77-.45-3.42-.9-.46.07-.94.1-1.44.1-.22 0-.44-.01-.65-.03A5.95 5.95 0 0 1 16.75 13c0-3.71-3.25-6.72-7.25-6.72-.43 0-.85.04-1.27.11.91-1.68 4.09-2.89 7.77-2.89z"/><path d="M9.5 7.5C5.36 7.5 2 10.19 2 13.5c0 1.73.85 3.28 2.21 4.32-.14.79-.6 1.86-1.29 2.45-.1.09-.05.26.1.28 1.56.17 2.77-.45 3.42-.9.55.08 1.13.12 1.8.12 4.14 0 7.5-2.69 7.5-6s-3.36-6-7.5-6z"/></svg>
+                <svg viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 3C6.477 3 2 6.806 2 11.5C2 13.914 3.193 16.084 5.12 17.587C4.646 19.344 3.842 20.373 3.14 20.893C2.923 21.054 3.037 21.4 3.308 21.4C5.556 21.4 7.848 20.187 9.07 19.26C10.007 19.736 10.982 20 12 20C17.523 20 22 16.194 22 11.5C22 6.806 17.523 3 12 3Z"/></svg>
             </div>
             <div class="tab-label">彈幕</div>
         </a>
@@ -211,6 +211,6 @@
 
     <audio id="bg-music" src="./main/sanmin/sanmin.flac"></audio>
     <script src="api/env.js"></script>
-    <script type="module" src="js/app.js?v=2007"></script>
+    <script type="module" src="js/app.js?v=2015"></script>
 </body>
 </html>

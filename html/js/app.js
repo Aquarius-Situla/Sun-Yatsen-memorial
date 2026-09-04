@@ -20,12 +20,13 @@ import { syncTabBarLabels } from './modules/i18n.js';
 /* Expose fireworks loader globally for legacy triggers */
 window.loadAndTriggerFireworks = loadAndTriggerFireworks;
 
-document.addEventListener('DOMContentLoaded', () => {
+/* ============================================================================
+ * Application Initialization Controller
+ * ============================================================================ */
+function initApp() {
     const WORKER_API = window.ENV ? window.ENV.WORKER_API : '';
 
-    /* ========================================================================
-     * DOM References
-     * ======================================================================== */
+    /* DOM References */
     const audio             = document.getElementById('bg-music');
     const portraitBtn       = document.getElementById('portrait-btn');
     const portraitImg       = document.querySelector('.portrait-img');
@@ -53,226 +54,279 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ========================================================================
      * 1. Calendar & Festival Banners
      * ======================================================================== */
-    displayMinguoDate();
-    initFestivalBanner(navFestivalBanner, () => {
-        loadAndTriggerFireworks();
-    });
+    try {
+        displayMinguoDate();
+        initFestivalBanner(navFestivalBanner, () => {
+            loadAndTriggerFireworks();
+        });
+    } catch (err) {
+        console.error('[Calendar Init Error]:', err);
+    }
 
     /* ========================================================================
      * 2. Attendance Counter Registration
      * ======================================================================== */
-    registerAttendance(WORKER_API, attendanceCountEl, () => {
-        loadAndTriggerFireworks();
-    });
+    try {
+        registerAttendance(WORKER_API, attendanceCountEl, () => {
+            loadAndTriggerFireworks();
+        });
+    } catch (err) {
+        console.error('[Attendance Init Error]:', err);
+    }
 
     /* ========================================================================
      * 3. 3D Frame Tilt & Lighting
      * ======================================================================== */
-    initDesktopParallax(woodFrame);
-    initGyroscopeLighting(woodFrame);
+    try {
+        initDesktopParallax(woodFrame);
+        initGyroscopeLighting(woodFrame);
+    } catch (err) {
+        console.error('[Motion Init Error]:', err);
+    }
 
     /* ========================================================================
      * 4. Ceremonial Ritual & Music Sequence
      * ======================================================================== */
-    const urlParams = new URLSearchParams(window.location.search);
-    const isFromReturn = urlParams.get('from') === 'return';
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isFromReturn = urlParams.get('from') === 'return';
 
-    if (isFromReturn) {
-        window.history.replaceState({}, document.title, window.location.pathname);
-    } else {
-        setTimeout(() => {
-            triggerToastBanner('請向國父遺像行三鞠躬禮', 5000);
-        }, 1000);
-    }
+        if (isFromReturn) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        } else {
+            setTimeout(() => {
+                triggerToastBanner('請向國父遺像行三鞠躬禮', 5000);
+            }, 1000);
+        }
 
-    if (portraitBtn && audio) {
-        portraitBtn.addEventListener('click', () => {
+        const triggerPortraitMusic = () => {
+            if (!audio) return;
             if (audio.paused) {
                 triggerToastBanner('請起立', 2000);
                 playMemorialMusic(audio, () => {
-                    memorialBanner.classList.add('hidden');
-                    sitDownBanner.classList.add('show');
+                    if (memorialBanner) memorialBanner.classList.add('hidden');
+                    if (sitDownBanner) sitDownBanner.classList.add('show');
                     document.body.classList.add('banner-active');
 
                     setTimeout(() => {
-                        sitDownBanner.classList.remove('show');
+                        if (sitDownBanner) sitDownBanner.classList.remove('show');
                         document.body.classList.remove('banner-active');
                     }, 6000);
                 });
             } else {
                 triggerToastBanner('請肅立！', 2000);
             }
-        });
+        };
+
+        window.handlePortraitClick = triggerPortraitMusic;
+
+        if (portraitBtn) {
+            portraitBtn.setAttribute('role', 'button');
+            portraitBtn.setAttribute('tabindex', '0');
+            portraitBtn.style.cursor = 'pointer';
+            portraitBtn.addEventListener('click', triggerPortraitMusic);
+        }
+    } catch (err) {
+        console.error('[Ritual Init Error]:', err);
     }
 
     /* ========================================================================
      * 5. Danmaku Comment Layer & Mobile Long-Press Trigger
      * ======================================================================== */
-    if (testamentBox) {
-        testamentBox.style.cursor = 'pointer';
+    try {
+        if (testamentBox) {
+            testamentBox.style.cursor = 'pointer';
 
-        let longPressTimer = null;
-        let touchStartX = 0;
-        let touchStartY = 0;
-        let isLongPressTriggered = false;
-        const testamentContent = document.getElementById('testament-content');
+            let longPressTimer = null;
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let isLongPressTriggered = false;
+            const testamentContent = document.getElementById('testament-content');
 
-        /* Touch Gestures for Mobile (Long-Press to Open Danmaku Sheet) */
-        testamentBox.addEventListener('touchstart', (e) => {
-            if (e.touches.length !== 1) return;
-            touchStartX = e.touches[0].clientX;
-            touchStartY = e.touches[0].clientY;
-            isLongPressTriggered = false;
+            testamentBox.addEventListener('touchstart', (e) => {
+                if (e.touches.length !== 1) return;
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                isLongPressTriggered = false;
 
-            if (testamentContent) {
-                testamentContent.classList.add('testament-pressing');
-            }
-
-            if (longPressTimer) clearTimeout(longPressTimer);
-            longPressTimer = setTimeout(() => {
-                isLongPressTriggered = true;
                 if (testamentContent) {
-                    testamentContent.classList.remove('testament-pressing');
+                    testamentContent.classList.add('testament-pressing');
                 }
 
-                /* Haptic vibration feedback on compatible devices */
-                if (navigator.vibrate) {
-                    try { navigator.vibrate(25); } catch (err) { /* No-op */ }
-                }
+                if (longPressTimer) clearTimeout(longPressTimer);
+                longPressTimer = setTimeout(() => {
+                    isLongPressTriggered = true;
+                    if (testamentContent) {
+                        testamentContent.classList.remove('testament-pressing');
+                    }
 
-                /* Open Message / Danmaku Sheet */
-                if (messageModal) {
-                    messageModal.classList.add('active');
-                    if (messageInput) {
-                        setTimeout(() => messageInput.focus(), 150);
+                    if (navigator.vibrate) {
+                        try { navigator.vibrate(25); } catch (err) { /* No-op */ }
+                    }
+
+                    if (messageModal) {
+                        messageModal.classList.add('active');
+                        if (messageInput) {
+                            setTimeout(() => messageInput.focus(), 150);
+                        }
+                    }
+                }, 500);
+            }, { passive: true });
+
+            testamentBox.addEventListener('touchmove', (e) => {
+                if (!longPressTimer) return;
+                const deltaX = Math.abs(e.touches[0].clientX - touchStartX);
+                const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
+
+                if (deltaX > 10 || deltaY > 10) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                    if (testamentContent) {
+                        testamentContent.classList.remove('testament-pressing');
                     }
                 }
-            }, 500);
-        }, { passive: true });
+            }, { passive: true });
 
-        testamentBox.addEventListener('touchmove', (e) => {
-            if (!longPressTimer) return;
-            const deltaX = Math.abs(e.touches[0].clientX - touchStartX);
-            const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
-
-            /* Cancel long-press if user scrolls or moves finger > 10px */
-            if (deltaX > 10 || deltaY > 10) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
+            const cancelLongPress = () => {
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
                 if (testamentContent) {
                     testamentContent.classList.remove('testament-pressing');
                 }
-            }
-        }, { passive: true });
+            };
 
-        const cancelLongPress = () => {
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
-            }
-            if (testamentContent) {
-                testamentContent.classList.remove('testament-pressing');
-            }
-        };
+            testamentBox.addEventListener('touchend', cancelLongPress, { passive: true });
+            testamentBox.addEventListener('touchcancel', cancelLongPress, { passive: true });
 
-        testamentBox.addEventListener('touchend', cancelLongPress, { passive: true });
-        testamentBox.addEventListener('touchcancel', cancelLongPress, { passive: true });
+            testamentBox.addEventListener('click', (e) => {
+                if (isLongPressTriggered) {
+                    isLongPressTriggered = false;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
 
-        /* Desktop Click & Regular Tap Handler */
-        testamentBox.addEventListener('click', (e) => {
-            if (isLongPressTriggered) {
-                isLongPressTriggered = false;
-                e.preventDefault();
-                e.stopPropagation();
-                return;
-            }
-
-            /* On desktop mouse click, maintain original toggle functionality */
-            toggleDanmaku(WORKER_API, danmakuContainer, portraitImg, (isEnabled) => {
-                showToast(isEnabled ? '彈幕已開啟' : '彈幕已關閉', 'system');
+                toggleDanmaku(WORKER_API, danmakuContainer, portraitImg, (isEnabled) => {
+                    showToast(isEnabled ? '彈幕已開啟' : '彈幕已關閉', 'system');
+                });
             });
-        });
+        }
+    } catch (err) {
+        console.error('[Testament Init Error]:', err);
     }
 
     /* ========================================================================
      * 6. Message Sheet & Captcha Integration
      * ======================================================================== */
-    setupMessageSheet({
-        openMessageBtn,
-        messageModal,
-        historyMessageBtn,
-        historyPopover,
-        historyList,
-        messageInput,
-        charCount,
-        submitMessageBtn,
-        desktopCancelBtn,
-        danmakuContainer,
-        portraitImg
-    }, WORKER_API);
+    try {
+        setupMessageSheet({
+            openMessageBtn,
+            messageModal,
+            historyMessageBtn,
+            historyPopover,
+            historyList,
+            messageInput,
+            charCount,
+            submitMessageBtn,
+            desktopCancelBtn,
+            danmakuContainer,
+            portraitImg
+        }, WORKER_API);
+    } catch (err) {
+        console.error('[Message Sheet Init Error]:', err);
+    }
 
     /* ========================================================================
      * 7. Apple Native Bottom Tab Bar Synchronization & Danmaku Trigger
      * ======================================================================== */
-    syncTabBarLabels();
-    window.addEventListener('sys-lang-change', () => {
+    try {
         syncTabBarLabels();
-    });
-
-    const danmakuTabBtn = document.querySelector('[data-tab-id="danmaku"]');
-    if (danmakuTabBtn && messageModal) {
-        danmakuTabBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            messageModal.classList.add('active');
-            if (messageInput) {
-                setTimeout(() => messageInput.focus(), 150);
-            }
+        window.addEventListener('sys-lang-change', () => {
+            syncTabBarLabels();
         });
-    }
 
-    /* Check URL query parameter for direct mobile danmaku trigger */
-    if (urlParams.get('open') === 'danmaku' && messageModal) {
-        setTimeout(() => {
-            messageModal.classList.add('active');
-            if (messageInput) {
-                messageInput.focus();
+        const triggerDanmakuModal = (e) => {
+            if (e) e.preventDefault();
+            if (messageModal) {
+                messageModal.classList.add('active');
+                if (messageInput) {
+                    setTimeout(() => messageInput.focus(), 150);
+                }
             }
-        }, 300);
+        };
+
+        window.openDanmakuModal = triggerDanmakuModal;
+
+        const danmakuTabBtn = document.querySelector('[data-tab-id="danmaku"]');
+        if (danmakuTabBtn) {
+            danmakuTabBtn.addEventListener('click', triggerDanmakuModal);
+            danmakuTabBtn.addEventListener('touchend', (e) => {
+                triggerDanmakuModal(e);
+            }, { passive: false });
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('open') === 'danmaku' && messageModal) {
+            setTimeout(() => {
+                triggerDanmakuModal();
+            }, 300);
+        }
+    } catch (err) {
+        console.error('[TabBar Init Error]:', err);
     }
 
     /* ========================================================================
      * 8. Mobile Navigation Dropdown Controls
      * ======================================================================== */
-    let navHideTimeout = null;
+    try {
+        let navHideTimeout = null;
 
-    if (mobileArrowBtn && dropdownNavBar) {
-        mobileArrowBtn.addEventListener('click', (e) => {
-            if (document.body.classList.contains('banner-active')) return;
-            e.stopPropagation();
+        const toggleDropdownNav = (e) => {
+            if (e) e.stopPropagation();
+            if (document.body.classList.contains('banner-active') || !dropdownNavBar) return;
             if (navHideTimeout) clearTimeout(navHideTimeout);
             dropdownNavBar.classList.add('force-show');
             navHideTimeout = setTimeout(() => {
                 dropdownNavBar.classList.remove('force-show');
             }, 4000);
-        });
+        };
 
-        dropdownNavBar.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (navHideTimeout) {
-                clearTimeout(navHideTimeout);
-                navHideTimeout = setTimeout(() => {
-                    dropdownNavBar.classList.remove('force-show');
-                }, 4000);
-            }
-        });
+        window.handleMobileArrowClick = toggleDropdownNav;
 
-        document.addEventListener('click', (e) => {
-            if (!dropdownNavBar.contains(e.target) && !mobileArrowBtn.contains(e.target)) {
-                if (dropdownNavBar.classList.contains('force-show')) {
-                    dropdownNavBar.classList.remove('force-show');
-                    if (navHideTimeout) clearTimeout(navHideTimeout);
+        if (mobileArrowBtn && dropdownNavBar) {
+            mobileArrowBtn.addEventListener('click', toggleDropdownNav);
+
+            dropdownNavBar.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (navHideTimeout) {
+                    clearTimeout(navHideTimeout);
+                    navHideTimeout = setTimeout(() => {
+                        dropdownNavBar.classList.remove('force-show');
+                    }, 4000);
                 }
-            }
-        });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!dropdownNavBar.contains(e.target) && !mobileArrowBtn.contains(e.target)) {
+                    if (dropdownNavBar.classList.contains('force-show')) {
+                        dropdownNavBar.classList.remove('force-show');
+                        if (navHideTimeout) clearTimeout(navHideTimeout);
+                    }
+                }
+            });
+        }
+    } catch (err) {
+        console.error('[Dropdown Nav Error]:', err);
     }
-});
+}
+
+/* ============================================================================
+ * Lifecycle Execution: Run Immediately if DOM is Already Interactive/Complete
+ * ============================================================================ */
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}

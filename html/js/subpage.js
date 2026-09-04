@@ -37,7 +37,8 @@ function getMarkdownStyles(isLight) {
             background: rgba(184,134,11,0.08) !important;
             padding: 12px 20px !important;
             border-radius: 0 6px 6px 0 !important;
-        }`;
+        }` + (document.querySelector('.festival-hero') ? `
+        .markdown-body > h1:first-child { display: none !important; }` : '');
     } else {
         return `.markdown-body {
             color: #e5e7eb !important;
@@ -64,7 +65,8 @@ function getMarkdownStyles(isLight) {
             background: rgba(184,134,11,0.07) !important;
             padding: 12px 20px !important;
             border-radius: 0 6px 6px 0 !important;
-        }`;
+        }` + (document.querySelector('.festival-hero') ? `
+        .markdown-body > h1:first-child { display: none !important; }` : '');
     }
 }
 
