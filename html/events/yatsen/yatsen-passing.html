@@ -17,15 +17,34 @@
     <link rel="icon" href="../../main/favicon/favicon.svg" type="image/svg+xml">
     <link rel="alternate icon" href="../../main/favicon/favicon.ico" type="image/x-icon" sizes="any">
 
+    <link rel="manifest" href="../../webapp/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="國父紀念堂">
+
     <link rel="preload" href="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js" as="script" crossorigin="anonymous">
     <link rel="preload" href="./yatsen-passing_tc.md" as="fetch" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="../../css/components/subpage.css">
+    <link rel="stylesheet" href="../../css/variables.css?v=2008">
+    <link rel="stylesheet" href="../../css/base.css?v=2008">
+    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=2008">
+    <link rel="stylesheet" href="../../css/components/subpage.css?v=2008">
     <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"></script>
 </head>
 <body>
 
-    <a href="../../index.html?from=return" class="top-back-btn">
+    <!-- Apple Native Frosted Glass Top Navigation Bar (Mobile Viewports) -->
+    <header class="apple-top-nav">
+        <a href="../../pages/announcement/announcement.html" class="nav-back-link" id="nav-back-link" aria-label="返回公告">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            <span id="nav-back-text">公告</span>
+        </a>
+        <h1 class="nav-title" id="top-nav-title">國父逝世紀念日</h1>
+    </header>
+
+    <!-- Desktop Fallback Navigation Links -->
+    <a href="../../pages/announcement/announcement.html" class="top-back-btn" aria-label="返回">
         <svg class="icon-ios" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M15 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -35,12 +54,19 @@
         <span>返回</span>
     </a>
 
+    <!-- Desktop Fallback Language Toggle -->
     <button id="lang-btn" class="lang-toggle-btn">切换至简化字</button>
 
+    <!-- Apple Native Settings-Style Hero Card (Image 2 Specification) -->
     <div class="festival-hero">
-        <span class="festival-icon" id="hero-icon">🕯️</span>
+        <div class="festival-badge">
+            <span class="festival-icon" id="hero-icon">🕯️</span>
+        </div>
         <h1 id="hero-title">國父逝世紀念日</h1>
         <div class="festival-date" id="hero-date">1925年（民國十四年）三月十二日</div>
+        <div class="festival-desc" id="hero-desc">
+            深切緬懷國父孫中山先生逝世，恪遵國父遺囑：「革命尚未成功，同志仍須努力」，繼承三民主義民主理想。
+        </div>
     </div>
 
     <div class="markdown-container">
@@ -54,13 +80,55 @@
         </zero-md>
     </div>
 
+    <!-- Apple Native Bottom Tab Bar -->
+    <nav id="apple-tab-bar" class="apple-tab-bar" role="navigation" aria-label="底部主選單">
+        <a href="../../index.html" class="tab-item" data-tab-id="home" aria-label="主頁">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2.1a1.2 1.2 0 0 0-.85.35L2.6 10.9a1.2 1.2 0 0 0 .85 2.05H4v7.75c0 .66.54 1.2 1.2 1.2h13.6c.66 0 1.2-.54 1.2-1.2V12.95h.55a1.2 1.2 0 0 0 .85-2.05L12.85 2.45A1.2 1.2 0 0 0 12 2.1z"/></svg>
+            </div>
+            <div class="tab-label">主頁</div>
+        </a>
+        <a href="../../pages/announcement/announcement.html" class="tab-item active" data-tab-id="announcement" aria-label="公告">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><rect x="2.5" y="2.5" width="8.5" height="8.5" rx="2.5"/><rect x="13" y="2.5" width="8.5" height="8.5" rx="2.5"/><rect x="2.5" y="13" width="8.5" height="8.5" rx="2.5"/><rect x="13" y="13" width="8.5" height="8.5" rx="2.5"/></svg>
+            </div>
+            <div class="tab-label">公告</div>
+        </a>
+        <a href="../../pages/library/library.html" class="tab-item" data-tab-id="library" aria-label="資料庫">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M7 2a1.2 1.2 0 0 0-1.2 1.2V4h12.4v-.8A1.2 1.2 0 0 0 17 2H7z"/><path d="M5 5.5A1.2 1.2 0 0 0 3.8 6.7V7.5h16.4v-.8A1.2 1.2 0 0 0 19 5.5H5z"/><path fill-rule="evenodd" clip-rule="evenodd" d="M3.4 9A1.4 1.4 0 0 0 2 10.45l1.15 9.2A2.4 2.4 0 0 0 5.53 21.8h12.94a2.4 2.4 0 0 0 2.38-2.15l1.15-9.2A1.4 1.4 0 0 0 20.6 9H3.4zm5.1 3.5a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5h-5.5a.75.75 0 0 1-.75-.75zm0 3a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5h-5.5a.75.75 0 0 1-.75-.75zm1.5 3a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75z"/></svg>
+            </div>
+            <div class="tab-label">資料庫</div>
+        </a>
+        <a href="../../index.html?open=danmaku" class="tab-item" data-tab-id="danmaku" aria-label="彈幕">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24"><path d="M16 3.5c3.86 0 7 2.69 7 6 0 1.73-.85 3.28-2.21 4.32.14.79.6 1.86 1.29 2.45.1.09.05.26-.1.28-1.56.17-2.77-.45-3.42-.9-.46.07-.94.1-1.44.1-.22 0-.44-.01-.65-.03A5.95 5.95 0 0 1 16.75 13c0-3.71-3.25-6.72-7.25-6.72-.43 0-.85.04-1.27.11.91-1.68 4.09-2.89 7.77-2.89z"/><path d="M9.5 7.5C5.36 7.5 2 10.19 2 13.5c0 1.73.85 3.28 2.21 4.32-.14.79-.6 1.86-1.29 2.45-.1.09-.05.26.1.28 1.56.17 2.77-.45 3.42-.9.55.08 1.13.12 1.8.12 4.14 0 7.5-2.69 7.5-6s-3.36-6-7.5-6z"/></svg>
+            </div>
+            <div class="tab-label">彈幕</div>
+        </a>
+    </nav>
+
     <script type="module">
         import { initSubpage } from '../../js/subpage.js';
 
         initSubpage({
+            activeBottomTab: 'announcement',
+            basePath: '../../',
             texts: {
-                tc: { btn: '切换至简化字', title: '國父逝世紀念日', date: '1925年（民國十四年）三月十二日', src: './yatsen-passing_tc.md' },
-                sc: { btn: '切換至正體字', title: '国父逝世纪念日', date: '1925年（民国十四年）三月十二日', src: './yatsen-passing_sc.md' }
+                tc: {
+                    btn: '切换至简化字',
+                    title: '國父逝世紀念日',
+                    date: '1925年（民國十四年）三月十二日',
+                    desc: '深切緬懷國父孫中山先生逝世，恪遵國父遺囑：「革命尚未成功，同志仍須努力」，繼承三民主義民主理想。',
+                    src: './yatsen-passing_tc.md'
+                },
+                sc: {
+                    btn: '切換至正體字',
+                    title: '国父逝世纪念日',
+                    date: '1925年（民国十四年）三月十二日',
+                    desc: '深切缅怀国父孙中山先生逝世，恪遵国父遗嘱：“革命尚未成功，同志仍须努力”，继承三民主义民主理想。',
+                    src: './yatsen-passing_sc.md'
+                }
             }
         });
     </script>

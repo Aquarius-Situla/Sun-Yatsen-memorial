@@ -36,10 +36,11 @@ export const TAB_ICONS = {
             <path fill-rule="evenodd" clip-rule="evenodd" d="M3.4 9A1.4 1.4 0 0 0 2 10.45l1.15 9.2A2.4 2.4 0 0 0 5.53 21.8h12.94a2.4 2.4 0 0 0 2.38-2.15l1.15-9.2A1.4 1.4 0 0 0 20.6 9H3.4zm5.1 3.5a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5h-5.5a.75.75 0 0 1-.75-.75zm0 3a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5h-5.5a.75.75 0 0 1-.75-.75zm1.5 3a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75z"/>
         </svg>
     `,
-    /* SF Symbol: text.bubble.fill (Apple Barrage / Chat Bubble with stream lines) */
+    /* SF Symbol: bubble.left.and.bubble.right.fill (Apple Native Speech Stream / Danmaku) */
     danmaku: `
         <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.43 3.86 7.02-.18.84-.71 2.33-1.63 3.2-.23.22-.05.61.27.58 2.33-.21 4.14-1.24 5.2-1.99.73.13 1.5.19 2.3.19 5.52 0 10-4.03 10-9s-4.48-9-10-9zm-5 6.5a1 1 0 1 1 0-2h10a1 1 0 1 1 0 2H7zm0 3.5a1 1 0 1 1 0-2h7a1 1 0 1 1 0 2H7zm0 3.5a1 1 0 1 1 0-2h10a1 1 0 1 1 0 2H7z"/>
+            <path d="M16 3.5c3.86 0 7 2.69 7 6 0 1.73-.85 3.28-2.21 4.32.14.79.6 1.86 1.29 2.45.1.09.05.26-.1.28-1.56.17-2.77-.45-3.42-.9-.46.07-.94.1-1.44.1-.22 0-.44-.01-.65-.03A5.95 5.95 0 0 1 16.75 13c0-3.71-3.25-6.72-7.25-6.72-.43 0-.85.04-1.27.11.91-1.68 4.09-2.89 7.77-2.89z"/>
+            <path d="M9.5 7.5C5.36 7.5 2 10.19 2 13.5c0 1.73.85 3.28 2.21 4.32-.14.79-.6 1.86-1.29 2.45-.1.09-.05.26.1.28 1.56.17 2.77-.45 3.42-.9.55.08 1.13.12 1.8.12 4.14 0 7.5-2.69 7.5-6s-3.36-6-7.5-6z"/>
         </svg>
     `
 };
@@ -115,4 +116,31 @@ export function initTabBar(options = {}) {
     });
 
     return tabBarEl;
+}
+
+/* ============================================================================
+ * iOS Standalone WebApp Navigation Controller
+ * Prevents iOS WebClip from bouncing to Safari on internal anchor navigation
+ * ============================================================================ */
+if (typeof window !== 'undefined') {
+    const isIOSStandalone = ('standalone' in window.navigator) && window.navigator.standalone;
+    const isPWAStandalone = window.matchMedia('(display-mode: standalone)').matches;
+
+    if (isIOSStandalone || isPWAStandalone) {
+        document.addEventListener('click', (e) => {
+            const anchor = e.target.closest('a');
+            if (anchor && anchor.href && anchor.href.startsWith(window.location.origin)) {
+                if (!anchor.getAttribute('target') && !anchor.hasAttribute('download')) {
+                    const currentFullPath = window.location.pathname + window.location.search;
+                    const targetUrl = new URL(anchor.href);
+                    const targetFullPath = targetUrl.pathname + targetUrl.search;
+
+                    if (targetFullPath !== currentFullPath && !anchor.href.includes('javascript:')) {
+                        e.preventDefault();
+                        window.location.href = anchor.href;
+                    }
+                }
+            }
+        }, false);
+    }
 }

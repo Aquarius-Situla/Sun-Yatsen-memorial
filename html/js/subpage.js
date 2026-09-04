@@ -97,6 +97,7 @@ export function initSubpage(options) {
     const container = document.querySelector('.markdown-container');
     const heroTitle = document.getElementById('hero-title');
     const heroDate = document.getElementById('hero-date');
+    const heroDesc = document.getElementById('hero-desc');
     const pageTitle = document.getElementById('page-title');
     const tabBtns = document.querySelectorAll('.tab-btn');
     const iosRows = document.querySelectorAll('.ios-row[data-tab]');
@@ -183,6 +184,7 @@ export function initSubpage(options) {
             if (langBtn && t.btn) langBtn.textContent = t.btn;
             if (heroTitle && t.title) heroTitle.textContent = t.title;
             if (heroDate && t.date) heroDate.textContent = t.date;
+            if (heroDesc && t.desc) heroDesc.textContent = t.desc;
             if (pageTitle && t.pageTitle) pageTitle.textContent = t.pageTitle;
 
             if (mdViewer && t.src && mdViewer.getAttribute('src') !== t.src) {
@@ -193,8 +195,18 @@ export function initSubpage(options) {
 
         /* Synchronize Apple Native Back Button Text */
         const navBackText = document.getElementById('nav-back-text');
+        const navBackLink = document.getElementById('nav-back-link');
         if (navBackText) {
-            navBackText.textContent = isTraditional ? '資料庫' : '资料库';
+            const explicitTc = navBackLink ? navBackLink.getAttribute('data-back-text-tc') : null;
+            const explicitSc = navBackLink ? navBackLink.getAttribute('data-back-text-sc') : null;
+
+            if (explicitTc && explicitSc) {
+                navBackText.textContent = isTraditional ? explicitTc : explicitSc;
+            } else if (window.location.pathname.includes('/events/') || window.location.pathname.includes('/announcement/')) {
+                navBackText.textContent = isTraditional ? '公告' : '公告';
+            } else {
+                navBackText.textContent = isTraditional ? '資料庫' : '资料库';
+            }
         }
 
         /* Synchronize Apple Native Frosted Top Navigation Bar Title */
@@ -206,14 +218,31 @@ export function initSubpage(options) {
                 topNavTitle.textContent = isTraditional ? '特別鳴謝' : '特别鸣谢';
             } else if (window.location.pathname.includes('/biography/')) {
                 topNavTitle.textContent = isTraditional ? '國父生平' : '国父生平';
+            } else if (window.location.pathname.includes('/announcement/detail.html')) {
+                if (texts && texts[isTraditional ? 'tc' : 'sc'] && texts[isTraditional ? 'tc' : 'sc'].title) {
+                    topNavTitle.textContent = texts[isTraditional ? 'tc' : 'sc'].title;
+                }
             } else if (window.location.pathname.includes('/announcement/')) {
                 topNavTitle.textContent = isTraditional ? '公告' : '公告';
+            } else if (window.location.pathname.includes('/library/language.html')) {
+                topNavTitle.textContent = isTraditional ? '語言偏好' : '语言偏好';
             } else if (window.location.pathname.includes('/library/')) {
                 topNavTitle.textContent = isTraditional ? '資料庫' : '资料库';
             } else if (texts && texts[isTraditional ? 'tc' : 'sc'] && texts[isTraditional ? 'tc' : 'sc'].title) {
                 topNavTitle.textContent = texts[isTraditional ? 'tc' : 'sc'].title;
             }
         }
+    }
+
+    /* Smart Back Navigation Handler */
+    const navBackBtn = document.getElementById('nav-back-link');
+    if (navBackBtn) {
+        navBackBtn.addEventListener('click', (e) => {
+            if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin)) {
+                e.preventDefault();
+                window.history.back();
+            }
+        });
     }
 
     /* Option Items Event Listeners (Global Language Click) */

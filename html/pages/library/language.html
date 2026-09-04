@@ -1,5 +1,5 @@
 <!-- ==========================================================================
- * Private Sun Yat-sen Memorial Hall — About (about.html)
+ * Private Sun Yat-sen Memorial Hall — Language Preferences (language.html)
  * ==========================================================================
  * COMMENTING STANDARDS
  * 1. Block comments only. Use HTML comments for DOM and /* */ for inline scripts.
@@ -11,7 +11,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title id="page-title">關於與聲明 - 私立中山紀念堂</title>
+    <title id="page-title">語言偏好 - 私立中山紀念堂</title>
     <link rel="icon" href="../../main/favicon/favicon.svg" type="image/svg+xml">
     <link rel="alternate icon" href="../../main/favicon/favicon.ico" type="image/x-icon" sizes="any">
 
@@ -21,27 +21,24 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="國父紀念堂">
 
-    <link rel="preload" href="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js" as="script" crossorigin="anonymous">
-    <link rel="preload" href="./about_tc.md" as="fetch" crossorigin="anonymous">
-
     <link rel="stylesheet" href="../../css/variables.css?v=2008">
     <link rel="stylesheet" href="../../css/base.css?v=2008">
     <link rel="stylesheet" href="../../css/components/tab-bar.css?v=2008">
     <link rel="stylesheet" href="../../css/components/subpage.css?v=2008">
-    <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"></script>
 </head>
 <body>
 
     <!-- Apple Native Frosted Glass Top Navigation Bar (Mobile Viewports) -->
     <header class="apple-top-nav">
-        <a href="../library/library.html" class="nav-back-link" aria-label="返回資料庫">
+        <a href="library.html" class="nav-back-link" id="nav-back-link" aria-label="返回資料庫">
             <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
             <span id="nav-back-text">資料庫</span>
         </a>
-        <h1 class="nav-title" id="top-nav-title">關於與聲明</h1>
+        <h1 class="nav-title" id="top-nav-title">語言偏好</h1>
     </header>
 
-    <a href="../../index.html?from=return" class="top-back-btn" aria-label="返回">
+    <!-- Desktop Fallback Navigation Links -->
+    <a href="library.html" class="top-back-btn" aria-label="返回">
         <svg class="icon-ios" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M15 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -54,77 +51,39 @@
     <!-- Desktop Fallback Language Toggle -->
     <button id="lang-btn" class="lang-toggle-btn">切换至简化字</button>
 
-    <!-- iOS Inset Grouped Settings Container (Image 3 Specification) -->
+    <!-- iOS Inset Grouped Settings Container (Image 2 & 3 Specification) -->
     <div class="ios-group-container">
-        <!-- Section 1: Project Information -->
-        <div class="ios-section-header">本館資訊 (ABOUT)</div>
+        <div class="ios-section-header" id="section-header-lang">偏好語言 (PREFERRED LANGUAGES)</div>
         <div class="ios-card">
-            <div class="ios-row expanded" data-tab="about">
+            <div class="ios-row ios-option-item" data-lang="tc" id="lang-row-tc">
                 <div class="ios-row-title">
-                    <span>關於我們</span>
+                    <span class="lang-primary-name">正體中文</span>
+                    <span class="lang-secondary-desc">（繁體）</span>
                 </div>
                 <div class="ios-row-accessory">
-                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                    <svg class="ios-checkmark" viewBox="0 0 24 24">
+                        <path d="M20 6L9 17l-5-5" fill="none" stroke="#0a84ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                 </div>
             </div>
-            <div class="ios-row" data-tab="changelog">
+            <div class="ios-row ios-option-item" data-lang="sc" id="lang-row-sc">
                 <div class="ios-row-title">
-                    <span>更新日誌</span>
+                    <span class="lang-primary-name">简体中文</span>
+                    <span class="lang-secondary-desc">（简化字）</span>
                 </div>
                 <div class="ios-row-accessory">
-                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                    <svg class="ios-checkmark" viewBox="0 0 24 24">
+                        <path d="M20 6L9 17l-5-5" fill="none" stroke="#0a84ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                 </div>
             </div>
         </div>
-
-        <!-- Section 3: Legal & Regulatory (1:1 with Image 3) -->
-        <div class="ios-section-header">法律與監管 (LEGAL &amp; REGULATORY)</div>
-        <div class="ios-card">
-            <a class="ios-row" href="#section-etiquette">
-                <div class="ios-row-title">
-                    <span>參典禮儀與彈幕規範</span>
-                </div>
-                <div class="ios-row-accessory">
-                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-                </div>
-            </a>
-            <a class="ios-row" href="#section-license">
-                <div class="ios-row-title">
-                    <span>開源協議 (AGPLv3)</span>
-                </div>
-                <div class="ios-row-accessory">
-                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-                </div>
-            </a>
-            <a class="ios-row" href="#section-disclaimer">
-                <div class="ios-row-title">
-                    <span>政治立場與免責聲明</span>
-                </div>
-                <div class="ios-row-accessory">
-                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-                </div>
-            </a>
+        <div class="ios-section-footer" id="lang-footer-text">
+            選擇在私立中山紀念堂中顯示的語言偏好。系統將自動保存您的偏好設置。
         </div>
     </div>
 
-    <!-- Desktop Pill Tab Switcher -->
-    <div class="tabs-container" id="tabs" style="display: none;">
-        <button class="tab-btn active" data-tab="about">關於我們</button>
-        <button class="tab-btn" data-tab="changelog">更新日誌</button>
-    </div>
-
-    <div class="markdown-container">
-        <zero-md id="md-viewer" src="./about_tc.md">
-            <template>
-                <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css">
-                <style>
-                    .markdown-body { background-color: transparent !important; }
-                </style>
-            </template>
-        </zero-md>
-    </div>
-
-    <!-- Apple Native Bottom Tab Bar -->
+    <!-- Apple Native Bottom Tab Bar (Mobile Viewports Only) -->
     <nav id="apple-tab-bar" class="apple-tab-bar" role="navigation" aria-label="底部主選單">
         <a href="../../index.html" class="tab-item" data-tab-id="home" aria-label="主頁">
             <div class="tab-icon">
@@ -138,7 +97,7 @@
             </div>
             <div class="tab-label">公告</div>
         </a>
-        <a href="../library/library.html" class="tab-item active" data-tab-id="library" aria-label="資料庫">
+        <a href="library.html" class="tab-item active" data-tab-id="library" aria-label="資料庫">
             <div class="tab-icon">
                 <svg viewBox="0 0 24 24"><path d="M7 2a1.2 1.2 0 0 0-1.2 1.2V4h12.4v-.8A1.2 1.2 0 0 0 17 2H7z"/><path d="M5 5.5A1.2 1.2 0 0 0 3.8 6.7V7.5h16.4v-.8A1.2 1.2 0 0 0 19 5.5H5z"/><path fill-rule="evenodd" clip-rule="evenodd" d="M3.4 9A1.4 1.4 0 0 0 2 10.45l1.15 9.2A2.4 2.4 0 0 0 5.53 21.8h12.94a2.4 2.4 0 0 0 2.38-2.15l1.15-9.2A1.4 1.4 0 0 0 20.6 9H3.4zm5.1 3.5a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5h-5.5a.75.75 0 0 1-.75-.75zm0 3a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5h-5.5a.75.75 0 0 1-.75-.75zm1.5 3a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75z"/></svg>
             </div>
@@ -153,15 +112,92 @@
     </nav>
 
     <script type="module">
-        import { initSubpage } from '../../js/subpage.js';
+        import { getCurrentLang, setGlobalLang, syncTabBarLabels } from '../../js/modules/i18n.js';
+        import { initTabBar } from '../../js/modules/tab-bar.js';
 
-        initSubpage({
-            activeBottomTab: 'library',
-            basePath: '../../',
-            tabs: [
-                { id: 'about', labelTc: '關於我們', labelSc: '关于我们', srcTc: './about_tc.md', srcSc: './about_sc.md' },
-                { id: 'changelog', labelTc: '更新日誌', labelSc: '更新日志', srcTc: './changelog_tc.md', srcSc: './changelog_sc.md' }
-            ]
+        initTabBar({
+            activeTab: 'library',
+            basePath: '../../'
+        });
+
+        const strings = {
+            tc: {
+                pageTitle: '語言偏好 - 私立中山紀念堂',
+                topTitle: '語言偏好',
+                backText: '資料庫',
+                sectionHeader: '偏好語言 (PREFERRED LANGUAGES)',
+                footer: '選擇在私立中山紀念堂中顯示的語言偏好。系統將自動保存您的偏好設置。',
+                toggleBtn: '切换至简化字'
+            },
+            sc: {
+                pageTitle: '语言偏好 - 私立中山纪念堂',
+                topTitle: '语言偏好',
+                backText: '资料库',
+                sectionHeader: '偏好语言 (PREFERRED LANGUAGES)',
+                footer: '选择在私立中山纪念堂中显示的长远语言偏好。系统将自动保存您的偏好设置。',
+                toggleBtn: '切換至正體字'
+            }
+        };
+
+        const rowTc = document.getElementById('lang-row-tc');
+        const rowSc = document.getElementById('lang-row-sc');
+        const pageTitle = document.getElementById('page-title');
+        const topNavTitle = document.getElementById('top-nav-title');
+        const navBackText = document.getElementById('nav-back-text');
+        const sectionHeader = document.getElementById('section-header-lang');
+        const footerText = document.getElementById('lang-footer-text');
+        const langBtn = document.getElementById('lang-btn');
+
+        function updateUI(lang) {
+            const isTc = lang === 'tc';
+            document.documentElement.lang = isTc ? 'zh-TW' : 'zh-CN';
+
+            if (rowTc && rowSc) {
+                if (isTc) {
+                    rowTc.classList.add('selected');
+                    rowSc.classList.remove('selected');
+                } else {
+                    rowSc.classList.add('selected');
+                    rowTc.classList.remove('selected');
+                }
+            }
+
+            const t = strings[lang] || strings.tc;
+            if (pageTitle) pageTitle.textContent = t.pageTitle;
+            if (topNavTitle) topNavTitle.textContent = t.topTitle;
+            if (navBackText) navBackText.textContent = t.backText;
+            if (sectionHeader) sectionHeader.textContent = t.sectionHeader;
+            if (footerText) footerText.textContent = t.footer;
+            if (langBtn) langBtn.textContent = t.toggleBtn;
+
+            syncTabBarLabels();
+        }
+
+        const initialLang = getCurrentLang();
+        updateUI(initialLang);
+
+        rowTc.addEventListener('click', () => {
+            setGlobalLang('tc');
+            updateUI('tc');
+        });
+
+        rowSc.addEventListener('click', () => {
+            setGlobalLang('sc');
+            updateUI('sc');
+        });
+
+        if (langBtn) {
+            langBtn.addEventListener('click', () => {
+                const nextLang = getCurrentLang() === 'tc' ? 'sc' : 'tc';
+                setGlobalLang(nextLang);
+                updateUI(nextLang);
+            });
+        }
+
+        window.addEventListener('sys-lang-change', (e) => {
+            if (e.detail && e.detail.lang) {
+                updateUI(e.detail.lang);
+            }
         });
     </script>
 </body>

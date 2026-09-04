@@ -92,41 +92,71 @@ body {
 }
 
 /* ============================================================================
- * Festival & Event Hero Banner
+ * Apple Native Hero Banner (Settings Specification / Image 2)
  * ============================================================================ */
 .festival-hero {
     width: 100%;
     max-width: 800px;
-    margin-bottom: 20px;
+    margin: 10px auto 20px auto;
     text-align: center;
-    padding: 28px 20px 24px;
-    background: var(--sys-hero-bg, #1a0e06);
-    border-radius: 14px;
-    border: 1px solid var(--sys-hero-border, rgba(184, 134, 11, 0.35));
-    box-shadow: var(--sys-hero-shadow, 0 8px 32px rgba(0, 0, 0, 0.7));
+    padding: 26px 20px 22px;
+    background: var(--sys-card-bg, #1c1c1e);
+    border-radius: 16px;
+    border: 0.5px solid var(--sys-border, rgba(255, 255, 255, 0.12));
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     transition: var(--sys-transition-standard, all 0.3s ease);
 }
 
+.festival-hero .festival-badge {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    margin: 0 auto 12px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
 .festival-hero .festival-icon {
-    font-size: 2.4rem;
-    margin-bottom: 10px;
+    font-size: 28px;
+    line-height: 1;
     display: block;
 }
 
 .festival-hero h1 {
-    color: var(--sys-accent-gold, #f1c40f);
-    font-size: clamp(1.3rem, 4vw, 1.8rem);
-    font-weight: bold;
-    letter-spacing: 4px;
-    margin: 0 0 8px 0;
-    text-shadow: 0 0 20px rgba(241, 196, 15, 0.35);
+    color: var(--sys-text, #ffffff);
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    text-align: center;
+    letter-spacing: normal;
+    line-height: 1.35;
 }
 
 .festival-hero .festival-date {
-    color: var(--sys-accent-dark-gold, #b8860b);
-    font-size: 0.9rem;
-    letter-spacing: 2px;
+    color: #0a84ff;
+    font-size: 13.5px;
+    font-weight: 500;
+    letter-spacing: normal;
+    margin: 0 0 8px 0;
+    text-align: center;
+}
+
+.festival-hero .festival-desc {
+    color: var(--sys-text-secondary, #98989f);
+    font-size: 13.5px;
+    line-height: 1.5;
+    margin: 0 auto;
+    max-width: 90%;
+    text-align: center;
 }
 
 /* ============================================================================
@@ -486,16 +516,13 @@ body {
     border-bottom: 0.5px solid rgba(255, 255, 255, 0.06);
 }
 
-.ios-option-item .ios-check-icon {
-    width: 16px;
-    height: 16px;
-    stroke: #0a84ff;
-    fill: none;
-    stroke-width: 2.5;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+.ios-option-item .ios-check-icon,
+.ios-option-item .ios-checkmark {
+    width: 18px;
+    height: 18px;
     opacity: 0;
     transition: opacity 0.18s ease;
+    flex-shrink: 0;
 }
 
 .ios-option-item.selected {
@@ -503,9 +530,30 @@ body {
     font-weight: 500;
 }
 
-.ios-option-item.selected .ios-check-icon {
+.ios-option-item.selected .ios-check-icon,
+.ios-option-item.selected .ios-checkmark {
     opacity: 1;
 }
+
+.lang-secondary-desc {
+    font-size: 13.5px;
+    color: var(--sys-text-secondary, #8e8e93);
+    margin-left: 6px;
+    font-weight: normal;
+}
+
+.ios-section-footer {
+    font-size: 13px;
+    color: var(--sys-text-secondary, #8e8e93);
+    line-height: 1.45;
+    padding: 8px 16px 0 16px;
+}
+
+/* Badge Color Themes */
+.badge-green { background: linear-gradient(135deg, #34c759 0%, #28cd41 100%) !important; }
+.badge-orange { background: linear-gradient(135deg, #ff9500 0%, #ff9f0a 100%) !important; }
+.badge-teal { background: linear-gradient(135deg, #30b0c7 0%, #00c7be 100%) !important; }
+.badge-indigo { background: linear-gradient(135deg, #5856d6 0%, #3634a3 100%) !important; }
 
 /* ============================================================================
  * Responsive Viewport Rules

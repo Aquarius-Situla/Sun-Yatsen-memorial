@@ -231,7 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* Check URL query parameter for direct mobile danmaku trigger */
-    const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('open') === 'danmaku' && messageModal) {
         setTimeout(() => {
             messageModal.classList.add('active');
