@@ -19,6 +19,30 @@
 }
 
 /* ============================================================================
+ * iOS PWA Page Transition: Smooth Fade-In on Page Load
+ * Eliminates the white flash between MPA page navigations in standalone WebApp.
+ * body starts invisible and fades in after paint, creating a polished feel.
+ * ============================================================================ */
+@media (max-width: 768px) {
+    @keyframes sys-page-in {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
+    body {
+        animation: sys-page-in 0.18s ease-out both;
+    }
+
+    /* Fade-out class applied by tab-bar.js just before navigating away */
+    body.tab-navigating {
+        animation: none !important;
+        opacity: 0;
+        transition: opacity 0.12s ease-in !important;
+        pointer-events: none;
+    }
+}
+
+/* ============================================================================
  * Mobile Viewport Rules (<= 768px)
  * ============================================================================ */
 @media (max-width: 768px) {

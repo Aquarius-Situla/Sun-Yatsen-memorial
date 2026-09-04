@@ -21,10 +21,13 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="國父紀念堂">
 
-    <link rel="stylesheet" href="../../css/variables.css?v=2015">
-    <link rel="stylesheet" href="../../css/base.css?v=2015">
-    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=2018">
-    <link rel="stylesheet" href="../../css/components/subpage.css?v=2018">
+    <!-- Critical inline CSS: eliminates white flash during iOS PWA page transitions -->
+    <style>html,body{background-color:#111111;}</style>
+
+    <link rel="stylesheet" href="../../css/variables.css?v=2019">
+    <link rel="stylesheet" href="../../css/base.css?v=2019">
+    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=2019">
+    <link rel="stylesheet" href="../../css/components/subpage.css?v=2019">
 </head>
 <body>
 

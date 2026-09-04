@@ -198,7 +198,10 @@ if (typeof window !== 'undefined') {
 
                     if (targetFullPath !== currentFullPath && !anchor.href.includes('javascript:')) {
                         e.preventDefault();
-                        window.location.href = anchor.href;
+                        const dest = anchor.href;
+                        /* Apply fade-out, then navigate after the transition completes */
+                        document.body.classList.add('tab-navigating');
+                        setTimeout(() => { window.location.href = dest; }, 120);
                     }
                 }
             }
