@@ -27,7 +27,7 @@
         display: none !important;
     }
 
-    /* Fixed Apple Native UITabBar Container */
+    /* Fixed Apple Native UITabBar Container (Authentic Translucent Frosted Glass) */
     .apple-tab-bar {
         position: fixed;
         bottom: 0;
@@ -42,10 +42,12 @@
         display: flex;
         align-items: center;
         justify-content: space-around;
-        background: rgba(26, 26, 28, 0.85);
-        backdrop-filter: blur(30px) saturate(210%);
-        -webkit-backdrop-filter: blur(30px) saturate(210%);
-        border-top: 0.5px solid rgba(255, 255, 255, 0.18);
+        background: rgba(22, 22, 24, 0.65);
+        backdrop-filter: blur(25px) saturate(190%);
+        -webkit-backdrop-filter: blur(25px) saturate(190%);
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+        border-top: 0.5px solid rgba(255, 255, 255, 0.15);
         box-sizing: border-box;
         z-index: 9999;
         user-select: none;
@@ -96,9 +98,9 @@
         margin-top: 2px;
     }
 
-    /* Active Selected State (Project Amber/Orange-Yellow Accent) */
+    /* Active Selected State (Authentic Apple iOS System Blue Tint) */
     .apple-tab-bar .tab-item.active {
-        color: var(--sys-accent-gold, #f1c40f);
+        color: #0a84ff;
     }
 
     .apple-tab-bar .tab-item.active .tab-icon svg {
@@ -121,15 +123,17 @@
  * ============================================================================ */
 @media (prefers-color-scheme: light) and (max-width: 768px) {
     .apple-tab-bar {
-        background: rgba(248, 248, 248, 0.85);
-        border-top-color: rgba(0, 0, 0, 0.15);
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(25px) saturate(190%);
+        -webkit-backdrop-filter: blur(25px) saturate(190%);
+        border-top-color: rgba(0, 0, 0, 0.12);
     }
 
     .apple-tab-bar .tab-item {
-        color: #8a7060;
+        color: #8e8e93;
     }
 
     .apple-tab-bar .tab-item.active {
-        color: var(--sys-accent-gold, #7a4f00);
+        color: #007aff;
     }
 }
