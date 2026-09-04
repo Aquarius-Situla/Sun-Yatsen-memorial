@@ -172,7 +172,13 @@ if (typeof window !== 'undefined') {
         window.addEventListener('load', syncStandaloneTabBar);
         window.addEventListener('resize', syncStandaloneTabBar);
         window.addEventListener('orientationchange', syncStandaloneTabBar);
-        window.addEventListener('pageshow', syncStandaloneTabBar);
+        window.addEventListener('pageshow', (e) => {
+            syncStandaloneTabBar();
+            /* On bfcache restore, remove any stale navigation class that could block interaction */
+            if (e.persisted) {
+                document.body.classList.remove('tab-navigating');
+            }
+        });
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') syncStandaloneTabBar();
         });
@@ -198,10 +204,7 @@ if (typeof window !== 'undefined') {
 
                     if (targetFullPath !== currentFullPath && !anchor.href.includes('javascript:')) {
                         e.preventDefault();
-                        const dest = anchor.href;
-                        /* Apply fade-out, then navigate after the transition completes */
-                        document.body.classList.add('tab-navigating');
-                        setTimeout(() => { window.location.href = dest; }, 120);
+                        window.location.href = anchor.href;
                     }
                 }
             }

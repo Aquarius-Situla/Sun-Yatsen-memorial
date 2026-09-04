@@ -332,3 +332,10 @@ if (document.readyState === 'loading') {
 } else {
     initApp();
 }
+
+/* Re-initialize on bfcache restore (iOS back/forward navigation) */
+window.addEventListener('pageshow', (e) => {
+    if (e.persisted) {
+        initApp();
+    }
+});
