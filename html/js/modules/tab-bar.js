@@ -144,8 +144,7 @@ export function syncStandaloneTabBar() {
         return;
     }
 
-    /* Ensure tab bar is cleanly anchored to bottom: 0 without negative offset clipping */
-    document.documentElement.style.setProperty('--tab-bar-standalone-bottom', '0px');
+    /* Clear any inline bottom property so CSS clamp(100dvh - 100lvh) governs positioning */
     tabBar.style.removeProperty('bottom');
 }
 
