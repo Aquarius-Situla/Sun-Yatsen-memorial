@@ -9,10 +9,6 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-@import url("../variables.css");
-@import url("../base.css");
-@import url("./tab-bar.css");
-
 body {
     display: flex;
     flex-direction: column;
@@ -20,6 +16,43 @@ body {
     padding: 60px 20px 40px 20px;
     min-height: 100vh;
     overflow-x: hidden;
+    background-color: var(--sys-bg, #111111);
+    color: var(--sys-text, #ffffff);
+    font-family: var(--sys-font-family, -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif);
+}
+
+/* ============================================================================
+ * Apple Native Top Navigation Bar (Frosted Glass Header)
+ * ============================================================================ */
+.apple-top-nav {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: calc(46px + env(safe-area-inset-top, 0px));
+    padding-top: env(safe-area-inset-top, 0px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(18, 18, 18, 0.78);
+    backdrop-filter: blur(25px) saturate(190%);
+    -webkit-backdrop-filter: blur(25px) saturate(190%);
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.12);
+    z-index: 1000;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.apple-top-nav .nav-title {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    color: var(--sys-text, #ffffff);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
 /* ============================================================================
@@ -31,12 +64,12 @@ body {
     margin-bottom: 20px;
     text-align: center;
     padding: 28px 20px 24px;
-    background: var(--sys-hero-bg);
-    border-radius: 12px;
-    border: 1px solid var(--sys-hero-border);
-    box-shadow: var(--sys-hero-shadow);
+    background: var(--sys-hero-bg, #1a0e06);
+    border-radius: 14px;
+    border: 1px solid var(--sys-hero-border, rgba(184, 134, 11, 0.35));
+    box-shadow: var(--sys-hero-shadow, 0 8px 32px rgba(0, 0, 0, 0.7));
     box-sizing: border-box;
-    transition: var(--sys-transition-standard);
+    transition: var(--sys-transition-standard, all 0.3s ease);
 }
 
 .festival-hero .festival-icon {
@@ -46,7 +79,7 @@ body {
 }
 
 .festival-hero h1 {
-    color: var(--sys-accent-gold);
+    color: var(--sys-accent-gold, #f1c40f);
     font-size: clamp(1.3rem, 4vw, 1.8rem);
     font-weight: bold;
     letter-spacing: 4px;
@@ -55,13 +88,13 @@ body {
 }
 
 .festival-hero .festival-date {
-    color: var(--sys-accent-dark-gold);
+    color: var(--sys-accent-dark-gold, #b8860b);
     font-size: 0.9rem;
     letter-spacing: 2px;
 }
 
 /* ============================================================================
- * Tab Navigation (Optional for pages with tabs)
+ * Tab Navigation (Desktop Fallback)
  * ============================================================================ */
 .tabs-container {
     display: flex;
@@ -79,29 +112,29 @@ body {
 }
 
 .tab-btn {
-    background-color: var(--sys-card-bg);
-    color: var(--sys-link);
-    border: 1px solid var(--sys-border);
+    background-color: var(--sys-card-bg, #1a1a1a);
+    color: var(--sys-link, #888888);
+    border: 1px solid var(--sys-border, #333333);
     padding: 10px 20px;
     border-radius: 20px;
     cursor: pointer;
     font-family: var(--sys-font-family);
     font-size: 14px;
     white-space: nowrap;
-    transition: var(--sys-transition-standard);
+    transition: var(--sys-transition-standard, all 0.3s ease);
     -webkit-tap-highlight-color: transparent;
 }
 
 .tab-btn.active {
     background-color: #2d1e0d;
-    color: var(--sys-accent-gold);
-    border-color: var(--sys-accent-gold);
+    color: var(--sys-accent-gold, #f1c40f);
+    border-color: var(--sys-accent-gold, #f1c40f);
     box-shadow: 0 0 10px rgba(241, 196, 15, 0.15);
 }
 
 @media (hover: hover) and (pointer: fine) {
     .tab-btn:hover:not(.active) {
-        color: var(--sys-link-hover);
+        color: var(--sys-link-hover, #cccccc);
         border-color: #555555;
     }
 }
@@ -113,15 +146,16 @@ body {
 .charts-container {
     width: 100%;
     max-width: 800px;
-    background-color: var(--sys-card-bg);
-    padding: 45px 50px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-    border: 1px solid var(--sys-border);
+    background-color: var(--sys-card-bg, #1c1c1e);
+    padding: 35px 32px;
+    border-radius: 14px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    border: 0.5px solid var(--sys-border, rgba(255, 255, 255, 0.12));
     box-sizing: border-box;
     opacity: 0;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.35s ease;
     margin-top: 10px;
+    margin-bottom: 25px;
 }
 
 .markdown-container.loaded,
@@ -139,48 +173,48 @@ body {
 }
 
 .chart-title {
-    color: var(--sys-accent-gold);
+    color: var(--sys-accent-gold, #f1c40f);
     text-align: center;
     font-size: 18px;
     margin-bottom: 20px;
     letter-spacing: 2px;
-    border-bottom: 1px solid var(--sys-border);
+    border-bottom: 1px solid var(--sys-border, #333333);
     padding-bottom: 10px;
 }
 
 .show-all-btn {
-    background-color: var(--sys-card-bg);
-    color: var(--sys-accent-gold);
-    border: 1px solid var(--sys-border);
+    background-color: var(--sys-card-bg, #1a1a1a);
+    color: var(--sys-accent-gold, #f1c40f);
+    border: 1px solid var(--sys-border, #333333);
     padding: 6px 16px;
     border-radius: 16px;
     cursor: pointer;
     font-family: var(--sys-font-family);
     font-size: 13px;
-    transition: var(--sys-transition-standard);
+    transition: var(--sys-transition-standard, all 0.3s ease);
 }
 
 .show-all-btn:hover {
-    border-color: var(--sys-accent-gold);
+    border-color: var(--sys-accent-gold, #f1c40f);
 }
 
 /* ============================================================================
- * Top Controls: Language Switcher & Back Button
+ * Desktop Controls: Language Switcher & Back Button
  * ============================================================================ */
 .lang-toggle-btn {
     position: absolute;
     top: 25px;
     right: 25px;
-    background-color: var(--sys-card-bg);
-    color: var(--sys-text-muted);
-    border: 1px solid var(--sys-border);
+    background-color: var(--sys-card-bg, #1a1a1a);
+    color: var(--sys-text-muted, #aaaaaa);
+    border: 1px solid var(--sys-border, #333333);
     padding: 8px 16px;
     border-radius: 20px;
     cursor: pointer;
     font-family: var(--sys-font-family);
     font-size: 14px;
     letter-spacing: 1px;
-    transition: var(--sys-transition-standard);
+    transition: var(--sys-transition-standard, all 0.3s ease);
     z-index: 100;
     -webkit-tap-highlight-color: transparent;
 }
@@ -191,7 +225,7 @@ body {
     left: 25px;
     display: inline-flex;
     align-items: center;
-    color: var(--sys-link);
+    color: var(--sys-link, #888888);
     text-decoration: none;
     font-size: 15px;
     font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -203,23 +237,23 @@ body {
 }
 
 .lang-toggle-btn:active {
-    color: var(--sys-accent-gold);
-    border-color: var(--sys-accent-gold);
+    color: var(--sys-accent-gold, #f1c40f);
+    border-color: var(--sys-accent-gold, #f1c40f);
 }
 
 .top-back-btn:active {
-    color: var(--sys-link-hover);
+    color: var(--sys-link-hover, #cccccc);
     opacity: 0.8;
 }
 
 @media (hover: hover) and (pointer: fine) {
     .lang-toggle-btn:hover {
-        color: var(--sys-accent-gold);
-        border-color: var(--sys-accent-gold);
+        color: var(--sys-accent-gold, #f1c40f);
+        border-color: var(--sys-accent-gold, #f1c40f);
         box-shadow: 0 0 10px rgba(241, 196, 15, 0.2);
     }
     .top-back-btn:hover {
-        color: var(--sys-link-hover);
+        color: var(--sys-link-hover, #cccccc);
         opacity: 0.8;
     }
 }
@@ -237,29 +271,29 @@ body {
 .ios-group-container {
     width: 100%;
     max-width: 800px;
-    margin: 10px auto 30px auto;
+    margin: 10px auto 25px auto;
     box-sizing: border-box;
 }
 
 .ios-section-header {
     font-size: 13px;
     font-weight: 500;
-    color: var(--sys-text-muted);
+    color: #8e8e93;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 22px 0 8px 16px;
-    font-family: var(--sys-font-family);
+    letter-spacing: 0.4px;
+    margin: 20px 0 8px 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", sans-serif;
     user-select: none;
     -webkit-user-select: none;
 }
 
 .ios-card {
-    background-color: var(--sys-card-bg);
+    background-color: var(--sys-card-bg, #1c1c1e);
     border-radius: 14px;
-    border: 0.5px solid var(--sys-border);
+    border: 0.5px solid rgba(255, 255, 255, 0.12);
     overflow: hidden;
     margin-bottom: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
     box-sizing: border-box;
 }
 
@@ -270,7 +304,7 @@ body {
     padding: 15px 16px;
     cursor: pointer;
     text-decoration: none;
-    color: var(--sys-text);
+    color: var(--sys-text, #ffffff);
     -webkit-tap-highlight-color: transparent;
     transition: background-color 0.15s ease, color 0.18s ease;
     position: relative;
@@ -298,18 +332,18 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: var(--sys-text);
-    font-family: var(--sys-font-family);
-    letter-spacing: 0.5px;
+    color: var(--sys-text, #ffffff);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", sans-serif;
+    letter-spacing: 0.3px;
 }
 
 .ios-row-accessory {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: var(--sys-text-muted);
+    color: #8e8e93;
     font-size: 14px;
-    font-family: var(--sys-font-family);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", sans-serif;
 }
 
 .ios-chevron {
@@ -362,9 +396,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 4px;
+    padding: 13px 4px;
     cursor: pointer;
-    color: var(--sys-text);
+    color: var(--sys-text, #ffffff);
     font-size: 15px;
     transition: color 0.15s ease;
     user-select: none;
@@ -400,35 +434,59 @@ body {
  * Responsive Viewport Rules
  * ============================================================================ */
 @media (min-width: 769px) {
+    .apple-top-nav {
+        display: none !important;
+    }
     .icon-ios { display: none; }
     .icon-macos { display: block; }
 }
 
 @media (max-width: 768px) {
     body {
-        padding: 60px 16px calc(75px + env(safe-area-inset-bottom, 16px)) 16px !important;
+        padding: 0 0 calc(75px + env(safe-area-inset-bottom, 16px)) 0 !important;
+        width: 100%;
     }
-    .markdown-container {
-        padding: 30px 25px;
+
+    /* Activate Apple Native Frosted Glass Navigation Bar */
+    .apple-top-nav {
+        display: flex !important;
+        width: 100%;
     }
-    .festival-hero {
-        padding: 22px 16px 18px;
-    }
-    .top-back-btn {
-        top: 18px;
-        left: 16px;
-        font-size: 17px;
-    }
-    .top-back-btn svg {
-        width: 24px;
-        height: 24px;
-    }
+
+    /* Completely hide top back and language buttons on mobile */
+    .top-back-btn,
     .lang-toggle-btn {
         display: none !important;
     }
+
+    .markdown-container {
+        width: calc(100% - 32px) !important;
+        padding: 24px 20px;
+        box-sizing: border-box;
+    }
+
+    .festival-hero {
+        width: calc(100% - 32px) !important;
+        padding: 22px 16px 18px;
+        margin-top: 14px;
+        box-sizing: border-box;
+    }
+
+    .ios-group-container {
+        width: calc(100% - 32px) !important;
+        margin-top: 14px;
+        box-sizing: border-box;
+    }
+
+    .charts-container {
+        width: calc(100% - 32px) !important;
+        box-sizing: border-box;
+    }
+
     .ios-section-header {
         margin-left: 12px;
     }
+
     .icon-ios { display: block; }
     .icon-macos { display: none; }
 }
@@ -437,45 +495,77 @@ body {
  * Light Mode Theme Overrides
  * ============================================================================ */
 @media (prefers-color-scheme: light) {
+    .apple-top-nav {
+        background: rgba(245, 240, 232, 0.88);
+        border-bottom-color: rgba(0, 0, 0, 0.12);
+    }
+
+    .apple-top-nav .nav-title {
+        color: #2c1810;
+    }
+
     .festival-hero h1 {
         text-shadow: 0 0 20px rgba(122, 79, 0, 0.2);
     }
+
     .markdown-container {
-        box-shadow: 0 10px 30px rgba(80, 50, 10, 0.12);
-    }
-    .tab-btn {
-        background-color: var(--sys-card-bg);
-        color: var(--sys-accent-gold);
-        border-color: var(--sys-border);
-    }
-    .tab-btn.active {
-        background-color: #f5e8c8;
-        color: var(--sys-accent-gold);
-        border-color: var(--sys-accent-dark-gold);
-        box-shadow: 0 0 10px rgba(184, 134, 11, 0.2);
-    }
-    .ios-card {
-        background-color: var(--sys-card-bg);
-        border-color: var(--sys-border);
+        background-color: var(--sys-card-bg, #ede8dc);
+        border-color: var(--sys-border, #c4a876);
         box-shadow: 0 4px 20px rgba(80, 50, 10, 0.08);
     }
+
+    .tab-btn {
+        background-color: var(--sys-card-bg, #ede8dc);
+        color: var(--sys-accent-gold, #7a4f00);
+        border-color: var(--sys-border, #c4a876);
+    }
+
+    .tab-btn.active {
+        background-color: #f5e8c8;
+        color: var(--sys-accent-gold, #7a4f00);
+        border-color: var(--sys-accent-dark-gold, #8a6400);
+        box-shadow: 0 0 10px rgba(184, 134, 11, 0.2);
+    }
+
+    .ios-card {
+        background-color: var(--sys-card-bg, #ede8dc);
+        border-color: var(--sys-border, #c4a876);
+        box-shadow: 0 4px 20px rgba(80, 50, 10, 0.08);
+    }
+
+    .ios-row {
+        color: var(--sys-text, #2c1810);
+    }
+
+    .ios-row-title {
+        color: var(--sys-text, #2c1810);
+    }
+
     .ios-row:not(:last-child)::after {
         background-color: rgba(0, 0, 0, 0.08);
     }
+
     .ios-row:active {
         background-color: rgba(0, 0, 0, 0.04);
     }
+
     .ios-row.expanded + .ios-accordion-content .ios-accordion-inner,
     .ios-accordion-content.open .ios-accordion-inner {
         border-top-color: rgba(0, 0, 0, 0.08);
     }
+
+    .ios-option-item {
+        color: var(--sys-text, #2c1810);
+    }
+
     .ios-option-item:not(:last-child) {
         border-bottom-color: rgba(0, 0, 0, 0.06);
     }
+
     @media (hover: hover) and (pointer: fine) {
         .tab-btn:hover:not(.active) {
-            color: var(--sys-text);
-            border-color: var(--sys-accent-dark-gold);
+            color: var(--sys-text, #2c1810);
+            border-color: var(--sys-accent-dark-gold, #8a6400);
         }
     }
 }

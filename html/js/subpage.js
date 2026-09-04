@@ -190,6 +190,20 @@ export function initSubpage(options) {
                 mdViewer.setAttribute('src', t.src);
             }
         }
+
+        /* Synchronize Apple Native Frosted Top Navigation Bar Title */
+        const topNavTitle = document.getElementById('top-nav-title');
+        if (topNavTitle) {
+            if (activeBottomTab === 'about') {
+                topNavTitle.textContent = isTraditional ? '關於與聲明' : '关于与声明';
+            } else if (activeBottomTab === 'announcement') {
+                topNavTitle.textContent = isTraditional ? '公告' : '公告';
+            } else if (activeBottomTab === 'thanks') {
+                topNavTitle.textContent = isTraditional ? '特別鳴謝' : '特别鸣谢';
+            } else if (texts && texts[isTraditional ? 'tc' : 'sc'] && texts[isTraditional ? 'tc' : 'sc'].title) {
+                topNavTitle.textContent = texts[isTraditional ? 'tc' : 'sc'].title;
+            }
+        }
     }
 
     /* Option Items Event Listeners (Global Language Click) */

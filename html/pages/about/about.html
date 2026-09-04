@@ -18,10 +18,18 @@
     <link rel="preload" href="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js" as="script" crossorigin="anonymous">
     <link rel="preload" href="./about_tc.md" as="fetch" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="../../css/components/subpage.css">
+    <link rel="stylesheet" href="../../css/variables.css?v=2005">
+    <link rel="stylesheet" href="../../css/base.css?v=2005">
+    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=2005">
+    <link rel="stylesheet" href="../../css/components/subpage.css?v=2005">
     <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"></script>
 </head>
 <body>
+
+    <!-- Apple Native Frosted Glass Top Navigation Bar (Mobile Viewports) -->
+    <header class="apple-top-nav">
+        <h1 class="nav-title" id="top-nav-title">關於與聲明</h1>
+    </header>
 
     <a href="../../index.html?from=return" class="top-back-btn" aria-label="返回">
         <svg class="icon-ios" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -140,31 +148,31 @@
     <nav id="apple-tab-bar" class="apple-tab-bar" role="navigation" aria-label="底部主選單">
         <a href="../../index.html" class="tab-item" data-tab-id="home" aria-label="主頁">
             <div class="tab-icon">
-                <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1v-9.5z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12.707 2.293a1 1 0 0 0-1.414 0l-9 9A1 1 0 0 0 3 13h1v7a2 2 0 0 0 2 2h4a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h4a2 2 0 0 0 2-2v-7h1a1 1 0 0 0 .707-1.707l-9-9z"/></svg>
             </div>
             <div class="tab-label">主頁</div>
         </a>
         <a href="../announcement/announcement.html" class="tab-item" data-tab-id="announcement" aria-label="公告">
             <div class="tab-icon">
-                <svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 0-2 2c0 .06.003.119.008.177C6.862 4.793 4.5 7.632 4.5 11v3.414l-1.707 1.707A1 1 0 0 0 3.5 18h17a1 1 0 0 0 .707-1.879L19.5 14.414V11c0-3.368-2.362-6.207-5.508-6.823.005-.058.008-.117.008-.177a2 2 0 0 0-2-2zm-2.5 17a2.5 2.5 0 0 0 5 0h-5z"/></svg>
             </div>
             <div class="tab-label">公告</div>
         </a>
         <a href="../biography/biography.html" class="tab-item" data-tab-id="biography" aria-label="生平">
             <div class="tab-icon">
-                <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 4.5c-1.85-1.5-4.5-1.5-7.5-1.5A1 1 0 0 0 3.5 4v13.5a1 1 0 0 0 1 1c2.85 0 5.4.3 7 1.5 1.6-1.2 4.15-1.5 7-1.5a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1c-3 0-5.65 0-7.5 1.5zm-1 12.8c-1.5-.9-3.8-1.3-6.5-1.3V5.5c2.5 0 4.8.3 6.5 1.4v10.4zm2 0V6.9c1.7-1.1 4-1.4 6.5-1.4v10.5c-2.7 0-5 .4-6.5 1.3z"/></svg>
             </div>
             <div class="tab-label">生平</div>
         </a>
         <a href="../about/about.html" class="tab-item active" data-tab-id="about" aria-label="關於">
             <div class="tab-icon">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8" r="0.5" fill="currentColor"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
             </div>
             <div class="tab-label">關於</div>
         </a>
         <a href="../thanks/thanks.html" class="tab-item" data-tab-id="thanks" aria-label="鳴謝">
             <div class="tab-icon">
-                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
             </div>
             <div class="tab-label">鳴謝</div>
         </a>
