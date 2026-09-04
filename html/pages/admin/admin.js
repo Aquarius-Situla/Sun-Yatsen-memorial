@@ -9,7 +9,7 @@ const passwordInput = document.getElementById('admin-password');
 
 let captchaSuccessCallback = null;
 
-// Listen for iframe success message
+/* Listen for iframe success message. */
 window.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'CAPTCHA_SUCCESS') {
         const overlay = document.getElementById('captcha-modal-overlay');
@@ -42,17 +42,19 @@ function showCaptcha(onSuccessCallback) {
     
     captchaSuccessCallback = onSuccessCallback;
     
-    // Reload iframe to get a fresh Captcha
+    /* Reload iframe to obtain a fresh Captcha challenge. */
     iframe.src = iframe.src;
     overlay.style.display = 'flex';
 }
 
-// --- Login Logic ---
+/* ============================================================================
+ * Login Logic
+ * ============================================================================ */
 if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Trigger Captcha before actual login attempt
+        /* Trigger Captcha before actual login attempt. */
         const submitBtn = loginForm.querySelector('button');
         const oldText = submitBtn.textContent;
         submitBtn.textContent = '安全驗證中...';
@@ -67,7 +69,7 @@ if (loginForm) {
                 return;
             }
             
-            // Hash password and attempt login
+            /* Hash password and attempt login. */
             try {
                 submitBtn.textContent = '登入中...';
                 const tempKey = await hashSHA256(pwd);
@@ -97,8 +99,10 @@ if (loginForm) {
             }
         });
         
-        // If user closes captcha without solving (if supported by playcaptcha), we should ideally reset the button, 
-        // but since playcaptcha doesn't have an onClose callback out of the box, we reset it if overlay is hidden manually
+        /*
+         * Reset submit button if the user closes captcha without solving
+         * by monitoring modal overlay display attribute changes.
+         */
         const overlay = document.getElementById('captcha-modal-overlay');
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
@@ -114,7 +118,11 @@ if (loginForm) {
     });
 }
 
-// SHA-256 Helper function for secure transport
+/* ============================================================================
+ * Cryptographic Utilities
+ * ============================================================================ */
+
+/* SHA-256 helper function for secure credential transport. */
 async function hashSHA256(message) {
     if (!window.crypto || !window.crypto.subtle) {
         throw new Error("INSECURE_CONTEXT");
@@ -163,7 +171,9 @@ let adminKey = localStorage.getItem('danmaku_admin_key');
 let currentAiModels = [];
 let currentLlmBlacklist = [];
 
-// Toast Notification System
+/* ============================================================================
+ * Toast Notification System
+ * ============================================================================ */
 let currentToast = null;
 let toastTimeout = null;
 
@@ -182,12 +192,17 @@ function showToast(msg) {
     document.body.appendChild(toast);
     currentToast = toast;
 
-    void toast.offsetWidth; // Reflow
+    /* Force DOM reflow to trigger CSS transition. */
+    void toast.offsetWidth;
     toast.classList.add('show');
     toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3000);
 }
 
-// Download JSON logic
+/* ============================================================================
+ * Export Utilities
+ * ============================================================================ */
+
+/* Export danmaku samples as JSON file. */
 if (downloadJsonBtn) {
     downloadJsonBtn.addEventListener('click', () => {
         const list = window.currentDanmakuList || [];
@@ -205,7 +220,7 @@ if (downloadJsonBtn) {
     });
 }
 
-// Format Date
+/* Format timestamp into localized Taiwan time string. */
 function formatTime(timestamp) {
     const d = new Date(timestamp);
     return d.toLocaleString('zh-TW', {
@@ -214,7 +229,9 @@ function formatTime(timestamp) {
     });
 }
 
-// Switch Screens
+/* ============================================================================
+ * Screen Navigation & Configuration Management
+ * ============================================================================ */
 function showDashboard() {
     loginScreen.classList.remove('active');
     dashboardScreen.classList.add('active');
@@ -266,7 +283,8 @@ async function loadConfig() {
 
 whitelistToggle.addEventListener('change', async (e) => {
     const isEnabled = e.target.checked;
-    e.target.disabled = true; // Lock while updating
+    /* Lock control while updating remote state. */
+    e.target.disabled = true;
     try {
         const res = await fetch(WORKER_API + '/admin/config', {
             method: 'POST',
@@ -284,17 +302,21 @@ whitelistToggle.addEventListener('change', async (e) => {
 
         } else {
             showToast('設定失敗：' + (data.error || '權限不足'));
-            e.target.checked = !isEnabled; // Revert
+            /* Revert checkbox state upon failure. */
+            e.target.checked = !isEnabled;
         }
     } catch (err) {
         showToast('設定失敗，請檢查網路');
-        e.target.checked = !isEnabled; // Revert
+        /* Revert checkbox state upon network error. */
+        e.target.checked = !isEnabled;
     } finally {
         e.target.disabled = false;
     }
 });
 
-// Add AI Button Toggle
+/* ============================================================================
+ * AI Model Configuration
+ * ============================================================================ */
 let editingAiIndex = -1;
 
 if (addAiBtn) {
@@ -312,7 +334,7 @@ if (addAiBtn) {
     });
 }
 
-// Render AI Models
+/* Render configured AI models into container list. */
 function renderAiModels() {
     if (!aiListContainer) return;
     aiListContainer.innerHTML = '';
@@ -349,7 +371,7 @@ window.editAiModel = function(index) {
     if (aiKeys) aiKeys.value = model.keys || '';
     if (addAiForm) addAiForm.style.display = 'flex';
     if (saveAiBtn) saveAiBtn.textContent = '更新此模型設定';
-    // Scroll to form smoothly
+    /* Scroll smoothly to editor form. */
     if (addAiForm) addAiForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
 };
 
@@ -363,7 +385,7 @@ window.deleteAiModel = function(index) {
     saveConfig(true);
 };
 
-// Save Full Config Function
+/* Persist updated configuration to Cloudflare Worker. */
 async function saveConfig(silent = false) {
     const payload = {
         admin_key: adminKey,
@@ -390,7 +412,7 @@ async function saveConfig(silent = false) {
     }
 }
 
-// Auto Whitelist toggle onChange
+/* Auto whitelist toggle listener. */
 if (autoWhitelistToggle) {
     autoWhitelistToggle.addEventListener('change', (e) => {
         autoWhitelistDatesContainer.style.display = e.target.checked ? 'flex' : 'none';
@@ -403,7 +425,7 @@ if (autoWhitelistDates) {
     });
 }
 
-// Developer Mode toggle
+/* Developer mode toggle handler. */
 const devModeToggle = document.getElementById('dev-mode-toggle');
 if (devModeToggle) {
     devModeToggle.checked = localStorage.getItem('developer_mode') === 'true';
@@ -436,7 +458,7 @@ async function saveWhitelistConfig() {
     }
 }
 
-// AI Toggle onChange
+/* AI switch toggle listeners. */
 if (aiToggle) {
     aiToggle.addEventListener('change', (e) => {
 
@@ -447,7 +469,7 @@ if (aiChinaToggle) {
     aiChinaToggle.addEventListener('change', () => saveConfig(false));
 }
 
-// Save New AI
+/* Save or update AI model configuration. */
 if (saveAiBtn) {
     saveAiBtn.addEventListener('click', async () => {
         const ep = aiEndpoint.value.trim();
@@ -459,12 +481,12 @@ if (saveAiBtn) {
         }
         
         if (editingAiIndex >= 0 && editingAiIndex < currentAiModels.length) {
-            // Update existing
+            /* Update existing model entry. */
             currentAiModels[editingAiIndex].endpoint = ep;
             currentAiModels[editingAiIndex].model = mod;
             currentAiModels[editingAiIndex].keys = ks;
         } else {
-            // Add new
+            /* Append new model entry. */
             currentAiModels.push({
                 id: Date.now().toString(),
                 endpoint: ep,
@@ -496,7 +518,9 @@ if (cancelAiBtn) {
     });
 }
 
-// LLM Blacklist Download & Clear
+/* ============================================================================
+ * LLM Learned Blacklist Management
+ * ============================================================================ */
 if (downloadLlmBtn) {
     downloadLlmBtn.addEventListener('click', () => {
         if (currentLlmBlacklist.length === 0) {
@@ -534,7 +558,11 @@ if (clearLlmBtn) {
     });
 }
 
-// Generic file upload handler
+/* ============================================================================
+ * Dictionary File Upload Handling
+ * ============================================================================ */
+
+/* Parse and upload sensitive word lists from uploaded JSON files. */
 function handleFileUpload(inputElement, configKey) {
     inputElement.addEventListener('change', (e) => {
         const file = e.target.files[0];
@@ -563,7 +591,7 @@ function handleFileUpload(inputElement, configKey) {
                 const data = await res.json();
                 if (data.success) {
                     showToast('上傳成功！');
-                    // Optimistically update UI to bypass KV propagation delay
+                    /* Optimistically update UI to bypass KV propagation delay. */
                     if (configKey === 'baseBannedWords' && baseCountDisplay) {
                         baseCountDisplay.textContent = arr.length;
                     }
@@ -576,7 +604,8 @@ function handleFileUpload(inputElement, configKey) {
             } catch (err) {
                 showToast('讀取失敗或 JSON 格式不合法');
             } finally {
-                inputElement.value = ''; // Reset input
+                /* Reset file input to allow selecting the same file again. */
+                inputElement.value = '';
             }
         };
         reader.readAsText(file);
@@ -596,7 +625,7 @@ function showLogin() {
 
 function renderList(list) {
     danmakuList.innerHTML = '';
-    // Show newest first
+    /* Render newest items first. */
     list.slice().reverse().forEach(item => {
         const div = document.createElement('div');
         div.className = 'list-item';
@@ -654,7 +683,11 @@ function renderList(list) {
     });
 }
 
-// Load Data
+/* ============================================================================
+ * Danmaku Data Fetching & Deletion
+ * ============================================================================ */
+
+/* Fetch active danmaku list from worker. */
 async function loadDanmaku() {
     if (!adminKey) return;
     
@@ -684,7 +717,7 @@ async function loadDanmaku() {
     }
 }
 
-// Delete Data
+/* Delete specific danmaku item by ID. */
 async function deleteDanmaku(id, element) {
     if (!confirm('確定要強制刪除此彈幕嗎？')) return;
     
@@ -727,8 +760,9 @@ async function deleteDanmaku(id, element) {
     }
 }
 
-// Event Listeners
-// Login event listener removed (now handled at the top of the file with Captcha)
+/* ============================================================================
+ * Global Action Listeners & Session Lifecycle
+ * ============================================================================ */
 
 refreshBtn.addEventListener('click', () => {
     loadDanmaku();
@@ -736,7 +770,7 @@ refreshBtn.addEventListener('click', () => {
 });
 logoutBtn.addEventListener('click', showLogin);
 
-// Init: verify existing token
+/* Initial check: verify existing token or attempt SSO handshake. */
 if (adminKey) {
     fetch(WORKER_API + '/admin/config?admin_key=' + encodeURIComponent(adminKey))
         .then(res => {
@@ -749,18 +783,20 @@ if (adminKey) {
             }
         })
         .catch(() => {
-            // If network fails on init, still try to show login screen
+            /* If network fails on initialization, display login screen. */
             showLogin();
         });
 } else {
-    // [Situla Auth SSO Integration]
-    // Attempt to fetch the SSO key injected by Nginx Proxy Manager (Domain A).
-    // Mirror sites (Domain B) will return 404 and gracefully fallback to login.
+    /*
+     * Situla Auth SSO Integration:
+     * Attempt to fetch the SSO key injected by Nginx Proxy Manager (Domain A).
+     * Mirror sites (Domain B) will return 404 and gracefully fallback to standard login.
+     */
     fetch('/api/sso_key')
         .then(res => res.ok ? res.json() : Promise.reject())
         .then(async data => {
             if (data && data.key) {
-                // If key is already a 64-char hex string (SHA-256), use it directly. Otherwise, hash it.
+                /* If key is already a 64-char hex string (SHA-256), use directly; otherwise hash it. */
                 const tempKey = data.key.length === 64 ? data.key : await hashSHA256(data.key);
                 const res = await fetch(WORKER_API + '/admin/config?admin_key=' + encodeURIComponent(tempKey), { cache: 'no-store' });
                 if (res.ok) {
@@ -775,7 +811,7 @@ if (adminKey) {
             }
         })
         .catch(() => {
-            // No SSO key found (Mirror site), show standard login
+            /* No SSO key found (Mirror site); show standard login. */
             showLogin();
         });
 }
@@ -811,7 +847,8 @@ const learnHelpPopover = document.getElementById('learn-help-popover');
 
 if (learnHelpBtn) {
     learnHelpBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // prevent document click from immediately closing it
+        /* Prevent document click from immediately closing popover. */
+        e.stopPropagation();
         if (learnHelpPopover) {
             learnHelpPopover.classList.toggle('show');
         }
@@ -821,7 +858,7 @@ if (learnCloseBtn) {
     learnCloseBtn.addEventListener('click', closeAiLearnModal);
 }
 
-// Close popover when clicking anywhere else
+/* Close help popover when clicking anywhere outside. */
 document.addEventListener('click', (e) => {
     if (learnHelpPopover && learnHelpPopover.classList.contains('show')) {
         if (!learnHelpPopover.contains(e.target) && e.target !== learnHelpBtn) {

@@ -1,11 +1,11 @@
 <!-- ==========================================================================
+ * Private Sun Yat-sen Memorial Hall — Special Thanks (thanks.html)
+ * ==========================================================================
  * COMMENTING STANDARDS
  * 1. Block comments only. Use HTML comments for DOM and /* */ for inline scripts.
  * 2. Section dividers use the === banner format.
  * 3. All prose is written in English.
- * 4. No debugging notes or temporary workarounds in committed code.
- * 5. Store temporary files under /temp/[feature_name]/.
- ========================================================================== -->
+ * ========================================================================== -->
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -13,195 +13,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="page-title">特別鳴謝 - 私立中山紀念堂</title>
     <link rel="icon" href="../../main/favicon/favicon.svg" type="image/svg+xml">
-    
+    <link rel="alternate icon" href="../../main/favicon/favicon.ico" type="image/x-icon" sizes="any">
+
     <link rel="preload" href="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js" as="script" crossorigin="anonymous">
     <link rel="preload" href="./thanks_tc.md" as="fetch" crossorigin="anonymous">
 
+    <link rel="stylesheet" href="../../css/components/subpage.css">
     <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"></script>
-    
-    <style>
-        /* Global Settings */
-        html, body {
-            background-color: #111111;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;
-            overflow-x: hidden;
-        }
-
-        .page-transition {
-            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease !important;
-            transform: translateX(100%) !important;
-            opacity: 0 !important;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 60px 20px 40px 20px;
-            min-height: 100vh;
-        }
-        
-        /* Markdown Container */
-        .markdown-container {
-            width: 100%;
-            max-width: 800px;
-            background-color: #1a1a1a; 
-            padding: 45px 50px; 
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            border: 1px solid #333;
-            margin-top: 20px;
-            box-sizing: border-box;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-        .markdown-container.loaded {
-            opacity: 1;
-        }
-
-        /* Language Toggle */
-        .lang-toggle-btn {
-            position: absolute;
-            top: 25px;
-            right: 25px;
-            background-color: #1a1a1a;
-            color: #aaaaaa;
-            border: 1px solid #333333;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;
-            font-size: 14px;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            z-index: 100;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* Back Button */
-        .top-back-btn {
-            position: absolute;
-            top: 25px;
-            left: 25px;
-            display: inline-flex;
-            align-items: center;
-            color: #888888;
-            text-decoration: none;
-            font-size: 15px;
-            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
-            transition: color 0.2s ease, opacity 0.2s ease;
-            cursor: pointer;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            z-index: 100;
-        }
-
-        .lang-toggle-btn:active {
-            color: #f1c40f;
-            border-color: #f1c40f;
-        }
-
-        .top-back-btn:active {
-            color: #cccccc;
-            opacity: 0.8;
-        }
-
-        @media (hover: hover) and (pointer: fine) {
-            .lang-toggle-btn:hover {
-                color: #f1c40f;
-                border-color: #f1c40f;
-                box-shadow: 0 0 10px rgba(241, 196, 15, 0.2);
-            }
-            .top-back-btn:hover {
-                color: #cccccc;
-                opacity: 0.8;
-            }
-        }
-
-        .top-back-btn svg {
-            width: 22px;
-            height: 22px;
-            margin-right: 2px;
-            margin-left: -4px;
-        }
-
-        /* Desktop Layout Adaptations */
-        @media (min-width: 769px) {
-            .icon-ios { display: none; }
-            .icon-macos { display: block; }
-        }
-
-        /* Mobile Layout Adaptations */
-        @media (max-width: 768px) {
-            body {
-                padding: 80px 16px 30px 16px; 
-            }
-            .markdown-container {
-                padding: 30px 25px; 
-                margin-top: 0;
-            }
-            .top-back-btn {
-                top: 20px;
-                left: 16px;
-                font-size: 17px;
-            }
-            .top-back-btn svg {
-                width: 24px;
-                height: 24px;
-            }
-            .lang-toggle-btn {
-                top: 20px;
-                right: 16px;
-                padding: 6px 12px;
-                font-size: 12px;
-            }
-            .icon-ios { display: block; }
-            .icon-macos { display: none; }
-        }
-
-        /* ===== Light mode overrides ===== */
-        @media (prefers-color-scheme: light) {
-            html, body {
-                background-color: #f5f0e8;
-                color: #2c1810;
-            }
-            .markdown-container {
-                background-color: #ede8dc;
-                border-color: #c4a876;
-                box-shadow: 0 10px 30px rgba(80,50,10,0.12);
-            }
-            .lang-toggle-btn {
-                background-color: #ede8dc;
-                color: #6b4c35;
-                border-color: #c4a876;
-            }
-            .lang-toggle-btn:active {
-                color: #b8860b;
-                border-color: #b8860b;
-            }
-            @media (hover: hover) and (pointer: fine) {
-                .lang-toggle-btn:hover {
-                    color: #b8860b;
-                    border-color: #b8860b;
-                    box-shadow: 0 0 10px rgba(184,134,11,0.2);
-                }
-            }
-            .top-back-btn {
-                color: #8a7060;
-            }
-            .top-back-btn:active {
-                color: #2c1810;
-            }
-            @media (hover: hover) and (pointer: fine) {
-                .top-back-btn:hover {
-                    color: #2c1810;
-                }
-            }
-        }
-    </style>
 </head>
 <body>
 
@@ -221,159 +39,30 @@
         <zero-md id="md-viewer" src="./thanks_tc.md">
             <template>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css">
-                
                 <style>
-                    .markdown-body {
-                        color: #e5e7eb !important; 
-                        background-color: transparent !important; 
-                        font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif !important; 
-                        line-height: 1.8;
-                        padding: 0 15px !important; 
-                        overflow-wrap: break-word !important;
-                        word-wrap: break-word !important;
-                        word-break: break-all !important;
-                    }
-                    .markdown-body h1, .markdown-body h2 {
-                        color: #ffffff !important; 
-                        border-bottom-color: #333333 !important; 
-                        padding-bottom: 10px;
-                    }
-                    .markdown-body a {
-                        color: #f1c40f !important; 
-                        text-decoration: none;
-                    }
-                    .markdown-body a:hover {
-                        text-decoration: underline;
-                    }
-                    .markdown-body ul {
-                        margin-bottom: 20px !important;
-                    }
-                    .markdown-body li {
-                        margin-bottom: 8px !important;
-                    }
+                    .markdown-body { background-color: transparent !important; }
                 </style>
             </template>
         </zero-md>
     </div>
 
-    <script>
-        const langBtn = document.getElementById('lang-btn');
-        const mdViewer = document.getElementById('md-viewer');
-        const pageTitle = document.getElementById('page-title');
-        
-        let isTraditional = true;
+    <script type="module">
+        import { initSubpage } from '../../js/subpage.js';
 
-        langBtn.addEventListener('click', () => {
-            isTraditional = !isTraditional;
-            
-            if (isTraditional) {
-                mdViewer.setAttribute('src', './thanks_tc.md');
-                langBtn.textContent = '切换至简化字';
-                pageTitle.textContent = '特別鳴謝 - 私立中山紀念堂';
-                document.documentElement.lang = 'zh-TW';
-            } else {
-                mdViewer.setAttribute('src', './thanks_sc.md');
-                langBtn.textContent = '切換至正體字';
-                pageTitle.textContent = '特别鸣谢 - 私立中山纪念堂';
-                document.documentElement.lang = 'zh-CN';
+        initSubpage({
+            texts: {
+                tc: {
+                    btn: '切换至简化字',
+                    pageTitle: '特別鳴謝 - 私立中山紀念堂',
+                    src: './thanks_tc.md'
+                },
+                sc: {
+                    btn: '切換至正體字',
+                    pageTitle: '特别鸣谢 - 私立中山纪念堂',
+                    src: './thanks_sc.md'
+                }
             }
         });
-
-        mdViewer.addEventListener('zero-md-rendered', () => {
-            document.querySelector('.markdown-container').classList.add('loaded');
-            const links = mdViewer.shadowRoot.querySelectorAll('a');
-            links.forEach(link => {
-                const href = link.getAttribute('href');
-                if (href && href.startsWith('http')) {
-                    link.setAttribute('target', '_blank'); 
-                    link.setAttribute('rel', 'noopener noreferrer'); 
-                }
-            });
-        });
-
-        const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: light)');
-        function updateMarkdownTheme() {
-            const isLight = colorSchemeQuery.matches;
-            const template = mdViewer.querySelector('template');
-            if (template) {
-                const link = template.content.querySelector('link');
-                if (link) {
-                    link.href = isLight
-                        ? 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown.css'
-                        : 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css';
-                }
-                const style = template.content.querySelector('style');
-                if (style) {
-                    style.textContent = getMarkdownStyles(isLight);
-                }
-            }
-            const currentSrc = mdViewer.getAttribute('src');
-            mdViewer.removeAttribute('src');
-            requestAnimationFrame(() => mdViewer.setAttribute('src', currentSrc));
-        }
-        function getMarkdownStyles(isLight) {
-            if (isLight) {
-                return `.markdown-body {
-                    color: #2c1810 !important;
-                    background-color: transparent !important;
-                    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif !important;
-                    line-height: 1.8;
-                    padding: 0 15px !important;
-                    overflow-wrap: break-word !important;
-                    word-wrap: break-word !important;
-                    word-break: break-all !important;
-                }
-                .markdown-body h1, .markdown-body h2 {
-                    color: #2c1810 !important;
-                    border-bottom-color: #c4a876 !important;
-                    padding-bottom: 10px;
-                }
-                .markdown-body a {
-                    color: #b8860b !important;
-                    text-decoration: none;
-                }
-                .markdown-body a:hover { text-decoration: underline; }
-                .markdown-body ul { margin-bottom: 20px !important; }
-                .markdown-body li { margin-bottom: 8px !important; }`;
-            } else {
-                return `.markdown-body {
-                    color: #e5e7eb !important;
-                    background-color: transparent !important;
-                    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif !important;
-                    line-height: 1.8;
-                    padding: 0 15px !important;
-                    overflow-wrap: break-word !important;
-                    word-wrap: break-word !important;
-                    word-break: break-all !important;
-                }
-                .markdown-body h1, .markdown-body h2 {
-                    color: #ffffff !important;
-                    border-bottom-color: #333333 !important;
-                    padding-bottom: 10px;
-                }
-                .markdown-body a {
-                    color: #f1c40f !important;
-                    text-decoration: none;
-                }
-                .markdown-body a:hover { text-decoration: underline; }
-                .markdown-body ul { margin-bottom: 20px !important; }
-                .markdown-body li { margin-bottom: 8px !important; }`;
-            }
-        }
-        colorSchemeQuery.addEventListener('change', updateMarkdownTheme);
-        if (colorSchemeQuery.matches) updateMarkdownTheme();
-
-        const topBackBtn = document.querySelector('.top-back-btn');
-        if (topBackBtn) {
-            topBackBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                document.body.classList.add('page-transition');
-                setTimeout(() => {
-                    window.location.href = this.href;
-                }, 300);
-            });
-        }
     </script>
-
 </body>
 </html>

@@ -1,0 +1,19 @@
+# ============================================================================
+# Private Sun Yat-sen Memorial Hall — Docker Ignore (.dockerignore)
+# ============================================================================
+# 1. Block comments only (full line #).
+# 2. Section dividers use the === banner format.
+# 3. All prose is written in English.
+# ============================================================================
+
+.git
+.github
+.gitignore
+.dockerignore
+tools/
+temp/
+bugfix/
+README.md
+LICENSE
+*.md
+*.log

@@ -1,0 +1,297 @@
+@charset "UTF-8";
+
+/* ============================================================================
+ * Private Sun Yat-sen Memorial Hall — Subpage & Event Styles (subpage.css)
+ * ============================================================================
+ * COMMENTING STANDARDS
+ * 1. Block comments only. Inline comments (//) are strictly prohibited.
+ * 2. Section dividers use the === banner format.
+ * 3. All prose is written in English.
+ * ============================================================================ */
+
+@import url("../variables.css");
+@import url("../base.css");
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 20px 40px 20px;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ============================================================================
+ * Festival & Event Hero Banner
+ * ============================================================================ */
+.festival-hero {
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 20px;
+    text-align: center;
+    padding: 28px 20px 24px;
+    background: var(--sys-hero-bg);
+    border-radius: 12px;
+    border: 1px solid var(--sys-hero-border);
+    box-shadow: var(--sys-hero-shadow);
+    box-sizing: border-box;
+    transition: var(--sys-transition-standard);
+}
+
+.festival-hero .festival-icon {
+    font-size: 2.4rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.festival-hero h1 {
+    color: var(--sys-accent-gold);
+    font-size: clamp(1.3rem, 4vw, 1.8rem);
+    font-weight: bold;
+    letter-spacing: 4px;
+    margin: 0 0 8px 0;
+    text-shadow: 0 0 20px rgba(241, 196, 15, 0.35);
+}
+
+.festival-hero .festival-date {
+    color: var(--sys-accent-dark-gold);
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+}
+
+/* ============================================================================
+ * Tab Navigation (Optional for pages with tabs)
+ * ============================================================================ */
+.tabs-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    margin-bottom: 15px;
+    width: 100%;
+    max-width: 800px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.tabs-container::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-btn {
+    background-color: var(--sys-card-bg);
+    color: var(--sys-link);
+    border: 1px solid var(--sys-border);
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: var(--sys-font-family);
+    font-size: 14px;
+    white-space: nowrap;
+    transition: var(--sys-transition-standard);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.tab-btn.active {
+    background-color: #2d1e0d;
+    color: var(--sys-accent-gold);
+    border-color: var(--sys-accent-gold);
+    box-shadow: 0 0 10px rgba(241, 196, 15, 0.15);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .tab-btn:hover:not(.active) {
+        color: var(--sys-link-hover);
+        border-color: #555555;
+    }
+}
+
+/* ============================================================================
+ * Markdown Content Card
+ * ============================================================================ */
+.markdown-container,
+.charts-container {
+    width: 100%;
+    max-width: 800px;
+    background-color: var(--sys-card-bg);
+    padding: 45px 50px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--sys-border);
+    box-sizing: border-box;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    margin-top: 10px;
+}
+
+.markdown-container.loaded,
+.charts-container.loaded {
+    opacity: 1;
+}
+
+.markdown-container.active,
+.charts-container.active {
+    display: block;
+}
+
+.chart-box {
+    margin-bottom: 40px;
+}
+
+.chart-title {
+    color: var(--sys-accent-gold);
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+    border-bottom: 1px solid var(--sys-border);
+    padding-bottom: 10px;
+}
+
+.show-all-btn {
+    background-color: var(--sys-card-bg);
+    color: var(--sys-accent-gold);
+    border: 1px solid var(--sys-border);
+    padding: 6px 16px;
+    border-radius: 16px;
+    cursor: pointer;
+    font-family: var(--sys-font-family);
+    font-size: 13px;
+    transition: var(--sys-transition-standard);
+}
+
+.show-all-btn:hover {
+    border-color: var(--sys-accent-gold);
+}
+
+/* ============================================================================
+ * Top Controls: Language Switcher & Back Button
+ * ============================================================================ */
+.lang-toggle-btn {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    background-color: var(--sys-card-bg);
+    color: var(--sys-text-muted);
+    border: 1px solid var(--sys-border);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: var(--sys-font-family);
+    font-size: 14px;
+    letter-spacing: 1px;
+    transition: var(--sys-transition-standard);
+    z-index: 100;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.top-back-btn {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    display: inline-flex;
+    align-items: center;
+    color: var(--sys-link);
+    text-decoration: none;
+    font-size: 15px;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    transition: color 0.2s ease, opacity 0.2s ease;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    z-index: 100;
+}
+
+.lang-toggle-btn:active {
+    color: var(--sys-accent-gold);
+    border-color: var(--sys-accent-gold);
+}
+
+.top-back-btn:active {
+    color: var(--sys-link-hover);
+    opacity: 0.8;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .lang-toggle-btn:hover {
+        color: var(--sys-accent-gold);
+        border-color: var(--sys-accent-gold);
+        box-shadow: 0 0 10px rgba(241, 196, 15, 0.2);
+    }
+    .top-back-btn:hover {
+        color: var(--sys-link-hover);
+        opacity: 0.8;
+    }
+}
+
+.top-back-btn svg {
+    width: 22px;
+    height: 22px;
+    margin-right: 2px;
+    margin-left: -4px;
+}
+
+/* ============================================================================
+ * Responsive Viewport Rules
+ * ============================================================================ */
+@media (min-width: 769px) {
+    .icon-ios { display: none; }
+    .icon-macos { display: block; }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 65px 16px 40px 16px;
+    }
+    .markdown-container {
+        padding: 30px 25px;
+    }
+    .festival-hero {
+        padding: 22px 16px 18px;
+    }
+    .top-back-btn {
+        top: 20px;
+        left: 16px;
+        font-size: 17px;
+    }
+    .top-back-btn svg {
+        width: 24px;
+        height: 24px;
+    }
+    .lang-toggle-btn {
+        top: 20px;
+        right: 16px;
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    .icon-ios { display: block; }
+    .icon-macos { display: none; }
+}
+
+/* ============================================================================
+ * Light Mode Theme Overrides
+ * ============================================================================ */
+@media (prefers-color-scheme: light) {
+    .festival-hero h1 {
+        text-shadow: 0 0 20px rgba(122, 79, 0, 0.2);
+    }
+    .markdown-container {
+        box-shadow: 0 10px 30px rgba(80, 50, 10, 0.12);
+    }
+    .tab-btn {
+        background-color: var(--sys-card-bg);
+        color: var(--sys-accent-gold);
+        border-color: var(--sys-border);
+    }
+    .tab-btn.active {
+        background-color: #f5e8c8;
+        color: var(--sys-accent-gold);
+        border-color: var(--sys-accent-dark-gold);
+        box-shadow: 0 0 10px rgba(184, 134, 11, 0.2);
+    }
+    @media (hover: hover) and (pointer: fine) {
+        .tab-btn:hover:not(.active) {
+            color: var(--sys-text);
+            border-color: var(--sys-accent-dark-gold);
+        }
+    }
+}

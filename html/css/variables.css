@@ -1,0 +1,54 @@
+@charset "UTF-8";
+
+/* ============================================================================
+ * Private Sun Yat-sen Memorial Hall — Design Tokens (variables.css)
+ * ============================================================================
+ * COMMENTING STANDARDS
+ * 1. Block comments only. Inline comments (//) are strictly prohibited.
+ * 2. Section dividers use the === banner format.
+ * 3. All prose is written in English.
+ * ============================================================================ */
+
+:root {
+    /* Fonts */
+    --sys-font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;
+    --sys-font-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+    /* Theme Colors (Default: Dark) */
+    --sys-bg: #111111;
+    --sys-text: #ffffff;
+    --sys-text-muted: #aaaaaa;
+    --sys-card-bg: #1a1a1a;
+    --sys-border: #333333;
+    --sys-accent-gold: #f1c40f;
+    --sys-accent-dark-gold: #b8860b;
+    --sys-link: #888888;
+    --sys-link-hover: #cccccc;
+
+    /* Hero Banner Gradients */
+    --sys-hero-bg: linear-gradient(135deg, #1a0e06 0%, #2d1408 50%, #1a0e06 100%);
+    --sys-hero-border: rgba(184, 134, 11, 0.35);
+    --sys-hero-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(241, 196, 15, 0.08);
+
+    /* Animation Timing */
+    --sys-transition-standard: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    --sys-transition-page: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --sys-bg: #f5f0e8;
+        --sys-text: #2c1810;
+        --sys-text-muted: #6b4c35;
+        --sys-card-bg: #ede8dc;
+        --sys-border: #c4a876;
+        --sys-accent-gold: #7a4f00;
+        --sys-accent-dark-gold: #8a6400;
+        --sys-link: #8a7060;
+        --sys-link-hover: #2c1810;
+
+        --sys-hero-bg: linear-gradient(135deg, #f0e6cc 0%, #e8d8b0 50%, #f0e6cc 100%);
+        --sys-hero-border: rgba(184, 134, 11, 0.4);
+        --sys-hero-shadow: 0 8px 32px rgba(80, 50, 10, 0.12), inset 0 1px 0 rgba(184, 134, 11, 0.15);
+    }
+}

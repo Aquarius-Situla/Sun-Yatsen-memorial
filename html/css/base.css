@@ -1,0 +1,35 @@
+@charset "UTF-8";
+
+/* ============================================================================
+ * Private Sun Yat-sen Memorial Hall — Base Styles (base.css)
+ * ============================================================================
+ * COMMENTING STANDARDS
+ * 1. Block comments only. Inline comments (//) are strictly prohibited.
+ * 2. Section dividers use the === banner format.
+ * 3. All prose is written in English.
+ * ============================================================================ */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--sys-bg, #111111);
+    color: var(--sys-text, #ffffff);
+    font-family: var(--sys-font-family);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================================
+ * Page Transition Animation
+ * ============================================================================ */
+.page-transition {
+    transition: var(--sys-transition-page) !important;
+    transform: translateX(100%) !important;
+    opacity: 0 !important;
+}

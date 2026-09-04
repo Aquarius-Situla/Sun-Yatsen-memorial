@@ -1,18 +1,18 @@
 <!-- ==========================================================================
+ * Private Sun Yat-sen Memorial Hall — Sun Yat-sen Birthday (yatsen-birth.html)
+ * ==========================================================================
  * COMMENTING STANDARDS
  * 1. Block comments only. Use HTML comments for DOM and /* */ for inline scripts.
  * 2. Section dividers use the === banner format.
  * 3. All prose is written in English.
- * 4. No debugging notes or temporary workarounds in committed code.
- * 5. Store temporary files under /temp/[feature_name]/.
- ========================================================================== -->
+ * ========================================================================== -->
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="page-title">國父誕辰紀念日 - 私立中山紀念堂</title>
-    <meta name="description" content="國父孫中山先生誕辰紀念日介紹——緬懷國父革命精神，傳承天下為公理念。">
+    <meta name="description" content="國父誕辰紀念日介紹——緬懷革命先烈，傳承三民主義精神。">
 
     <link rel="icon" href="../../main/favicon/favicon.svg" type="image/svg+xml">
     <link rel="alternate icon" href="../../main/favicon/favicon.ico" type="image/x-icon" sizes="any">
@@ -20,183 +20,8 @@
     <link rel="preload" href="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js" as="script" crossorigin="anonymous">
     <link rel="preload" href="./yatsen-birth_tc.md" as="fetch" crossorigin="anonymous">
 
+    <link rel="stylesheet" href="../../css/components/subpage.css">
     <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"></script>
-
-    <style>
-        html, body {
-            background-color: #111111;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;
-            overflow-x: hidden;
-        }
-
-        .page-transition {
-            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease !important;
-            transform: translateX(100%) !important;
-            opacity: 0 !important;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 60px 20px 60px 20px;
-            min-height: 100vh;
-        }
-
-
-
-        /* 節日標題橫幅 */
-        .festival-hero {
-            width: 100%;
-            max-width: 800px;
-            margin-bottom: 20px;
-            text-align: center;
-            padding: 28px 20px 24px;
-            background: linear-gradient(135deg, #1a0e06 0%, #2d1408 50%, #1a0e06 100%);
-            border-radius: 12px;
-            border: 1px solid rgba(184, 134, 11, 0.35);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.7), inset 0 1px 0 rgba(241,196,15,0.08);
-            box-sizing: border-box;
-            transition: all 0.4s ease;
-        }
-
-        .festival-hero .festival-icon {
-            font-size: 2.4rem;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .festival-hero h1 {
-            color: #f1c40f;
-            font-size: clamp(1.3rem, 4vw, 1.8rem);
-            font-weight: bold;
-            letter-spacing: 4px;
-            margin: 0 0 8px 0;
-            text-shadow: 0 0 20px rgba(241, 196, 15, 0.35);
-        }
-
-        .festival-hero .festival-date {
-            color: #b8860b;
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-        }
-
-        /* Markdown 卡片 */
-        .markdown-container {
-            width: 100%;
-            max-width: 800px;
-            background-color: #1a1a1a;
-            padding: 45px 50px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            border: 1px solid #333;
-            box-sizing: border-box;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-        .markdown-container.loaded { opacity: 1; }
-
-        /* 語言切換 */
-        .lang-toggle-btn {
-            position: absolute;
-            top: 25px;
-            right: 25px;
-            background-color: #1a1a1a;
-            color: #aaaaaa;
-            border: 1px solid #333333;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;
-            font-size: 14px;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            z-index: 100;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* 返回按鈕 */
-        .top-back-btn {
-            position: absolute;
-            top: 25px;
-            left: 25px;
-            display: inline-flex;
-            align-items: center;
-            color: #888888;
-            text-decoration: none;
-            font-size: 15px;
-            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
-            transition: color 0.2s ease, opacity 0.2s ease;
-            cursor: pointer;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            z-index: 100;
-        }
-
-        .lang-toggle-btn:active { color: #f1c40f; border-color: #f1c40f; }
-        .top-back-btn:active { color: #cccccc; opacity: 0.8; }
-
-        @media (hover: hover) and (pointer: fine) {
-            .lang-toggle-btn:hover {
-                color: #f1c40f;
-                border-color: #f1c40f;
-                box-shadow: 0 0 10px rgba(241, 196, 15, 0.2);
-            }
-            .top-back-btn:hover { color: #cccccc; opacity: 0.8; }
-        }
-
-        .top-back-btn svg { width: 22px; height: 22px; margin-right: 2px; margin-left: -4px; }
-
-        @media (min-width: 769px) {
-            .icon-ios { display: none; }
-            .icon-macos { display: block; }
-        }
-
-        @media (max-width: 768px) {
-            body { padding: 65px 16px 40px 16px; }
-            .markdown-container { padding: 30px 25px; }
-            .festival-hero { padding: 22px 16px 18px; }
-            .top-back-btn { top: 20px; left: 16px; font-size: 17px; }
-            .top-back-btn svg { width: 24px; height: 24px; }
-            .lang-toggle-btn { top: 20px; right: 16px; padding: 6px 12px; font-size: 12px; }
-            .icon-ios { display: block; }
-            .icon-macos { display: none; }
-        }
-
-        @media (prefers-color-scheme: light) {
-            html, body { background-color: #f5f0e8; color: #2c1810; }
-
-            .festival-hero {
-                background: linear-gradient(135deg, #f0e6cc 0%, #e8d8b0 50%, #f0e6cc 100%);
-                border-color: rgba(184,134,11,0.4);
-                box-shadow: 0 8px 32px rgba(80,50,10,0.12), inset 0 1px 0 rgba(184,134,11,0.15);
-            }
-            .festival-hero h1 { color: #7a4f00; text-shadow: 0 0 20px rgba(122,79,0,0.2); }
-            .festival-hero .festival-date { color: #8a6400; }
-
-            .markdown-container {
-                background-color: #ede8dc;
-                border-color: #c4a876;
-                box-shadow: 0 10px 30px rgba(80,50,10,0.12);
-            }
-
-
-
-            .lang-toggle-btn { background-color: #ede8dc; color: #6b4c35; border-color: #c4a876; }
-            .lang-toggle-btn:active { color: #b8860b; border-color: #b8860b; }
-
-            .top-back-btn { color: #8a7060; }
-            .top-back-btn:active { color: #2c1810; }
-        }
-
-        @media (prefers-color-scheme: light) and (hover: hover) and (pointer: fine) {
-            .lang-toggle-btn:hover { color: #b8860b; border-color: #b8860b; box-shadow: 0 0 10px rgba(184,134,11,0.2); }
-            .top-back-btn:hover { color: #2c1810; }
-        }
-    </style>
 </head>
 <body>
 
@@ -223,184 +48,21 @@
             <template>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css">
                 <style>
-                    .markdown-body {
-                        color: #e5e7eb !important;
-                        background-color: transparent !important;
-                        font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif !important;
-                        line-height: 1.8;
-                        padding: 0 15px !important;
-                        overflow-wrap: break-word !important;
-                        word-wrap: break-word !important;
-                        word-break: break-all !important;
-                    }
-                    .markdown-body h1, .markdown-body h2 {
-                        color: #ffffff !important;
-                        border-bottom-color: #333333 !important;
-                        padding-bottom: 10px;
-                    }
-                    .markdown-body a {
-                        color: #f1c40f !important;
-                        text-decoration: none;
-                    }
-                    .markdown-body a:hover { text-decoration: underline; }
-                    .markdown-body ul { margin-bottom: 20px !important; }
-                    .markdown-body li { margin-bottom: 8px !important; }
-                    .markdown-body blockquote {
-                        border-left: 4px solid #b8860b !important;
-                        color: #cccccc !important;
-                        background: rgba(184,134,11,0.07) !important;
-                        padding: 12px 20px !important;
-                        border-radius: 0 6px 6px 0 !important;
-                    }
+                    .markdown-body { background-color: transparent !important; }
                 </style>
             </template>
         </zero-md>
     </div>
 
-    <script>
-        const langBtn = document.getElementById('lang-btn');
-        const mdViewer = document.getElementById('md-viewer');
-        const container = document.querySelector('.markdown-container');
-        const heroTitle = document.getElementById('hero-title');
-        const heroDate = document.getElementById('hero-date');
+    <script type="module">
+        import { initSubpage } from '../../js/subpage.js';
 
-        let isTraditional = true;
-
-        const texts = {
-            tc: { btn: '切换至简化字', title: '國父誕辰紀念日', date: '1866年（民國前四十五年）十一月十二日', src: './yatsen-birth_tc.md' },
-            sc: { btn: '切換至正體字', title: '国父诞辰纪念日', date: '1866年（民国前四十五年）十一月十二日', src: './yatsen-birth_sc.md' }
-        };
-
-        function updateContent() {
-            const t = texts[isTraditional ? 'tc' : 'sc'];
-            langBtn.textContent = t.btn;
-            heroTitle.textContent = t.title;
-            heroDate.textContent = t.date;
-            document.documentElement.lang = isTraditional ? 'zh-TW' : 'zh-CN';
-
-            if (mdViewer.getAttribute('src') !== t.src) {
-                container.classList.remove('loaded');
-                mdViewer.setAttribute('src', t.src);
+        initSubpage({
+            texts: {
+                tc: { btn: '切换至简化字', title: '國父誕辰紀念日', date: '1866年（民國前四十五年）十一月十二日', src: './yatsen-birth_tc.md' },
+                sc: { btn: '切換至正體字', title: '国父诞辰纪念日', date: '1866年（民国前四十五年）十一月十二日', src: './yatsen-birth_sc.md' }
             }
-        }
-
-        langBtn.addEventListener('click', () => {
-            isTraditional = !isTraditional;
-            updateContent();
         });
-
-        mdViewer.addEventListener('zero-md-rendered', () => {
-            container.classList.add('loaded');
-            const links = mdViewer.shadowRoot.querySelectorAll('a');
-            links.forEach(link => {
-                const href = link.getAttribute('href');
-                if (href && href.startsWith('http')) {
-                    link.setAttribute('target', '_blank');
-                    link.setAttribute('rel', 'noopener noreferrer');
-                }
-            });
-        });
-
-        const topBackBtn = document.querySelector('.top-back-btn');
-        if (topBackBtn) {
-            topBackBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                document.body.classList.add('page-transition');
-                setTimeout(() => {
-                    const params = new URLSearchParams(window.location.search);
-                    if (params.get('from') === 'announcement') {
-                        window.location.href = '../../pages/announcement/announcement.html?tab=memorial';
-                    } else {
-                        window.location.href = this.href;
-                    }
-                }, 300);
-            });
-        }
-
-        // 初始化顯示
-        updateContent();
-
-        // 色彩模式切換：動態更新 zero-md 樣式表
-        const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: light)');
-        function updateMarkdownTheme() {
-            const isLight = colorSchemeQuery.matches;
-            const template = mdViewer.querySelector('template');
-            if (template) {
-                const link = template.content.querySelector('link');
-                if (link) {
-                    link.href = isLight
-                        ? 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown.css'
-                        : 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css';
-                }
-                const style = template.content.querySelector('style');
-                if (style) {
-                    style.textContent = getMarkdownStyles(isLight);
-                }
-            }
-            const currentSrc = mdViewer.getAttribute('src');
-            mdViewer.removeAttribute('src');
-            requestAnimationFrame(() => mdViewer.setAttribute('src', currentSrc));
-        }
-        function getMarkdownStyles(isLight) {
-            if (isLight) {
-                return `.markdown-body {
-                    color: #2c1810 !important;
-                    background-color: transparent !important;
-                    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif !important;
-                    line-height: 1.8;
-                    padding: 0 15px !important;
-                    overflow-wrap: break-word !important;
-                    word-wrap: break-word !important;
-                    word-break: break-all !important;
-                }
-                .markdown-body h1, .markdown-body h2 {
-                    color: #2c1810 !important;
-                    border-bottom-color: #c4a876 !important;
-                    padding-bottom: 10px;
-                }
-                .markdown-body a { color: #b8860b !important; text-decoration: none; }
-                .markdown-body a:hover { text-decoration: underline; }
-                .markdown-body ul { margin-bottom: 20px !important; }
-                .markdown-body li { margin-bottom: 8px !important; }
-                .markdown-body blockquote {
-                    border-left: 4px solid #b8860b !important;
-                    color: #5a3e2a !important;
-                    background: rgba(184,134,11,0.08) !important;
-                    padding: 12px 20px !important;
-                    border-radius: 0 6px 6px 0 !important;
-                }`;
-            } else {
-                return `.markdown-body {
-                    color: #e5e7eb !important;
-                    background-color: transparent !important;
-                    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif !important;
-                    line-height: 1.8;
-                    padding: 0 15px !important;
-                    overflow-wrap: break-word !important;
-                    word-wrap: break-word !important;
-                    word-break: break-all !important;
-                }
-                .markdown-body h1, .markdown-body h2 {
-                    color: #ffffff !important;
-                    border-bottom-color: #333333 !important;
-                    padding-bottom: 10px;
-                }
-                .markdown-body a { color: #f1c40f !important; text-decoration: none; }
-                .markdown-body a:hover { text-decoration: underline; }
-                .markdown-body ul { margin-bottom: 20px !important; }
-                .markdown-body li { margin-bottom: 8px !important; }
-                .markdown-body blockquote {
-                    border-left: 4px solid #b8860b !important;
-                    color: #cccccc !important;
-                    background: rgba(184,134,11,0.07) !important;
-                    padding: 12px 20px !important;
-                    border-radius: 0 6px 6px 0 !important;
-                }`;
-            }
-        }
-        colorSchemeQuery.addEventListener('change', updateMarkdownTheme);
-        if (colorSchemeQuery.matches) updateMarkdownTheme();
     </script>
-
 </body>
 </html>
