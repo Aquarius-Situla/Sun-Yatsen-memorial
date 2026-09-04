@@ -23,8 +23,8 @@
 
     <link rel="stylesheet" href="../../css/variables.css?v=2015">
     <link rel="stylesheet" href="../../css/base.css?v=2015">
-    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=2015">
-    <link rel="stylesheet" href="../../css/components/subpage.css?v=2015">
+    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=2018">
+    <link rel="stylesheet" href="../../css/components/subpage.css?v=2018">
 </head>
 <body>
 
@@ -141,6 +141,7 @@
          * Library Module Initialization & Dynamic Language Toggle
          * ==================================================================== */
         import { getCurrentLang, setGlobalLang, syncTabBarLabels } from '../../js/modules/i18n.js';
+        import { syncStandaloneTabBar } from '../../js/modules/tab-bar.js';
 
         const i18nStrings = {
             tc: {
@@ -219,6 +220,7 @@
 
         const currentLang = getCurrentLang();
         updateTexts(currentLang);
+        syncStandaloneTabBar();
 
 
         const langBtn = document.getElementById('lang-btn');

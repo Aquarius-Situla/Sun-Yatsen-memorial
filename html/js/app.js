@@ -16,6 +16,7 @@ import { toggleDanmaku } from './modules/danmaku.js';
 import { setupMessageSheet } from './modules/message-sheet.js';
 import { loadAndTriggerFireworks } from './modules/fireworks.js';
 import { syncTabBarLabels } from './modules/i18n.js';
+import { syncStandaloneTabBar } from './modules/tab-bar.js';
 
 /* Expose fireworks loader globally for legacy triggers */
 window.loadAndTriggerFireworks = loadAndTriggerFireworks;
@@ -243,6 +244,7 @@ function initApp() {
      * ======================================================================== */
     try {
         syncTabBarLabels();
+        syncStandaloneTabBar();
         window.addEventListener('sys-lang-change', () => {
             syncTabBarLabels();
         });

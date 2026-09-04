@@ -118,14 +118,76 @@ export function initTabBar(options = {}) {
 }
 
 /* ============================================================================
- * iOS Standalone WebApp Navigation Controller
+ * iOS Standalone WebApp Viewport & Tab Bar Synchronizer
+ * Fixes WebKit "chin gap" / status bar offset bug where WebKit pulls bottom: 0
+ * upward by the status bar height (~59px-64px) on standalone PWA launch.
+ * ============================================================================ */
+export function syncStandaloneTabBar() {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+    const isIOSStandalone = ('standalone' in window.navigator) && window.navigator.standalone;
+    const isPWAStandalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+
+    if (!isIOSStandalone && !isPWAStandalone) {
+        return;
+    }
+
+    document.documentElement.classList.add('is-standalone');
+
+    const tabBar = document.querySelector('.apple-tab-bar');
+    if (!tabBar) return;
+
+    /* Measure difference between physical screen height and WebKit layout viewport */
+    const isPortrait = window.innerHeight >= window.innerWidth;
+    const currentScreenH = isPortrait ? Math.max(window.screen.height, window.screen.width) : Math.min(window.screen.height, window.screen.width);
+    const diff = currentScreenH - window.innerHeight;
+
+    /* In WebKit standalone bug, diff equals status bar height (approx 44px - 64px).
+     * When keyboard opens, diff is much larger (>200px), which must not be touched. */
+    if (diff >= 10 && diff <= 120) {
+        document.documentElement.style.setProperty('--tab-bar-standalone-bottom', `-${diff}px`);
+        tabBar.style.setProperty('bottom', `-${diff}px`, 'important');
+    } else if (diff <= 5) {
+        document.documentElement.style.setProperty('--tab-bar-standalone-bottom', '0px');
+        tabBar.style.removeProperty('bottom');
+    }
+}
+
+/* ============================================================================
+ * iOS Standalone WebApp Navigation Controller & Viewport Watcher
  * Prevents iOS WebClip from bouncing to Safari on internal anchor navigation
+ * and synchronizes viewport bounds on all lifecycle milestones.
  * ============================================================================ */
 if (typeof window !== 'undefined') {
     const isIOSStandalone = ('standalone' in window.navigator) && window.navigator.standalone;
-    const isPWAStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    const isPWAStandalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
 
     if (isIOSStandalone || isPWAStandalone) {
+        /* Immediate and delayed layout stabilization */
+        syncStandaloneTabBar();
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', syncStandaloneTabBar);
+        }
+        window.addEventListener('load', syncStandaloneTabBar);
+        window.addEventListener('resize', syncStandaloneTabBar);
+        window.addEventListener('orientationchange', syncStandaloneTabBar);
+        window.addEventListener('pageshow', syncStandaloneTabBar);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') syncStandaloneTabBar();
+        });
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', syncStandaloneTabBar);
+            window.visualViewport.addEventListener('scroll', syncStandaloneTabBar);
+        }
+
+        setTimeout(syncStandaloneTabBar, 50);
+        setTimeout(syncStandaloneTabBar, 150);
+        setTimeout(syncStandaloneTabBar, 300);
+        setTimeout(syncStandaloneTabBar, 600);
+
+        /* Intercept internal anchors to prevent bouncing out to mobile Safari */
         document.addEventListener('click', (e) => {
             const anchor = e.target.closest('a');
             if (anchor && anchor.href && anchor.href.startsWith(window.location.origin)) {
