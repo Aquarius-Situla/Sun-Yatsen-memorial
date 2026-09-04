@@ -34,15 +34,18 @@
         left: 0;
         right: 0;
         width: 100%;
-        height: calc(52px + env(safe-area-inset-bottom, 0px));
-        padding: 4px 6px calc(env(safe-area-inset-bottom, 0px) + 2px) 6px;
+        height: calc(50px + env(safe-area-inset-bottom, 0px));
+        padding-top: 4px;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        padding-left: 4px;
+        padding-right: 4px;
         display: flex;
         align-items: center;
         justify-content: space-around;
-        background: rgba(18, 18, 18, 0.82);
-        backdrop-filter: blur(25px) saturate(190%);
-        -webkit-backdrop-filter: blur(25px) saturate(190%);
-        border-top: 0.5px solid rgba(255, 255, 255, 0.15);
+        background: rgba(26, 26, 28, 0.85);
+        backdrop-filter: blur(30px) saturate(210%);
+        -webkit-backdrop-filter: blur(30px) saturate(210%);
+        border-top: 0.5px solid rgba(255, 255, 255, 0.18);
         box-sizing: border-box;
         z-index: 9999;
         user-select: none;
@@ -62,11 +65,12 @@
         transition: color 0.18s ease, transform 0.12s ease;
         -webkit-tap-highlight-color: transparent;
         cursor: pointer;
+        padding: 2px 0;
     }
 
     /* Icon Container & Apple SF Symbol Silhouette Standard */
     .apple-tab-bar .tab-item .tab-icon {
-        width: 26px;
+        width: 28px;
         height: 26px;
         display: flex;
         align-items: center;
@@ -75,8 +79,8 @@
     }
 
     .apple-tab-bar .tab-item .tab-icon svg {
-        width: 22px;
-        height: 22px;
+        width: 25px;
+        height: 25px;
         fill: currentColor;
         stroke: none;
         transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -86,9 +90,10 @@
     .apple-tab-bar .tab-item .tab-label {
         font-size: 10px;
         font-weight: 500;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.2px;
         font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;
         line-height: 1.1;
+        margin-top: 2px;
     }
 
     /* Active Selected State (Project Amber/Orange-Yellow Accent) */
@@ -97,7 +102,7 @@
     }
 
     .apple-tab-bar .tab-item.active .tab-icon svg {
-        transform: scale(1.08);
+        transform: scale(1.04);
     }
 
     .apple-tab-bar .tab-item.active .tab-label {
@@ -116,8 +121,8 @@
  * ============================================================================ */
 @media (prefers-color-scheme: light) and (max-width: 768px) {
     .apple-tab-bar {
-        background: rgba(245, 240, 232, 0.88);
-        border-top-color: rgba(0, 0, 0, 0.14);
+        background: rgba(248, 248, 248, 0.85);
+        border-top-color: rgba(0, 0, 0, 0.15);
     }
 
     .apple-tab-bar .tab-item {
