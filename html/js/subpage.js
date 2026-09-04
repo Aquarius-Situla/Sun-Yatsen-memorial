@@ -70,8 +70,9 @@ function getMarkdownStyles(isLight) {
     }
 }
 
-import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=2020';
-import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=2020';
+import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=2021';
+import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=2021';
+import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=2021';
 
 /* ============================================================================
  * Subpage Initialization Engine
@@ -85,6 +86,9 @@ export function initSubpage(options) {
         basePath = '../../',
         onRendered = null
     } = options;
+
+    /* Initialize diagnostic HUD trigger (3-tap on header) */
+    setupDiagnosticTrigger();
 
     /* Initialize Apple Native Bottom Tab Bar if an active tab is specified */
     if (activeBottomTab) {
