@@ -84,6 +84,10 @@ export function initIOSNavTransition(options = {}) {
     let isNavigating = false;
 
     function getTargetUrl(btn) {
+        const currentParams = new URLSearchParams(window.location.search);
+        if (currentParams.get('from') === 'announcement') {
+            return '../../pages/announcement/announcement.html?tab=memorial';
+        }
         if (btn && btn.getAttribute('href')) {
             return btn.getAttribute('href');
         }
@@ -147,7 +151,7 @@ export function initIOSNavTransition(options = {}) {
     }
 
     /* ========================================================================
-     * Section 4: Pop Exit Transition (Button Trigger)
+     * Section 4: Original Unified Page-Transition Exit Animation
      * ======================================================================== */
     function triggerPopTransition(targetUrl) {
         if (isNavigating || !targetUrl) return;
@@ -155,29 +159,16 @@ export function initIOSNavTransition(options = {}) {
 
         prefetchUrl(targetUrl);
 
-        if (navBackBtn) {
-            navBackBtn.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
-            navBackBtn.style.opacity = '0';
-            navBackBtn.style.transform = 'translate3d(-10px, 0, 0)';
-        }
-        if (navTitle) {
-            navTitle.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
-            navTitle.style.opacity = '0';
-            navTitle.style.transform = 'translate3d(30px, 0, 0)';
-        }
-
-        const slideElements = getSlideElements();
-        for (let i = 0; i < slideElements.length; i++) {
-            slideElements[i].classList.add('ios-content-sliding-out');
-        }
+        /* Trigger the original page-transition animation on the entire document body */
+        document.body.classList.add('page-transition');
 
         setTimeout(function() {
             window.location.href = targetUrl;
-        }, 210);
+        }, 280);
 
         setTimeout(function() {
             window.location.href = targetUrl;
-        }, 450);
+        }, 500);
     }
 
     function attachClickHandler(btn) {
@@ -217,190 +208,24 @@ export function initIOSNavTransition(options = {}) {
     }
 
     /* ========================================================================
-     * Section 5: Interactive Left-Edge Swipe Gesture (iOS Native Pop)
-     * ======================================================================== */
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchStartTime = 0;
-    let isTrackingEdge = false;
-    let isSwiping = false;
-
-    function stopTracking() {
-        isTrackingEdge = false;
-        isSwiping = false;
-        window.removeEventListener('touchmove', onTouchMove);
-    }
-
-    function onTouchStart(e) {
-        if (isNavigating || e.touches.length !== 1) return;
-
-        const touch = e.touches[0];
-        if (touch.clientY < 60 || (e.target && e.target.closest && e.target.closest('.apple-top-nav, .top-back-btn, .apple-tab-bar'))) {
-            return;
-        }
-
-        if (touch.clientX <= 25) {
-            touchStartX = touch.clientX;
-            touchStartY = touch.clientY;
-            touchStartTime = Date.now();
-            isTrackingEdge = true;
-            isSwiping = false;
-            window.addEventListener('touchmove', onTouchMove, { passive: false });
-        }
-    }
-
-    function onTouchMove(e) {
-        if (!isTrackingEdge || e.touches.length !== 1) return;
-
-        const touch = e.touches[0];
-        const deltaX = touch.clientX - touchStartX;
-        const deltaY = touch.clientY - touchStartY;
-
-        if (!isSwiping) {
-            if (Math.abs(deltaY) > Math.abs(deltaX)) {
-                stopTracking();
-                return;
-            }
-            if (deltaX > 8 && Math.abs(deltaX) > Math.abs(deltaY)) {
-                isSwiping = true;
-                const slideElements = getSlideElements();
-                for (let i = 0; i < slideElements.length; i++) {
-                    slideElements[i].classList.add('ios-content-dragging');
-                }
-                const target = getTargetUrl(navBackBtn);
-                if (target) prefetchUrl(target);
-            }
-        }
-
-        if (isSwiping) {
-            if (e.cancelable) e.preventDefault();
-
-            const currentX = Math.max(0, deltaX);
-            const screenWidth = window.innerWidth || 375;
-            const progress = Math.min(1, currentX / screenWidth);
-
-            const slideElements = getSlideElements();
-            for (let i = 0; i < slideElements.length; i++) {
-                slideElements[i].style.transform = 'translate3d(' + currentX + 'px, 0, 0)';
-            }
-
-            if (navBackBtn) {
-                navBackBtn.style.opacity = String(1 - progress);
-                navBackBtn.style.transform = 'translate3d(' + (-10 * progress) + 'px, 0, 0)';
-            }
-            if (navTitle) {
-                navTitle.style.opacity = String(1 - progress);
-                navTitle.style.transform = 'translate3d(' + (30 * progress) + 'px, 0, 0)';
-            }
-        }
-    }
-
-    function onTouchEnd(e) {
-        if (!isTrackingEdge && !isSwiping) {
-            window.removeEventListener('touchmove', onTouchMove);
-            return;
-        }
-
-        const wasSwiping = isSwiping;
-        stopTracking();
-
-        if (!wasSwiping) return;
-
-        const touch = e.changedTouches[0];
-        const deltaX = touch ? (touch.clientX - touchStartX) : 0;
-        const elapsed = Math.max(1, Date.now() - touchStartTime);
-        const velocity = deltaX / elapsed;
-        const screenWidth = window.innerWidth || 375;
-
-        const shouldCommit = (deltaX > screenWidth * 0.3) || (deltaX > 40 && velocity > 0.35);
-        const target = getTargetUrl(navBackBtn);
-        const slideElements = getSlideElements();
-
-        for (let i = 0; i < slideElements.length; i++) {
-            slideElements[i].classList.remove('ios-content-dragging');
-        }
-
-        if (shouldCommit && target) {
-            isNavigating = true;
-            for (let i = 0; i < slideElements.length; i++) {
-                slideElements[i].style.transition = 'transform 0.2s cubic-bezier(0.32, 0.72, 0, 1)';
-                slideElements[i].style.transform = 'translate3d(100%, 0, 0)';
-            }
-            if (navBackBtn) {
-                navBackBtn.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
-                navBackBtn.style.opacity = '0';
-                navBackBtn.style.transform = 'translate3d(-10px, 0, 0)';
-            }
-            if (navTitle) {
-                navTitle.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
-                navTitle.style.opacity = '0';
-                navTitle.style.transform = 'translate3d(30px, 0, 0)';
-            }
-
-            setTimeout(function() {
-                window.location.href = target;
-            }, 200);
-        } else {
-            /* Cancel swipe return */
-            for (let i = 0; i < slideElements.length; i++) {
-                slideElements[i].style.transition = 'transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1)';
-                slideElements[i].style.transform = 'translate3d(0, 0, 0)';
-            }
-            if (navBackBtn) {
-                navBackBtn.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
-                navBackBtn.style.opacity = '1';
-                navBackBtn.style.transform = 'translate3d(0, 0, 0)';
-            }
-            if (navTitle) {
-                navTitle.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
-                navTitle.style.opacity = '1';
-                navTitle.style.transform = 'translate3d(0, 0, 0)';
-            }
-
-            setTimeout(function() {
-                for (let i = 0; i < slideElements.length; i++) {
-                    slideElements[i].style.transition = '';
-                    slideElements[i].style.transform = '';
-                }
-                if (navBackBtn) {
-                    navBackBtn.style.transition = '';
-                    navBackBtn.style.opacity = '';
-                    navBackBtn.style.transform = '';
-                }
-                if (navTitle) {
-                    navTitle.style.transition = '';
-                    navTitle.style.opacity = '';
-                    navTitle.style.transform = '';
-                }
-            }, 240);
-        }
-    }
-
-    window.addEventListener('touchstart', onTouchStart, { passive: true });
-    window.addEventListener('touchend', onTouchEnd, { passive: true });
-    window.addEventListener('touchcancel', onTouchEnd, { passive: true });
-
-    /* ========================================================================
-     * Section 6: BFCache & History Restore Handlers
+     * Section 5: BFCache & History Restore Handlers
      * ======================================================================== */
     window.addEventListener('pageshow', function(e) {
         if (e.persisted) {
+            document.body.classList.remove('page-transition');
             if (navBackBtn) {
                 navBackBtn.style.opacity = '';
                 navBackBtn.style.transform = '';
-                navBackBtn.style.transition = '';
             }
             if (desktopBackBtn) desktopBackBtn.style.opacity = '';
             if (navTitle) {
                 navTitle.style.opacity = '';
                 navTitle.style.transform = '';
-                navTitle.style.transition = '';
             }
             const slideElements = getSlideElements();
             for (let i = 0; i < slideElements.length; i++) {
-                slideElements[i].classList.remove('ios-content-sliding-out', 'ios-content-dragging', 'ios-content-entering', 'ios-content-enter-active');
+                slideElements[i].classList.remove('ios-content-entering', 'ios-content-enter-active');
                 slideElements[i].style.transform = '';
-                slideElements[i].style.transition = '';
             }
             isNavigating = false;
         }

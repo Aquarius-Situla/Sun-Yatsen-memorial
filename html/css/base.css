@@ -32,4 +32,5 @@ html, body {
     transition: var(--sys-transition-page) !important;
     transform: translateX(100%) !important;
     opacity: 0 !important;
+    pointer-events: none !important;
 }

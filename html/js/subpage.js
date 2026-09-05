@@ -73,7 +73,7 @@ function getMarkdownStyles(isLight) {
 import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=2025';
 import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=2025';
 import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=2025';
-import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260905i';
+import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260905j';
 
 /* ============================================================================
  * Subpage Initialization Engine
@@ -337,22 +337,7 @@ export function initSubpage(options) {
         });
     }
 
-    /* Page Navigation & Back Transition */
-    const topBackBtn = document.querySelector('.top-back-btn');
-    if (topBackBtn) {
-        topBackBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            document.body.classList.add('page-transition');
-            setTimeout(() => {
-                const currentParams = new URLSearchParams(window.location.search);
-                if (currentParams.get('from') === 'announcement') {
-                    window.location.href = '../../pages/announcement/announcement.html?tab=memorial';
-                } else {
-                    window.location.href = this.getAttribute('href') || this.href;
-                }
-            }, 300);
-        });
-    }
+    /* Page Navigation & Back Transition is handled by initIOSNavTransition */
 
     /* Theme Switcher for Zero-MD */
     const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: light)');
