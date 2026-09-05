@@ -21,26 +21,19 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="國父紀念堂">
 
-    <link rel="preload" href="../../js/zero-md.min.js" as="script">
     <!-- Critical inline CSS: eliminates white flash during iOS PWA page transitions -->
     <style>html,body{background-color:#111111;min-height:100.5vh;min-height:calc(100lvh + 1px);}</style>
 
     <link rel="stylesheet" href="../../css/variables.css?v=2025">
     <link rel="stylesheet" href="../../css/base.css?v=2025">
     <link rel="stylesheet" href="../../css/components/tab-bar.css?v=2025">
-    <link rel="stylesheet" href="../../css/components/subpage.css?v=20260905g">
-    <script type="module" src="../../js/zero-md.min.js"></script>
+    <link rel="stylesheet" href="../../css/components/subpage.css?v=20260905i">
 </head>
 <body class="page-announcement-menu">
 
     <!-- Apple Native Frosted Glass Top Navigation Bar (Mobile Viewports) -->
     <header class="apple-top-nav">
-        <a href="#" class="nav-back-link" id="nav-back-link" aria-label="返回公告" style="display: none;">
-            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-            <span id="nav-back-text">公告</span>
-        </a>
         <h1 class="nav-title" id="top-nav-title">公告</h1>
-        <h1 class="nav-title" id="subpage-nav-title" style="display: none;"></h1>
     </header>
 
     <a href="../../index.html?from=return" class="top-back-btn" aria-label="返回">
@@ -56,65 +49,49 @@
     <!-- Desktop Fallback Language Toggle -->
     <button id="lang-btn" class="lang-toggle-btn">切换至简化字</button>
 
-    <!-- iOS Master Container (Parent List Cards) -->
-    <div class="ios-master-container" id="ios-master-container">
-        <!-- iOS Inset Grouped Settings Container (Image 3 Specification) -->
-        <div class="ios-group-container">
-            <!-- Section 1: Announcements -->
-            <div class="ios-section-header" id="sec-announcements">堂務公告 (ANNOUNCEMENTS)</div>
-            <div class="ios-card">
-                <a class="ios-row has-badge" href="detail.html?item=status" data-detail-item="status">
-                    <div class="ios-row-title">
-                        <div class="ios-badge badge-green">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                        </div>
-                        <span id="label-status">網站狀態</span>
+    <!-- iOS Inset Grouped Settings Container (Image 3 Specification) -->
+    <div class="ios-group-container">
+        <!-- Section 1: Announcements -->
+        <div class="ios-section-header" id="sec-announcements">堂務公告 (ANNOUNCEMENTS)</div>
+        <div class="ios-card">
+            <a class="ios-row has-badge" href="detail.html?item=status">
+                <div class="ios-row-title">
+                    <div class="ios-badge badge-green">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                     </div>
-                    <div class="ios-row-accessory">
-                        <span class="ios-row-value" id="val-status">運行正常</span>
-                        <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                    <span id="label-status">網站狀態</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <span class="ios-row-value" id="val-status">運行正常</span>
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </a>
+            <a class="ios-row has-badge" href="detail.html?item=memorial">
+                <div class="ios-row-title">
+                    <div class="ios-badge badge-orange">
+                        <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
                     </div>
-                </a>
-                <a class="ios-row has-badge" href="detail.html?item=memorial" data-detail-item="memorial">
-                    <div class="ios-row-title">
-                        <div class="ios-badge badge-orange">
-                            <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
-                        </div>
-                        <span id="label-memorial">紀念日</span>
+                    <span id="label-memorial">紀念日</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <span class="ios-row-value" id="val-memorial">重要典禮</span>
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </a>
+            <a class="ios-row has-badge" href="detail.html?item=ukraine">
+                <div class="ios-row-title">
+                    <div class="ios-badge badge-blue">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
                     </div>
-                    <div class="ios-row-accessory">
-                        <span class="ios-row-value" id="val-memorial">重要典禮</span>
-                        <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-                    </div>
-                </a>
-                <a class="ios-row has-badge" href="detail.html?item=ukraine" data-detail-item="ukraine">
-                    <div class="ios-row-title">
-                        <div class="ios-badge badge-blue">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-                        </div>
-                        <span id="label-ukraine">聲援烏克蘭</span>
-                    </div>
-                    <div class="ios-row-accessory">
-                        <span class="ios-row-value" id="val-ukraine">和平聲明</span>
-                        <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-                    </div>
-                </a>
-            </div>
+                    <span id="label-ukraine">聲援烏克蘭</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <span class="ios-row-value" id="val-ukraine">和平聲明</span>
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </a>
         </div>
-    </div>
 
-    <!-- iOS Subpage Sheet Layer (Native In-Page Transition, Zero Reload) -->
-    <div class="ios-subpage-sheet" id="announcement-detail-sheet">
-        <div class="markdown-container loaded">
-            <zero-md id="sheet-md-viewer" src="./status_tc.md">
-                <template>
-                    <link rel="stylesheet" href="../../css/github-markdown-dark.css">
-                    <style>
-                        .markdown-body { background-color: transparent !important; }
-                    </style>
-                </template>
-            </zero-md>
-        </div>
     </div>
 
     <!-- Apple Native Bottom Tab Bar -->
@@ -146,7 +123,7 @@
     </nav>
 
     <script type="module">
-        import { initSubpage } from '../../js/subpage.js?v=20260905g';
+        import { initSubpage } from '../../js/subpage.js?v=20260905i';
         import { getCurrentLang, setGlobalLang } from '../../js/modules/i18n.js?v=2025';
         import { syncStandaloneTabBar } from '../../js/modules/tab-bar.js?v=2025';
 
@@ -175,43 +152,12 @@
             }
         };
 
-        const itemConfigs = {
-            status: {
-                tc: { title: '網站狀態', pageTitle: '網站狀態 - 私立中山紀念堂', src: './status_tc.md' },
-                sc: { title: '网站状态', pageTitle: '网站状态 - 私立中山纪念堂', src: './status_sc.md' }
-            },
-            memorial: {
-                tc: { title: '紀念日', pageTitle: '紀念日 - 私立中山紀念堂', src: './memorial_tc.md' },
-                sc: { title: '纪念日', pageTitle: '纪念日 - 私立中山纪念堂', src: './memorial_sc.md' }
-            },
-            ukraine: {
-                tc: { title: '聲援烏克蘭', pageTitle: '聲援烏克蘭 - 私立中山紀念堂', src: './Ukraine_tc.md' },
-                sc: { title: '声援乌克兰', pageTitle: '声援乌克兰 - 私立中山纪念堂', src: './Ukraine_sc.md' }
-            },
-            Ukraine: {
-                tc: { title: '聲援烏克蘭', pageTitle: '聲援烏克蘭 - 私立中山紀念堂', src: './Ukraine_tc.md' },
-                sc: { title: '声援乌克兰', pageTitle: '声援乌克兰 - 私立中山纪念堂', src: './Ukraine_sc.md' }
-            }
-        };
-
-        let currentDetailItem = null;
-        let isSheetTransitioning = false;
-
-        const masterContainer = document.getElementById('ios-master-container');
-        const detailSheet = document.getElementById('announcement-detail-sheet');
-        const sheetMdViewer = document.getElementById('sheet-md-viewer');
-        const navBackLink = document.getElementById('nav-back-link');
-        const navBackText = document.getElementById('nav-back-text');
-        const topNavTitle = document.getElementById('top-nav-title');
-        const subpageNavTitle = document.getElementById('subpage-nav-title');
-        const pageTitleEl = document.getElementById('page-title');
-
         function syncAnnouncementTexts(lang) {
             const s = announcementStrings[lang] || announcementStrings.tc;
-            if (!currentDetailItem) {
-                if (pageTitleEl) pageTitleEl.textContent = s.pageTitle;
-                if (topNavTitle) topNavTitle.textContent = s.topTitle;
-            }
+            const pageTitle = document.getElementById('page-title');
+            if (pageTitle) pageTitle.textContent = s.pageTitle;
+            const topNavTitle = document.getElementById('top-nav-title');
+            if (topNavTitle) topNavTitle.textContent = s.topTitle;
 
             const secAnn = document.getElementById('sec-announcements');
             if (secAnn) secAnn.textContent = s.secAnnounce;
@@ -232,366 +178,6 @@
             if (valUkraine) valUkraine.textContent = s.valUkraine;
         }
 
-        /* ====================================================================
-         * Sheet Open Animation (Native iOS Forward Push)
-         * ==================================================================== */
-        function openDetailSheet(itemKey, pushHistory = true) {
-            if (isSheetTransitioning) return;
-            const config = itemConfigs[itemKey] || itemConfigs.status;
-            currentDetailItem = itemKey;
-            isSheetTransitioning = true;
-
-            const lang = getCurrentLang();
-            const localized = config[lang] || config.tc;
-
-            if (subpageNavTitle) subpageNavTitle.textContent = localized.title;
-            if (pageTitleEl) pageTitleEl.textContent = localized.pageTitle;
-            if (sheetMdViewer) {
-                if (sheetMdViewer.getAttribute('src') !== localized.src) {
-                    sheetMdViewer.setAttribute('src', localized.src);
-                }
-            }
-
-            if (pushHistory) {
-                try {
-                    history.pushState({ item: itemKey }, '', 'detail.html?item=' + itemKey);
-                } catch (e) {
-                    /* History fallback */
-                }
-            }
-
-            detailSheet.scrollTop = 0;
-            detailSheet.style.display = 'block';
-            detailSheet.style.transform = 'translate3d(100%, 0, 0)';
-            detailSheet.classList.remove('active', 'sliding-out');
-
-            navBackLink.style.display = 'flex';
-            subpageNavTitle.style.display = 'flex';
-            topNavTitle.style.display = 'none';
-
-            const chevronSvg = navBackLink.querySelector('svg');
-            if (chevronSvg) chevronSvg.classList.add('ios-nav-chevron-enter');
-
-            /* Compute dynamic center offset for back label entering from center */
-            const rect = navBackText.getBoundingClientRect();
-            const currentCenterX = rect.left + rect.width / 2;
-            const screenCenterX = window.innerWidth / 2;
-            const offset = screenCenterX - currentCenterX;
-            navBackText.style.setProperty('--nav-center-offset', offset + 'px');
-            navBackText.classList.add('ios-nav-label-sliding-from-center');
-
-            subpageNavTitle.classList.add('ios-nav-title-enter');
-
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    detailSheet.classList.add('animating');
-                    detailSheet.style.transform = 'translate3d(0, 0, 0)';
-                    masterContainer.classList.add('pushed');
-
-                    if (chevronSvg) {
-                        chevronSvg.classList.remove('ios-nav-chevron-enter');
-                        chevronSvg.classList.add('ios-nav-chevron-enter-active');
-                    }
-
-                    subpageNavTitle.classList.remove('ios-nav-title-enter');
-                    subpageNavTitle.classList.add('ios-nav-title-enter-active');
-
-                    setTimeout(() => {
-                        detailSheet.classList.remove('animating');
-                        detailSheet.classList.add('active');
-                        detailSheet.style.transform = '';
-
-                        if (chevronSvg) chevronSvg.classList.remove('ios-nav-chevron-enter-active');
-                        navBackText.classList.remove('ios-nav-label-sliding-from-center');
-                        navBackText.style.removeProperty('--nav-center-offset');
-                        subpageNavTitle.classList.remove('ios-nav-title-enter-active');
-                        isSheetTransitioning = false;
-                    }, 280);
-                });
-            });
-        }
-
-        /* ====================================================================
-         * Sheet Close Animation (Native iOS Settings Return Transition)
-         * ==================================================================== */
-        function closeDetailSheet(pushHistory = true) {
-            if (isSheetTransitioning || !currentDetailItem) return;
-            isSheetTransitioning = true;
-
-            const chevronSvg = navBackLink.querySelector('svg');
-
-            /* Dynamically compute exact center offset for the back text */
-            const rect = navBackText.getBoundingClientRect();
-            const currentCenterX = rect.left + rect.width / 2;
-            const screenCenterX = window.innerWidth / 2;
-            const offset = screenCenterX - currentCenterX;
-            navBackText.style.setProperty('--nav-center-offset', offset + 'px');
-
-            /* Trigger authentic Apple Settings nav animations */
-            if (chevronSvg) chevronSvg.classList.add('ios-nav-chevron-exit');
-            subpageNavTitle.classList.add('ios-nav-title-exit');
-            navBackText.classList.add('ios-nav-label-sliding-center');
-
-            /* Slide out detail sheet and restore parent container */
-            detailSheet.classList.remove('active');
-            detailSheet.classList.add('sliding-out');
-            masterContainer.classList.remove('pushed');
-
-            if (pushHistory) {
-                try {
-                    history.pushState(null, '', 'announcement.html');
-                } catch (e) {
-                    /* History fallback */
-                }
-            }
-
-            const lang = getCurrentLang();
-            const s = announcementStrings[lang] || announcementStrings.tc;
-            if (pageTitleEl) pageTitleEl.textContent = s.pageTitle;
-
-            setTimeout(() => {
-                detailSheet.style.display = 'none';
-                detailSheet.classList.remove('sliding-out');
-                detailSheet.style.transform = '';
-
-                navBackLink.style.display = 'none';
-                if (chevronSvg) chevronSvg.classList.remove('ios-nav-chevron-exit');
-                navBackText.classList.remove('ios-nav-label-sliding-center');
-                navBackText.style.removeProperty('--nav-center-offset');
-
-                subpageNavTitle.style.display = 'none';
-                subpageNavTitle.classList.remove('ios-nav-title-exit');
-                topNavTitle.style.display = 'flex';
-
-                currentDetailItem = null;
-                isSheetTransitioning = false;
-            }, 280);
-        }
-
-        /* ====================================================================
-         * Left-Edge Interactive Swipe Gesture for Detail Sheet
-         * ==================================================================== */
-        let sheetTouchStartX = 0;
-        let sheetTouchStartY = 0;
-        let sheetTouchStartTime = 0;
-        let isSheetEdgeTracking = false;
-        let isSheetSwiping = false;
-
-        function stopSheetTracking() {
-            isSheetEdgeTracking = false;
-            isSheetSwiping = false;
-            window.removeEventListener('touchmove', onSheetTouchMove);
-        }
-
-        function onSheetTouchStart(e) {
-            if (isSheetTransitioning || !currentDetailItem || e.touches.length !== 1) return;
-            const touch = e.touches[0];
-            if (touch.clientY < 60 || (e.target && e.target.closest && e.target.closest('.apple-top-nav, .apple-tab-bar'))) {
-                return;
-            }
-            if (touch.clientX <= 25) {
-                sheetTouchStartX = touch.clientX;
-                sheetTouchStartY = touch.clientY;
-                sheetTouchStartTime = Date.now();
-                isSheetEdgeTracking = true;
-                isSheetSwiping = false;
-                window.addEventListener('touchmove', onSheetTouchMove, { passive: false });
-            }
-        }
-
-        function onSheetTouchMove(e) {
-            if (!isSheetEdgeTracking || e.touches.length !== 1) return;
-            const touch = e.touches[0];
-            const deltaX = touch.clientX - sheetTouchStartX;
-            const deltaY = touch.clientY - sheetTouchStartY;
-
-            if (!isSheetSwiping) {
-                if (Math.abs(deltaY) > Math.abs(deltaX)) {
-                    stopSheetTracking();
-                    return;
-                }
-                if (deltaX > 8 && Math.abs(deltaX) > Math.abs(deltaY)) {
-                    isSheetSwiping = true;
-                    detailSheet.classList.add('ios-content-dragging');
-                    masterContainer.style.transition = 'none';
-                }
-            }
-
-            if (isSheetSwiping) {
-                if (e.cancelable) e.preventDefault();
-                const currentX = Math.max(0, deltaX);
-                const screenWidth = window.innerWidth || 375;
-                const progress = Math.min(1, currentX / screenWidth);
-
-                detailSheet.style.transform = 'translate3d(' + currentX + 'px, 0, 0)';
-                const masterPercent = -30 * (1 - progress);
-                masterContainer.style.transform = 'translate3d(' + masterPercent + '%, 0, 0)';
-                masterContainer.style.opacity = String(0.8 + 0.2 * progress);
-
-                const chevronSvg = navBackLink.querySelector('svg');
-                if (chevronSvg) {
-                    chevronSvg.style.transform = 'translate3d(' + (-14 * progress) + 'px, 0, 0)';
-                    chevronSvg.style.opacity = String(1 - progress);
-                }
-
-                const rect = navBackText.getBoundingClientRect();
-                const currentCenterX = rect.left + rect.width / 2;
-                const screenCenterX = window.innerWidth / 2;
-                const targetOffset = screenCenterX - currentCenterX;
-                navBackText.style.transform = 'translate3d(' + (targetOffset * progress) + 'px, 0, 0)';
-                if (progress < 0.35) {
-                    navBackText.style.opacity = String(1 - (progress / 0.35));
-                    navBackText.style.color = '';
-                    navBackText.style.fontWeight = '';
-                } else if (progress < 0.65) {
-                    navBackText.style.opacity = '0';
-                } else {
-                    navBackText.style.opacity = String((progress - 0.65) / 0.35);
-                    const isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-                    navBackText.style.color = isLight ? '#000000' : '#ffffff';
-                    navBackText.style.fontWeight = '600';
-                }
-
-                if (subpageNavTitle) {
-                    subpageNavTitle.style.transform = 'translate3d(' + (60 * progress) + 'px, 0, 0)';
-                    subpageNavTitle.style.opacity = String(1 - progress);
-                }
-            }
-        }
-
-        function onSheetTouchEnd(e) {
-            if (!isSheetEdgeTracking && !isSheetSwiping) {
-                window.removeEventListener('touchmove', onSheetTouchMove);
-                return;
-            }
-            const wasSwiping = isSheetSwiping;
-            stopSheetTracking();
-            if (!wasSwiping) return;
-
-            const touch = e.changedTouches[0];
-            const deltaX = touch ? (touch.clientX - sheetTouchStartX) : 0;
-            const elapsed = Math.max(1, Date.now() - sheetTouchStartTime);
-            const velocity = deltaX / elapsed;
-            const screenWidth = window.innerWidth || 375;
-            const shouldCommit = (deltaX > screenWidth * 0.3) || (deltaX > 40 && velocity > 0.35);
-
-            detailSheet.classList.remove('ios-content-dragging');
-
-            if (shouldCommit) {
-                closeDetailSheet(true);
-            } else {
-                /* Snap back to opened sheet */
-                detailSheet.style.transition = 'transform 0.24s cubic-bezier(0.2, 0.9, 0.3, 1)';
-                detailSheet.style.transform = 'translate3d(0, 0, 0)';
-
-                masterContainer.style.transition = 'transform 0.24s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.24s ease';
-                masterContainer.style.transform = 'translate3d(-30%, 0, 0)';
-                masterContainer.style.opacity = '0.8';
-
-                const chevronSvg = navBackLink.querySelector('svg');
-                if (chevronSvg) {
-                    chevronSvg.style.transition = 'transform 0.24s ease, opacity 0.24s ease';
-                    chevronSvg.style.transform = 'translate3d(0, 0, 0)';
-                    chevronSvg.style.opacity = '1';
-                }
-                navBackText.style.transition = 'transform 0.24s ease, opacity 0.24s ease, color 0.2s ease';
-                navBackText.style.transform = 'translate3d(0, 0, 0)';
-                navBackText.style.opacity = '1';
-                navBackText.style.color = '';
-                navBackText.style.fontWeight = '';
-
-                if (subpageNavTitle) {
-                    subpageNavTitle.style.transition = 'transform 0.24s ease, opacity 0.24s ease';
-                    subpageNavTitle.style.transform = 'translate3d(0, 0, 0)';
-                    subpageNavTitle.style.opacity = '1';
-                }
-
-                setTimeout(() => {
-                    detailSheet.style.transition = '';
-                    detailSheet.style.transform = '';
-                    masterContainer.style.transition = '';
-                    masterContainer.style.transform = '';
-                    masterContainer.style.opacity = '';
-                    if (chevronSvg) {
-                        chevronSvg.style.transition = '';
-                        chevronSvg.style.transform = '';
-                        chevronSvg.style.opacity = '';
-                    }
-                    navBackText.style.transition = '';
-                    navBackText.style.transform = '';
-                    navBackText.style.opacity = '';
-                    navBackText.style.color = '';
-                    navBackText.style.fontWeight = '';
-                    if (subpageNavTitle) {
-                        subpageNavTitle.style.transition = '';
-                        subpageNavTitle.style.transform = '';
-                        subpageNavTitle.style.opacity = '';
-                    }
-                }, 250);
-            }
-        }
-
-        window.addEventListener('touchstart', onSheetTouchStart, { passive: true });
-        window.addEventListener('touchend', onSheetTouchEnd, { passive: true });
-        window.addEventListener('touchcancel', onSheetTouchEnd, { passive: true });
-
-        /* ====================================================================
-         * Event Listeners (Clicks, History, Language, Dark/Light Mode)
-         * ==================================================================== */
-        const announcementRows = document.querySelectorAll('.ios-row[data-detail-item]');
-        announcementRows.forEach(row => {
-            row.addEventListener('click', (e) => {
-                e.preventDefault();
-                const item = row.getAttribute('data-detail-item');
-                if (item) {
-                    openDetailSheet(item, true);
-                }
-            });
-        });
-
-        if (navBackLink) {
-            navBackLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                closeDetailSheet(true);
-            });
-        }
-
-        window.addEventListener('popstate', (e) => {
-            if (e.state && e.state.item) {
-                openDetailSheet(e.state.item, false);
-            } else {
-                const params = new URLSearchParams(window.location.search);
-                const item = params.get('item');
-                if (item && itemConfigs[item]) {
-                    openDetailSheet(item, false);
-                } else if (currentDetailItem) {
-                    closeDetailSheet(false);
-                }
-            }
-        });
-
-        /* Zero-MD theme updates */
-        const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: light)');
-        function updateSheetMarkdownTheme() {
-            if (!sheetMdViewer) return;
-            const isLight = colorSchemeQuery.matches;
-            const template = sheetMdViewer.querySelector('template');
-            if (template) {
-                const link = template.content.querySelector('link');
-                if (link) {
-                    link.href = isLight
-                        ? '../../css/github-markdown.css'
-                        : '../../css/github-markdown-dark.css';
-                }
-            }
-            const currentSrc = sheetMdViewer.getAttribute('src');
-            if (currentSrc) {
-                sheetMdViewer.removeAttribute('src');
-                requestAnimationFrame(() => sheetMdViewer.setAttribute('src', currentSrc));
-            }
-        }
-        colorSchemeQuery.addEventListener('change', updateSheetMarkdownTheme);
-
         initSubpage({
             activeBottomTab: 'announcement',
             basePath: '../../'
@@ -599,38 +185,9 @@
 
         syncStandaloneTabBar();
         syncAnnouncementTexts(getCurrentLang());
-
-        /* Handle direct URL visits with ?item= parameter */
-        const urlParams = new URLSearchParams(window.location.search);
-        const initialItem = urlParams.get('item');
-        if (initialItem && itemConfigs[initialItem]) {
-            currentDetailItem = initialItem;
-            const config = itemConfigs[initialItem];
-            const lang = getCurrentLang();
-            const localized = config[lang] || config.tc;
-
-            if (subpageNavTitle) subpageNavTitle.textContent = localized.title;
-            if (pageTitleEl) pageTitleEl.textContent = localized.pageTitle;
-            if (sheetMdViewer) sheetMdViewer.setAttribute('src', localized.src);
-
-            detailSheet.style.display = 'block';
-            detailSheet.classList.add('active');
-            masterContainer.classList.add('pushed');
-
-            navBackLink.style.display = 'flex';
-            subpageNavTitle.style.display = 'flex';
-            topNavTitle.style.display = 'none';
-        }
-
         window.addEventListener('sys-lang-change', (e) => {
-            const lang = e.detail && e.detail.lang ? e.detail.lang : getCurrentLang();
-            syncAnnouncementTexts(lang);
-            if (currentDetailItem) {
-                const config = itemConfigs[currentDetailItem] || itemConfigs.status;
-                const localized = config[lang] || config.tc;
-                if (subpageNavTitle) subpageNavTitle.textContent = localized.title;
-                if (pageTitleEl) pageTitleEl.textContent = localized.pageTitle;
-                if (sheetMdViewer) sheetMdViewer.setAttribute('src', localized.src);
+            if (e.detail && e.detail.lang) {
+                syncAnnouncementTexts(e.detail.lang);
             }
         });
     </script>

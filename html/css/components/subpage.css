@@ -231,6 +231,18 @@ body {
     transition: transform 0.24s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.24s ease !important;
 }
 
+.ios-nav-back-enter {
+    transform: translate3d(-10px, 0, 0) !important;
+    opacity: 0 !important;
+    transition: none !important;
+}
+
+.ios-nav-back-enter-active {
+    transform: translate3d(0, 0, 0) !important;
+    opacity: 1 !important;
+    transition: transform 0.24s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.24s ease !important;
+}
+
 /* ============================================================================
  * Apple Native In-Page Subpage Sheet & Master Container
  * ============================================================================ */
@@ -714,7 +726,9 @@ body {
     letter-spacing: 0.2px;
 }
 
-/* iOS Settings App Icon Badges (Image 2 Specification) */
+/* ============================================================================
+ * iOS Settings App Icon Badges (iOS 18 Dark & Light Specification)
+ * ============================================================================ */
 .ios-badge {
     width: 28px;
     height: 28px;
@@ -723,26 +737,30 @@ body {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    color: #ffffff !important;
+    box-sizing: border-box;
+    /* Dark Mode (Default): Dark background with subtle white border ring */
+    background: #1c1c1e !important;
+    box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.18), 0 1px 2px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .ios-badge svg {
     width: 17px;
     height: 17px;
-    fill: #ffffff !important;
-    color: #ffffff !important;
     stroke: none;
+    transition: fill 0.2s ease, color 0.2s ease;
 }
 
-.ios-badge.badge-blue   { background-color: #007aff; color: #ffffff !important; }
-.ios-badge.badge-purple { background-color: #5856d6; color: #ffffff !important; }
-.ios-badge.badge-red    { background-color: #ff2d55; color: #ffffff !important; }
-.ios-badge.badge-orange { background-color: #ff9500; color: #ffffff !important; }
-.ios-badge.badge-green  { background-color: #34c759; color: #ffffff !important; }
-.ios-badge.badge-gray   { background-color: #8e8e93; color: #ffffff !important; }
-.ios-badge.badge-dark   { background-color: #3a3a3c; color: #ffffff !important; }
-.ios-badge.badge-teal   { background-color: #00c7be; color: #ffffff !important; }
-.ios-badge.badge-indigo { background-color: #5856d6; color: #ffffff !important; }
+/* Dark Mode: The glyph takes the accent theme color */
+.ios-badge.badge-blue svg   { fill: #0a84ff !important; color: #0a84ff !important; }
+.ios-badge.badge-purple svg { fill: #bf5af2 !important; color: #bf5af2 !important; }
+.ios-badge.badge-red svg    { fill: #ff453a !important; color: #ff453a !important; }
+.ios-badge.badge-orange svg { fill: #ff9f0a !important; color: #ff9f0a !important; }
+.ios-badge.badge-green svg  { fill: #30d158 !important; color: #30d158 !important; }
+.ios-badge.badge-teal svg   { fill: #64d2ff !important; color: #64d2ff !important; }
+.ios-badge.badge-indigo svg { fill: #5e5ce6 !important; color: #5e5ce6 !important; }
+.ios-badge.badge-gray svg   { fill: #98989d !important; color: #98989d !important; }
+.ios-badge.badge-dark svg   { fill: #ebebf5 !important; color: #ebebf5 !important; }
 
 .ios-row.has-badge:not(:last-child)::after {
     left: 56px;
@@ -879,11 +897,6 @@ body {
     padding: 8px 16px 0 16px;
 }
 
-/* Badge Color Themes */
-.badge-green { background: linear-gradient(135deg, #34c759 0%, #28cd41 100%) !important; color: #ffffff !important; }
-.badge-orange { background: linear-gradient(135deg, #ff9500 0%, #ff9f0a 100%) !important; color: #ffffff !important; }
-.badge-teal { background: linear-gradient(135deg, #30b0c7 0%, #00c7be 100%) !important; color: #ffffff !important; }
-.badge-indigo { background: linear-gradient(135deg, #5856d6 0%, #3634a3 100%) !important; color: #ffffff !important; }
 
 /* ============================================================================
  * Responsive Viewport Rules
@@ -1079,6 +1092,26 @@ body {
     .ios-option-item:not(:last-child) {
         border-bottom-color: rgba(0, 0, 0, 0.06);
     }
+
+    /* Light Mode: Classic Apple Colored Background + Pure White Glyph */
+    .ios-badge {
+        box-shadow: none !important;
+    }
+
+    .ios-badge svg {
+        fill: #ffffff !important;
+        color: #ffffff !important;
+    }
+
+    .ios-badge.badge-blue   { background-color: #007aff !important; }
+    .ios-badge.badge-purple { background-color: #5856d6 !important; }
+    .ios-badge.badge-red    { background-color: #ff2d55 !important; }
+    .ios-badge.badge-orange { background-color: #ff9500 !important; }
+    .ios-badge.badge-green  { background-color: #34c759 !important; }
+    .ios-badge.badge-teal   { background-color: #00c7be !important; }
+    .ios-badge.badge-indigo { background-color: #5856d6 !important; }
+    .ios-badge.badge-gray   { background-color: #8e8e93 !important; }
+    .ios-badge.badge-dark   { background-color: #3a3a3c !important; }
 
     .ios-underlay-layer {
         background-color: #f2f2f7;

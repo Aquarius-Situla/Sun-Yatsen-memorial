@@ -29,21 +29,8 @@ export function initIOSNavTransition(options = {}) {
     }
 
     /* ========================================================================
-     * Section 1: Hub & Parent Page Handling (Snapshot Caching & Forward Push)
+     * Section 1: Forward Push Intent Listener (Row Clicks)
      * ======================================================================== */
-    const currentGroup = document.querySelector('.ios-group-container');
-    if (currentGroup) {
-        try {
-            const sanitizedSnapshot = currentGroup.outerHTML.replace(/\s+id="[^"]*"/g, '');
-            sessionStorage.setItem('sys_last_group_html', sanitizedSnapshot);
-            const pathname = window.location.pathname || '';
-            sessionStorage.setItem('sys_underlay_' + pathname, sanitizedSnapshot);
-        } catch (e) {
-            /* Ignore storage quota or access errors */
-        }
-    }
-
-    /* Attach forward push listener to clickable rows */
     const rowLinks = document.querySelectorAll('.ios-row[href], a.has-subpage-transition[href]');
     for (let i = 0; i < rowLinks.length; i++) {
         const link = rowLinks[i];
@@ -55,12 +42,6 @@ export function initIOSNavTransition(options = {}) {
             e.preventDefault();
 
             try {
-                if (currentGroup) {
-                    const freshSanitized = currentGroup.outerHTML.replace(/\s+id="[^"]*"/g, '');
-                    sessionStorage.setItem('sys_last_group_html', freshSanitized);
-                    const cleanPath = href.split('?')[0].split('#')[0];
-                    sessionStorage.setItem('sys_underlay_' + cleanPath, freshSanitized);
-                }
                 sessionStorage.setItem('sys_nav_action', 'push');
             } catch (err) {
                 /* Storage fallback */
@@ -68,7 +49,7 @@ export function initIOSNavTransition(options = {}) {
 
             prefetchUrl(href);
 
-            /* Immediately navigate without prematurely shifting the parent view */
+            /* Navigate cleanly without premature parent shifting */
             window.location.href = href;
         });
     }
@@ -76,25 +57,31 @@ export function initIOSNavTransition(options = {}) {
     /* ========================================================================
      * Section 2: Subpage Detection & Verification
      * ======================================================================== */
-    const navBackBtn = document.querySelector(backButtonSelector);
+    const navBackBtn = document.querySelector('.apple-top-nav .nav-back-link');
     const desktopBackBtn = document.querySelector(desktopBackButtonSelector);
 
-    /* If no back button exists on this page, exit early */
-    if (!navBackBtn && !desktopBackBtn) return;
+    /* Hub menu pages should never act as subpages */
+    const isMenuPage = document.body.classList.contains('page-announcement-menu') ||
+                       document.body.classList.contains('page-settings-menu') ||
+                       document.body.classList.contains('page-library-menu') ||
+                       !navBackBtn;
 
-    const navChevron = document.querySelector('.apple-top-nav .nav-back-link svg');
-    const navLabel = document.getElementById('nav-back-text');
+    if (isMenuPage) {
+        try {
+            sessionStorage.removeItem('sys_nav_action');
+        } catch (e) {
+            /* Ignore storage errors */
+        }
+        return;
+    }
+
     const navTitle = document.getElementById('top-nav-title');
 
-    function getContentElements() {
-        return document.querySelectorAll('.festival-hero, .markdown-container, .charts-container, .ios-group-container, .top-back-btn, .lang-toggle-btn');
+    function getSlideElements() {
+        return Array.from(document.querySelectorAll('.festival-hero, .markdown-container, .charts-container, .ios-group-container'));
     }
 
     let isNavigating = false;
-    let underlayLayer = null;
-    let underlayContent = null;
-    let underlayScrim = null;
-    let viewSheet = null;
 
     function getTargetUrl(btn) {
         if (btn && btn.getAttribute('href')) {
@@ -109,85 +96,11 @@ export function initIOSNavTransition(options = {}) {
         return null;
     }
 
-    function getSlideElements() {
-        const list = Array.from(getContentElements());
-        if (viewSheet && list.indexOf(viewSheet) === -1) {
-            list.push(viewSheet);
-        }
-        return list;
-    }
-
-    /* ========================================================================
-     * Section 3: Underlay Parallax Layer Initialization & Seamless Caching
-     * ======================================================================== */
-    function ensureUnderlay(targetUrl) {
-        if (underlayLayer) return;
-        underlayLayer = document.querySelector('.ios-underlay-layer');
-        if (!underlayLayer) {
-            underlayLayer = document.createElement('div');
-            underlayLayer.className = 'ios-underlay-layer ready';
-
-            underlayContent = document.createElement('div');
-            underlayContent.className = 'ios-underlay-content';
-
-            underlayScrim = document.createElement('div');
-            underlayScrim.className = 'ios-underlay-scrim';
-
-            underlayLayer.appendChild(underlayContent);
-            underlayLayer.appendChild(underlayScrim);
-            document.body.prepend(underlayLayer);
-        } else {
-            underlayContent = underlayLayer.querySelector('.ios-underlay-content');
-            underlayScrim = underlayLayer.querySelector('.ios-underlay-scrim');
-        }
-
-        viewSheet = document.querySelector('.ios-view-sheet');
-        if (!viewSheet) {
-            viewSheet = document.createElement('div');
-            viewSheet.className = 'ios-view-sheet';
-            document.body.insertBefore(viewSheet, underlayLayer.nextSibling);
-        }
-
-        /* Populate underlay content with parent cards snapshot */
-        if (underlayContent && underlayContent.children.length === 0) {
-            let cachedHtml = null;
-            try {
-                if (targetUrl) {
-                    const cleanPath = targetUrl.split('?')[0].split('#')[0];
-                    cachedHtml = sessionStorage.getItem('sys_underlay_' + cleanPath);
-                }
-                if (!cachedHtml) {
-                    cachedHtml = sessionStorage.getItem('sys_last_group_html');
-                }
-            } catch (e) {
-                cachedHtml = null;
-            }
-
-            if (cachedHtml) {
-                underlayContent.innerHTML = cachedHtml.replace(/\s+id="[^"]*"/g, '');
-            } else if (targetUrl && window.fetch) {
-                /* Asynchronously fetch parent page HTML in background to populate underlay */
-                fetch(targetUrl)
-                    .then(function(res) { return res.text(); })
-                    .then(function(html) {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const remoteGroup = doc.querySelector('.ios-group-container');
-                        if (remoteGroup && underlayContent && underlayContent.children.length === 0) {
-                            underlayContent.innerHTML = remoteGroup.outerHTML.replace(/\s+id="[^"]*"/g, '');
-                        }
-                    })
-                    .catch(function() {});
-            }
-        }
-    }
-
     const initialTarget = getTargetUrl(navBackBtn || desktopBackBtn);
-    ensureUnderlay(initialTarget);
     prefetchUrl(initialTarget);
 
     /* ========================================================================
-     * Section 4: Forward Push Entrance Animation Execution
+     * Section 3: Forward Push Entrance Animation Execution
      * ======================================================================== */
     let isForwardPush = false;
     try {
@@ -205,17 +118,7 @@ export function initIOSNavTransition(options = {}) {
             enterElements[i].classList.add('ios-content-entering');
         }
         if (navTitle) navTitle.classList.add('ios-nav-title-enter');
-        if (navChevron) navChevron.classList.add('ios-nav-back-enter');
-        if (navLabel) navLabel.classList.add('ios-nav-back-enter');
-
-        if (underlayLayer) {
-            underlayLayer.style.transform = 'translate3d(0, 0, 0)';
-            underlayLayer.style.transition = 'none';
-        }
-        if (underlayScrim) {
-            underlayScrim.style.opacity = '0';
-            underlayScrim.style.transition = 'none';
-        }
+        if (navBackBtn) navBackBtn.classList.add('ios-nav-back-enter');
 
         requestAnimationFrame(function() {
             requestAnimationFrame(function() {
@@ -223,78 +126,58 @@ export function initIOSNavTransition(options = {}) {
                     enterElements[i].classList.remove('ios-content-entering');
                     enterElements[i].classList.add('ios-content-enter-active');
                 }
-                if (navTitle) navTitle.classList.add('ios-nav-title-enter-active');
-                if (navChevron) navChevron.classList.add('ios-nav-back-enter-active');
-                if (navLabel) navLabel.classList.add('ios-nav-back-enter-active');
-
-                if (underlayLayer) {
-                    underlayLayer.style.transition = 'transform 0.28s cubic-bezier(0.32, 0.72, 0, 1)';
-                    underlayLayer.style.transform = 'translate3d(-30%, 0, 0)';
+                if (navTitle) {
+                    navTitle.classList.remove('ios-nav-title-enter');
+                    navTitle.classList.add('ios-nav-title-enter-active');
                 }
-                if (underlayScrim) {
-                    underlayScrim.style.transition = 'opacity 0.28s cubic-bezier(0.32, 0.72, 0, 1)';
-                    underlayScrim.style.opacity = '0.3';
+                if (navBackBtn) {
+                    navBackBtn.classList.remove('ios-nav-back-enter');
+                    navBackBtn.classList.add('ios-nav-back-enter-active');
                 }
 
                 setTimeout(function() {
                     for (let i = 0; i < enterElements.length; i++) {
                         enterElements[i].classList.remove('ios-content-enter-active');
                     }
-                    if (navTitle) navTitle.classList.remove('ios-nav-title-enter', 'ios-nav-title-enter-active');
-                    if (navChevron) navChevron.classList.remove('ios-nav-back-enter', 'ios-nav-back-enter-active');
-                    if (navLabel) navLabel.classList.remove('ios-nav-back-enter', 'ios-nav-back-enter-active');
-                    if (underlayLayer) underlayLayer.style.transition = '';
-                    if (underlayScrim) underlayScrim.style.transition = '';
-                }, 300);
+                    if (navTitle) navTitle.classList.remove('ios-nav-title-enter-active');
+                    if (navBackBtn) navBackBtn.classList.remove('ios-nav-back-enter-active');
+                }, 320);
             });
         });
     }
 
     /* ========================================================================
-     * Section 5: Navigation Exit Transition (Button Trigger)
+     * Section 4: Pop Exit Transition (Button Trigger)
      * ======================================================================== */
     function triggerPopTransition(targetUrl) {
         if (isNavigating || !targetUrl) return;
         isNavigating = true;
 
         prefetchUrl(targetUrl);
-        ensureUnderlay(targetUrl);
 
-        /* Animate nav bar micro-interactions */
-        if (navChevron) navChevron.classList.add('ios-nav-chevron-exit');
-        if (navTitle) navTitle.classList.add('ios-nav-title-exit');
-        if (navLabel) {
-            const rect = navLabel.getBoundingClientRect();
-            const currentCenterX = rect.left + rect.width / 2;
-            const screenCenterX = window.innerWidth / 2;
-            const offset = screenCenterX - currentCenterX;
-            navLabel.style.setProperty('--nav-center-offset', offset + 'px');
-            navLabel.classList.add('ios-nav-label-sliding-center');
+        if (navBackBtn) {
+            navBackBtn.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
+            navBackBtn.style.opacity = '0';
+            navBackBtn.style.transform = 'translate3d(-10px, 0, 0)';
+        }
+        if (navTitle) {
+            navTitle.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
+            navTitle.style.opacity = '0';
+            navTitle.style.transform = 'translate3d(30px, 0, 0)';
         }
 
-        /* Animate view sheet and page content sliding out to the right */
         const slideElements = getSlideElements();
         for (let i = 0; i < slideElements.length; i++) {
             slideElements[i].classList.add('ios-content-sliding-out');
         }
 
-        /* Animate underlay sliding into position and fade scrim */
-        if (underlayLayer) {
-            underlayLayer.classList.add('ios-underlay-sliding-in');
-        }
-        if (underlayScrim) {
-            underlayScrim.style.opacity = '0';
-        }
-
-        /* Navigate when exit animation completes */
         setTimeout(function() {
             window.location.href = targetUrl;
-        }, 220);
+        }, 210);
 
-        /* Fallback guarantee */
         setTimeout(function() {
             window.location.href = targetUrl;
-        }, 500);
+        }, 450);
     }
 
     function attachClickHandler(btn) {
@@ -334,7 +217,7 @@ export function initIOSNavTransition(options = {}) {
     }
 
     /* ========================================================================
-     * Section 6: Interactive Left-Edge Swipe Gesture (iOS Native Pop)
+     * Section 5: Interactive Left-Edge Swipe Gesture (iOS Native Pop)
      * ======================================================================== */
     let touchStartX = 0;
     let touchStartY = 0;
@@ -352,13 +235,10 @@ export function initIOSNavTransition(options = {}) {
         if (isNavigating || e.touches.length !== 1) return;
 
         const touch = e.touches[0];
-
-        /* Never intercept touches on navigation headers or buttons */
         if (touch.clientY < 60 || (e.target && e.target.closest && e.target.closest('.apple-top-nav, .top-back-btn, .apple-tab-bar'))) {
             return;
         }
 
-        /* Only activate gesture within the left 25px margin */
         if (touch.clientX <= 25) {
             touchStartX = touch.clientX;
             touchStartY = touch.clientY;
@@ -378,14 +258,11 @@ export function initIOSNavTransition(options = {}) {
 
         if (!isSwiping) {
             if (Math.abs(deltaY) > Math.abs(deltaX)) {
-                /* Vertical scroll intent: immediately cancel edge tracking */
                 stopTracking();
                 return;
             }
             if (deltaX > 8 && Math.abs(deltaX) > Math.abs(deltaY)) {
-                /* Horizontal swipe intent confirmed */
                 isSwiping = true;
-                ensureUnderlay(initialTarget);
                 const slideElements = getSlideElements();
                 for (let i = 0; i < slideElements.length; i++) {
                     slideElements[i].classList.add('ios-content-dragging');
@@ -407,46 +284,13 @@ export function initIOSNavTransition(options = {}) {
                 slideElements[i].style.transform = 'translate3d(' + currentX + 'px, 0, 0)';
             }
 
-            /* Underlay parallax sliding from -30% to 0% */
-            if (underlayLayer) {
-                const underlayPercent = -30 * (1 - progress);
-                underlayLayer.style.transform = 'translate3d(' + underlayPercent + '%, 0, 0)';
-                underlayLayer.style.transition = 'none';
-            }
-
-            /* Underlay scrim fade from 0.3 to 0 */
-            if (underlayScrim) {
-                underlayScrim.style.opacity = String(0.3 * (1 - progress));
-                underlayScrim.style.transition = 'none';
-            }
-
-            /* Micro-interactions in the top nav bar */
-            if (navChevron) {
-                navChevron.style.transform = 'translate3d(' + (-14 * progress) + 'px, 0, 0)';
-                navChevron.style.opacity = String(1 - progress);
-            }
-            if (navLabel) {
-                const rect = navLabel.getBoundingClientRect();
-                const currentCenterX = rect.left + rect.width / 2;
-                const screenCenterX = window.innerWidth / 2;
-                const targetOffset = screenCenterX - currentCenterX;
-                navLabel.style.transform = 'translate3d(' + (targetOffset * progress) + 'px, 0, 0)';
-                if (progress < 0.35) {
-                    navLabel.style.opacity = String(1 - (progress / 0.35));
-                    navLabel.style.color = '';
-                    navLabel.style.fontWeight = '';
-                } else if (progress < 0.65) {
-                    navLabel.style.opacity = '0';
-                } else {
-                    navLabel.style.opacity = String((progress - 0.65) / 0.35);
-                    const isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-                    navLabel.style.color = isLight ? '#000000' : '#ffffff';
-                    navLabel.style.fontWeight = '600';
-                }
+            if (navBackBtn) {
+                navBackBtn.style.opacity = String(1 - progress);
+                navBackBtn.style.transform = 'translate3d(' + (-10 * progress) + 'px, 0, 0)';
             }
             if (navTitle) {
-                navTitle.style.transform = 'translate3d(' + (60 * progress) + 'px, 0, 0)';
                 navTitle.style.opacity = String(1 - progress);
+                navTitle.style.transform = 'translate3d(' + (30 * progress) + 'px, 0, 0)';
             }
         }
     }
@@ -479,77 +323,38 @@ export function initIOSNavTransition(options = {}) {
         if (shouldCommit && target) {
             isNavigating = true;
             for (let i = 0; i < slideElements.length; i++) {
-                slideElements[i].style.transition = 'transform 0.22s cubic-bezier(0.32, 0.72, 0, 1)';
+                slideElements[i].style.transition = 'transform 0.2s cubic-bezier(0.32, 0.72, 0, 1)';
                 slideElements[i].style.transform = 'translate3d(100%, 0, 0)';
             }
-
-            if (underlayLayer) {
-                underlayLayer.style.transition = 'transform 0.22s cubic-bezier(0.32, 0.72, 0, 1)';
-                underlayLayer.style.transform = 'translate3d(0, 0, 0)';
-            }
-            if (underlayScrim) {
-                underlayScrim.style.transition = 'opacity 0.22s cubic-bezier(0.32, 0.72, 0, 1)';
-                underlayScrim.style.opacity = '0';
-            }
-
-            if (navChevron) {
-                navChevron.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
-                navChevron.style.transform = 'translate3d(-14px, 0, 0)';
-                navChevron.style.opacity = '0';
-            }
-            if (navLabel) {
-                const rect = navLabel.getBoundingClientRect();
-                const currentCenterX = rect.left + rect.width / 2;
-                const screenCenterX = window.innerWidth / 2;
-                const targetOffset = screenCenterX - currentCenterX;
-                navLabel.style.transition = 'transform 0.2s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.2s ease, color 0.15s ease';
-                navLabel.style.transform = 'translate3d(' + targetOffset + 'px, 0, 0)';
-                const isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-                navLabel.style.color = isLight ? '#000000' : '#ffffff';
-                navLabel.style.fontWeight = '600';
-                navLabel.style.opacity = '1';
+            if (navBackBtn) {
+                navBackBtn.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
+                navBackBtn.style.opacity = '0';
+                navBackBtn.style.transform = 'translate3d(-10px, 0, 0)';
             }
             if (navTitle) {
-                navTitle.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
-                navTitle.style.transform = 'translate3d(60px, 0, 0)';
+                navTitle.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
                 navTitle.style.opacity = '0';
+                navTitle.style.transform = 'translate3d(30px, 0, 0)';
             }
 
             setTimeout(function() {
                 window.location.href = target;
-            }, 210);
+            }, 200);
         } else {
-            /* Cancel pop transition */
+            /* Cancel swipe return */
             for (let i = 0; i < slideElements.length; i++) {
-                slideElements[i].style.transition = 'transform 0.24s cubic-bezier(0.2, 0.9, 0.3, 1)';
+                slideElements[i].style.transition = 'transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1)';
                 slideElements[i].style.transform = 'translate3d(0, 0, 0)';
             }
-
-            if (underlayLayer) {
-                underlayLayer.style.transition = 'transform 0.24s cubic-bezier(0.2, 0.9, 0.3, 1)';
-                underlayLayer.style.transform = 'translate3d(-30%, 0, 0)';
-            }
-            if (underlayScrim) {
-                underlayScrim.style.transition = 'opacity 0.24s cubic-bezier(0.2, 0.9, 0.3, 1)';
-                underlayScrim.style.opacity = '0.3';
-            }
-
-            if (navChevron) {
-                navChevron.style.transition = 'transform 0.24s ease, opacity 0.24s ease';
-                navChevron.style.transform = 'translate3d(0, 0, 0)';
-                navChevron.style.opacity = '1';
-            }
-            if (navLabel) {
-                navLabel.style.transition = 'transform 0.24s ease, opacity 0.24s ease, color 0.2s ease';
-                navLabel.style.transform = 'translate3d(0, 0, 0)';
-                navLabel.style.opacity = '1';
-                navLabel.style.color = '';
-                navLabel.style.fontWeight = '';
+            if (navBackBtn) {
+                navBackBtn.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+                navBackBtn.style.opacity = '1';
+                navBackBtn.style.transform = 'translate3d(0, 0, 0)';
             }
             if (navTitle) {
-                navTitle.style.transition = 'transform 0.24s ease, opacity 0.24s ease';
-                navTitle.style.transform = 'translate3d(0, 0, 0)';
+                navTitle.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
                 navTitle.style.opacity = '1';
+                navTitle.style.transform = 'translate3d(0, 0, 0)';
             }
 
             setTimeout(function() {
@@ -557,30 +362,17 @@ export function initIOSNavTransition(options = {}) {
                     slideElements[i].style.transition = '';
                     slideElements[i].style.transform = '';
                 }
-                if (underlayLayer) {
-                    underlayLayer.style.transition = '';
-                }
-                if (underlayScrim) {
-                    underlayScrim.style.transition = '';
-                }
-                if (navChevron) {
-                    navChevron.style.transition = '';
-                    navChevron.style.transform = '';
-                    navChevron.style.opacity = '';
-                }
-                if (navLabel) {
-                    navLabel.style.transition = '';
-                    navLabel.style.transform = '';
-                    navLabel.style.opacity = '';
-                    navLabel.style.color = '';
-                    navLabel.style.fontWeight = '';
+                if (navBackBtn) {
+                    navBackBtn.style.transition = '';
+                    navBackBtn.style.opacity = '';
+                    navBackBtn.style.transform = '';
                 }
                 if (navTitle) {
                     navTitle.style.transition = '';
-                    navTitle.style.transform = '';
                     navTitle.style.opacity = '';
+                    navTitle.style.transform = '';
                 }
-            }, 250);
+            }, 240);
         }
     }
 
@@ -589,41 +381,26 @@ export function initIOSNavTransition(options = {}) {
     window.addEventListener('touchcancel', onTouchEnd, { passive: true });
 
     /* ========================================================================
-     * Section 7: BFCache & History Restore Handlers
+     * Section 6: BFCache & History Restore Handlers
      * ======================================================================== */
     window.addEventListener('pageshow', function(e) {
         if (e.persisted) {
-            if (navBackBtn) navBackBtn.style.opacity = '';
+            if (navBackBtn) {
+                navBackBtn.style.opacity = '';
+                navBackBtn.style.transform = '';
+                navBackBtn.style.transition = '';
+            }
             if (desktopBackBtn) desktopBackBtn.style.opacity = '';
+            if (navTitle) {
+                navTitle.style.opacity = '';
+                navTitle.style.transform = '';
+                navTitle.style.transition = '';
+            }
             const slideElements = getSlideElements();
             for (let i = 0; i < slideElements.length; i++) {
-                slideElements[i].classList.remove('ios-content-sliding-out', 'ios-content-dragging', 'ios-content-entering', 'ios-content-enter-active', 'ios-parent-pushing-out');
+                slideElements[i].classList.remove('ios-content-sliding-out', 'ios-content-dragging', 'ios-content-entering', 'ios-content-enter-active');
                 slideElements[i].style.transform = '';
                 slideElements[i].style.transition = '';
-            }
-            if (underlayLayer) {
-                underlayLayer.classList.remove('ios-underlay-sliding-in');
-                underlayLayer.style.transform = 'translate3d(-30%, 0, 0)';
-                underlayLayer.style.transition = '';
-            }
-            if (underlayScrim) {
-                underlayScrim.style.opacity = '0.3';
-                underlayScrim.style.transition = '';
-            }
-            if (navChevron) {
-                navChevron.classList.remove('ios-nav-chevron-exit', 'ios-nav-back-enter', 'ios-nav-back-enter-active');
-                navChevron.style.transform = '';
-                navChevron.style.opacity = '';
-            }
-            if (navLabel) {
-                navLabel.classList.remove('ios-nav-label-exit', 'ios-nav-back-enter', 'ios-nav-back-enter-active');
-                navLabel.style.transform = '';
-                navLabel.style.opacity = '';
-            }
-            if (navTitle) {
-                navTitle.classList.remove('ios-nav-title-exit', 'ios-nav-title-enter', 'ios-nav-title-enter-active');
-                navTitle.style.transform = '';
-                navTitle.style.opacity = '';
             }
             isNavigating = false;
         }
