@@ -350,6 +350,25 @@
         }
     }
 
+    /* Apple Fluid Dynamic Sliding Indicator */
+    .desktop-nav-indicator {
+        position: absolute;
+        left: 14px;
+        width: 3.5px;
+        height: 16px;
+        border-radius: 2px;
+        background-color: #fa586a !important;
+        pointer-events: none;
+        z-index: 100;
+        opacity: 0;
+        will-change: top, height, opacity;
+    }
+
+    /* When JS indicator is active, hide the static pseudo-element to avoid duplication */
+    .has-desktop-indicator .desktop-nav-item.active::before {
+        display: none !important;
+    }
+
     /* Sidebar Footer */
     .desktop-sidebar-bottom {
         display: flex;

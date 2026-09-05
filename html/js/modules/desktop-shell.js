@@ -2,7 +2,7 @@
  * Private Sun Yat-sen Memorial Hall — Apple Desktop Shell Controller (desktop-shell.js)
  * ============================================================================
  * COMMENTING STANDARDS
- * 1. Block comments only. Inline comments (//) are strictly prohibited.
+ * 1. Block comments only. Inline comments are strictly prohibited.
  * 2. Section dividers use the === banner format.
  * 3. All prose is written in English.
  * ============================================================================ */
@@ -200,10 +200,34 @@ const SIDEBAR_STRINGS = {
  * Desktop Shell Initialization Controller
  * ============================================================================ */
 export function initDesktopShell(options = {}) {
-    const {
+    let {
         activeTab = 'home',
         basePath = './'
     } = options;
+
+    /* Smart automatic tab detection based on current URL */
+    const path = window.location.pathname.toLowerCase();
+    if (path.includes('/biography/')) {
+        activeTab = 'biography';
+    } else if (path.includes('/events/xinhai/')) {
+        activeTab = 'xinhai';
+    } else if (path.includes('/events/whampoa/')) {
+        activeTab = 'whampoa';
+    } else if (path.includes('/events/mayfourth/')) {
+        activeTab = 'mayfourth';
+    } else if (path.includes('/pages/library/language.html')) {
+        activeTab = 'settings';
+    } else if (path.includes('/pages/library/')) {
+        activeTab = 'library';
+    } else if (path.includes('/pages/settings/')) {
+        activeTab = 'settings';
+    } else if (path.includes('/pages/about/') || path.includes('/pages/thanks/')) {
+        activeTab = 'settings';
+    } else if (path.includes('/pages/announcement/')) {
+        activeTab = 'announcement';
+    } else if (path.includes('index.html') || path.endsWith('/') || path.endsWith('/sys-memorial/')) {
+        activeTab = 'home';
+    }
 
     /* Add layout helper class to body for wide desktop viewports */
     document.body.classList.add('has-desktop-sidebar');
@@ -214,6 +238,9 @@ export function initDesktopShell(options = {}) {
         sidebarEl = createSidebarElement(activeTab, basePath);
         document.body.insertBefore(sidebarEl, document.body.firstChild);
     }
+
+    /* Setup Apple-style dynamic red indicator transition */
+    setupAnimatedNavIndicator(sidebarEl, activeTab);
 
     /* Bind Search Input and Dropdown */
     setupDesktopSearch(sidebarEl, basePath);
@@ -298,23 +325,24 @@ function createSidebarElement(activeTab, basePath) {
             <!-- Subgroup: Historical Exhibitions -->
             <div class="desktop-nav-section">
                 <div class="desktop-nav-header" id="desktop-exhibits-header">${str.exhibitsHeader}</div>
-                <a href="${routes.biography}" class="desktop-nav-item" data-sidebar-tab="biography">
+                <a href="${routes.biography}" class="desktop-nav-item ${activeTab === 'biography' ? 'active' : ''}" data-sidebar-tab="biography">
                     <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
                     <span class="desktop-nav-label" id="label-exhibit-biography">${str.exhibitBiography}</span>
                 </a>
-                <a href="${routes.xinhai}" class="desktop-nav-item" data-sidebar-tab="xinhai">
+                <a href="${routes.xinhai}" class="desktop-nav-item ${activeTab === 'xinhai' ? 'active' : ''}" data-sidebar-tab="xinhai">
                     <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                     <span class="desktop-nav-label" id="label-exhibit-xinhai">${str.exhibitXinhai}</span>
                 </a>
-                <a href="${routes.whampoa}" class="desktop-nav-item" data-sidebar-tab="whampoa">
+                <a href="${routes.whampoa}" class="desktop-nav-item ${activeTab === 'whampoa' ? 'active' : ''}" data-sidebar-tab="whampoa">
                     <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
                     <span class="desktop-nav-label" id="label-exhibit-whampoa">${str.exhibitWhampoa}</span>
                 </a>
-                <a href="${routes.mayfourth}" class="desktop-nav-item" data-sidebar-tab="mayfourth">
+                <a href="${routes.mayfourth}" class="desktop-nav-item ${activeTab === 'mayfourth' ? 'active' : ''}" data-sidebar-tab="mayfourth">
                     <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
                     <span class="desktop-nav-label" id="label-exhibit-mayfourth">${str.exhibitMayfourth}</span>
                 </a>
             </div>
+        </div>
         </div>
 
         <!-- Sidebar Footer Status (Apple Profile Style) -->
@@ -472,4 +500,148 @@ function syncSidebarStatus(sidebarEl) {
 
     update();
     setInterval(update, 2000);
+}
+
+/* ============================================================================
+ * Animated Red Indicator Controller (Apple Fluid Shorten-Glide-Elongate Physics)
+ * ============================================================================ */
+function setupAnimatedNavIndicator(sidebarEl, activeTab) {
+    const topContainer = sidebarEl.querySelector('.desktop-sidebar-top');
+    if (!topContainer) return;
+
+    let indicator = topContainer.querySelector('#desktop-nav-indicator');
+    if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'desktop-nav-indicator';
+        indicator.className = 'desktop-nav-indicator';
+        topContainer.appendChild(indicator);
+    }
+
+    document.body.classList.add('has-desktop-indicator');
+
+    const navItems = sidebarEl.querySelectorAll('.desktop-nav-item');
+    const activeItem = sidebarEl.querySelector(`.desktop-nav-item[data-sidebar-tab="${activeTab}"]`);
+
+    function getItemPosition(itemEl) {
+        if (!itemEl) return null;
+        const itemRect = itemEl.getBoundingClientRect();
+        const parentRect = topContainer.getBoundingClientRect();
+        return itemRect.top - parentRect.top + (itemRect.height - 16) / 2;
+    }
+
+    function moveIndicator(fromY, toY, onFinish) {
+        if (typeof fromY !== 'number' || typeof toY !== 'number') {
+            if (typeof toY === 'number') {
+                indicator.style.top = `${toY}px`;
+                indicator.style.height = '16px';
+                indicator.style.opacity = '1';
+            }
+            if (onFinish) onFinish();
+            return;
+        }
+
+        indicator.style.opacity = '1';
+
+        if (Math.abs(toY - fromY) < 1) {
+            indicator.style.top = `${toY}px`;
+            indicator.style.height = '16px';
+            if (onFinish) onFinish();
+            return;
+        }
+
+        const isDown = toY > fromY;
+        const keyframes = isDown ? [
+            /* 0%: Full length at origin */
+            { top: `${fromY}px`, height: '16px', easing: 'cubic-bezier(0.32, 0.72, 0, 1)' },
+            /* 26%: In place, shorten towards bottom */
+            { top: `${fromY + 12}px`, height: '4px', easing: 'cubic-bezier(0.25, 1, 0.5, 1)' },
+            /* 66%: Move to destination top while compressed */
+            { top: `${toY}px`, height: '4px', easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
+            /* 88%: Slight elastic overshoot elongation */
+            { top: `${toY}px`, height: '17.5px', easing: 'ease-out' },
+            /* 100%: Settle at target 16px */
+            { top: `${toY}px`, height: '16px' }
+        ] : [
+            /* 0%: Full length at origin */
+            { top: `${fromY}px`, height: '16px', easing: 'cubic-bezier(0.32, 0.72, 0, 1)' },
+            /* 26%: In place, shorten towards top */
+            { top: `${fromY}px`, height: '4px', easing: 'cubic-bezier(0.25, 1, 0.5, 1)' },
+            /* 66%: Move to destination bottom while compressed */
+            { top: `${toY + 12}px`, height: '4px', easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
+            /* 88%: Slight elastic overshoot elongation */
+            { top: `${toY - 1.5}px`, height: '17.5px', easing: 'ease-out' },
+            /* 100%: Settle at target 16px */
+            { top: `${toY}px`, height: '16px' }
+        ];
+
+        const anim = indicator.animate(keyframes, {
+            duration: 320,
+            fill: 'forwards',
+            easing: 'linear'
+        });
+
+        anim.onfinish = () => {
+            indicator.style.top = `${toY}px`;
+            indicator.style.height = '16px';
+            if (onFinish) onFinish();
+        };
+    }
+
+    const lastNavTab = sessionStorage.getItem('sys_last_nav_tab');
+    sessionStorage.setItem('sys_last_nav_tab', activeTab);
+
+    requestAnimationFrame(() => {
+        const toPos = getItemPosition(activeItem);
+        if (toPos !== null) {
+            if (lastNavTab && lastNavTab !== activeTab) {
+                const prevItem = sidebarEl.querySelector(`.desktop-nav-item[data-sidebar-tab="${lastNavTab}"]`);
+                const fromPos = getItemPosition(prevItem);
+                if (fromPos !== null) {
+                    moveIndicator(fromPos, toPos);
+                } else {
+                    indicator.style.top = `${toPos}px`;
+                    indicator.style.height = '16px';
+                    indicator.style.opacity = '1';
+                }
+            } else {
+                indicator.style.top = `${toPos}px`;
+                indicator.style.height = '16px';
+                indicator.style.opacity = '1';
+            }
+        }
+    });
+
+    navItems.forEach((item) => {
+        item.addEventListener('click', (e) => {
+            const targetTab = item.getAttribute('data-sidebar-tab');
+            const targetHref = item.getAttribute('href');
+            if (!targetHref || targetHref.startsWith('javascript:')) return;
+
+            if (targetTab === activeTab && window.location.pathname.endsWith(targetHref)) {
+                return;
+            }
+
+            e.preventDefault();
+
+            const currentActive = sidebarEl.querySelector('.desktop-nav-item.active');
+            const fromY = getItemPosition(currentActive);
+            const toY = getItemPosition(item);
+
+            if (currentActive) currentActive.classList.remove('active');
+            item.classList.add('active');
+
+            sessionStorage.setItem('sys_last_nav_tab', targetTab);
+
+            if (fromY !== null && toY !== null) {
+                moveIndicator(fromY, toY, () => {
+                    window.location.href = targetHref;
+                });
+                setTimeout(() => {
+                    window.location.href = targetHref;
+                }, 280);
+            } else {
+                window.location.href = targetHref;
+            }
+        });
+    });
 }

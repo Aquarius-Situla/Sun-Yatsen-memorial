@@ -74,7 +74,7 @@ import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=2025';
 import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=2025';
 import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=2025';
 import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260905j';
-import { initDesktopShell } from './modules/desktop-shell.js?v=20260906a';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260906d';
 
 /* ============================================================================
  * Subpage Initialization Engine
