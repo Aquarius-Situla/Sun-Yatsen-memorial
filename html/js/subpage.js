@@ -247,16 +247,7 @@ export function initSubpage(options) {
         }
     }
 
-    /* Smart Back Navigation Handler */
-    const navBackBtn = document.getElementById('nav-back-link');
-    if (navBackBtn) {
-        navBackBtn.addEventListener('click', (e) => {
-            if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin)) {
-                e.preventDefault();
-                window.history.back();
-            }
-        });
-    }
+    /* Native navigation via href is used for nav-back-link to ensure reliable transitions */
 
     /* Option Items Event Listeners (Global Language Click) */
     iosOptionItems.forEach(opt => {

@@ -169,13 +169,11 @@ export function setupDiagnosticTrigger() {
         }
     }
 
-    /* Bind to common title elements */
+    /* Bind to title elements only without blocking navigation buttons */
     const targets = [
         document.getElementById('top-nav-title'),
         document.getElementById('page-title'),
-        document.querySelector('.apple-top-nav'),
-        document.getElementById('memorial-banner'),
-        document.querySelector('.nav-title')
+        document.getElementById('memorial-banner')
     ];
 
     targets.forEach(function(target) {
@@ -183,10 +181,4 @@ export function setupDiagnosticTrigger() {
             target.addEventListener('click', handleTap);
         }
     });
-
-    /* Also bind to top corner for easy triggering in standalone PWA */
-    const cornerTarget = document.createElement('div');
-    cornerTarget.style.cssText = 'position: fixed; top: 0; left: 0; width: 80px; height: 50px; z-index: 999998; background: transparent;';
-    cornerTarget.addEventListener('click', handleTap);
-    document.body.appendChild(cornerTarget);
 }
