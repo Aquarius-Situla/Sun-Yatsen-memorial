@@ -74,6 +74,7 @@ import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=2025';
 import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=2025';
 import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=2025';
 import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260905j';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260906a';
 
 /* ============================================================================
  * Subpage Initialization Engine
@@ -91,9 +92,13 @@ export function initSubpage(options) {
     /* Initialize diagnostic HUD trigger (3-tap on header) */
     setupDiagnosticTrigger();
 
-    /* Initialize Apple Native Bottom Tab Bar if an active tab is specified */
+    /* Initialize Apple Native Bottom Tab Bar and Desktop Sidebar */
     if (activeBottomTab) {
         initTabBar({
+            activeTab: activeBottomTab,
+            basePath: basePath
+        });
+        initDesktopShell({
             activeTab: activeBottomTab,
             basePath: basePath
         });

@@ -18,6 +18,7 @@ import { loadAndTriggerFireworks } from './modules/fireworks.js';
 import { syncTabBarLabels } from './modules/i18n.js?v=2025';
 import { syncStandaloneTabBar } from './modules/tab-bar.js?v=2025';
 import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=2025';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260906a';
 
 /* Expose fireworks loader globally for legacy triggers */
 window.loadAndTriggerFireworks = loadAndTriggerFireworks;
@@ -315,6 +316,31 @@ function initApp() {
         }
     } catch (err) {
         console.error('[Dropdown Nav Error]:', err);
+    }
+
+    /* ========================================================================
+     * 9. Apple Desktop Shell Initialization
+     * ======================================================================== */
+    try {
+        initDesktopShell({
+            activeTab: 'home',
+            basePath: './'
+        });
+
+        const desktopMsgCard = document.getElementById('desktop-open-msg-card');
+        if (desktopMsgCard) {
+            desktopMsgCard.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (openMessageBtn) {
+                    openMessageBtn.click();
+                } else if (messageModal) {
+                    messageModal.classList.add('active');
+                    if (messageInput) setTimeout(() => messageInput.focus(), 150);
+                }
+            });
+        }
+    } catch (err) {
+        console.error('[Desktop Shell Init Error]:', err);
     }
 }
 

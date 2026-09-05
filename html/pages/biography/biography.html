@@ -144,9 +144,11 @@
         import { getCurrentLang, setGlobalLang } from '../../js/modules/i18n.js?v=2025';
         import { initTabBar } from '../../js/modules/tab-bar.js?v=2025';
         import { initIOSNavTransition } from '../../js/modules/ios-nav-transition.js?v=20260905j';
+        import { initDesktopShell } from '../../js/modules/desktop-shell.js?v=20260906a';
 
         initTabBar({ activeTab: 'biography', basePath: '../../' });
         initIOSNavTransition();
+        initDesktopShell({ activeTab: 'library', basePath: '../../' });
 
         const langBtn = document.getElementById('lang-btn');
         const mdViewer = document.getElementById('md-viewer');
