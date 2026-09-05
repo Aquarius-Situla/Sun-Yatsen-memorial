@@ -1,4 +1,4 @@
-﻿/* ============================================================================
+/* ============================================================================
  * Private Sun Yat-sen Memorial Hall — iOS Navigation Transition (ios-nav-transition.js)
  * ============================================================================
  * COMMENTING STANDARDS
@@ -87,6 +87,7 @@ export function initIOSNavTransition(options = {}) {
             const url = getTargetUrl(btn);
             if (url && !url.startsWith('#') && !url.startsWith('javascript:')) {
                 e.preventDefault();
+                btn.style.opacity = '0.35';
                 triggerPopTransition(url);
             }
         });
@@ -155,20 +156,20 @@ export function initIOSNavTransition(options = {}) {
 
             const contents = getContentElements();
             contents.forEach(el => {
-                el.style.transform = 	ranslate3d(px, 0, 0);
+                el.style.transform = 'translate3d(' + currentX + 'px, 0, 0)';
             });
 
             if (navChevron) {
-                navChevron.style.transform = 	ranslate3d(px, 0, 0);
-                navChevron.style.opacity = ${1 - progress};
+                navChevron.style.transform = 'translate3d(' + (-14 * (1 - progress)) + 'px, 0, 0)';
+                navChevron.style.opacity = String(1 - progress);
             }
             if (navLabel) {
-                navLabel.style.transform = 	ranslate3d(px, 0, 0);
-                navLabel.style.opacity = ${1 - progress * 0.8};
+                navLabel.style.transform = 'translate3d(' + (24 * progress) + 'px, 0, 0)';
+                navLabel.style.opacity = String(1 - progress * 0.8);
             }
             if (navTitle) {
-                navTitle.style.transform = 	ranslate3d(px, 0, 0);
-                navTitle.style.opacity = ${1 - progress};
+                navTitle.style.transform = 'translate3d(' + (50 * progress) + 'px, 0, 0)';
+                navTitle.style.opacity = String(1 - progress);
             }
         }
     }
@@ -275,6 +276,8 @@ export function initIOSNavTransition(options = {}) {
     /* Handle bfcache restore */
     window.addEventListener('pageshow', (e) => {
         if (e.persisted) {
+            if (navBackBtn) navBackBtn.style.opacity = '';
+            if (desktopBackBtn) desktopBackBtn.style.opacity = '';
             const contents = getContentElements();
             contents.forEach(el => {
                 el.classList.remove('ios-content-sliding-out', 'ios-content-dragging');
