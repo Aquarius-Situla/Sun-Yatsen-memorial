@@ -2,7 +2,7 @@
  * Private Sun Yat-sen Memorial Hall — Subpage Controller (subpage.js)
  * ============================================================================
  * COMMENTING STANDARDS
- * 1. Block comments only. Inline comments (//) are strictly prohibited.
+ * 1. Block comments only. Inline comments are strictly prohibited.
  * 2. Section dividers use the === banner format.
  * 3. All prose is written in English.
  * ============================================================================ */
@@ -207,24 +207,46 @@ export function initSubpage(options) {
             }
         }
 
-        /* Synchronize Apple Native Back Button Text */
+        /* Synchronize Apple Native Back Button Text (Mobile and Desktop) */
         const navBackText = document.getElementById('nav-back-text');
         const navBackLink = document.getElementById('nav-back-link');
-        if (navBackText) {
-            const explicitTc = navBackLink ? navBackLink.getAttribute('data-back-text-tc') : null;
-            const explicitSc = navBackLink ? navBackLink.getAttribute('data-back-text-sc') : null;
+        const desktopBackText = document.querySelector('.top-back-btn span');
+        let backLabel = '';
 
+        if (navBackLink) {
+            const explicitTc = navBackLink.getAttribute('data-back-text-tc');
+            const explicitSc = navBackLink.getAttribute('data-back-text-sc');
             if (explicitTc && explicitSc) {
-                navBackText.textContent = isTraditional ? explicitTc : explicitSc;
-            } else if (window.location.pathname.includes('/about/') || window.location.pathname.includes('/thanks/')) {
-                navBackText.textContent = isTraditional ? '設定' : '设置';
-            } else if (window.location.pathname.includes('/events/')) {
-                navBackText.textContent = isTraditional ? '資料庫' : '资料库';
-            } else if (window.location.pathname.includes('/announcement/')) {
-                navBackText.textContent = isTraditional ? '公告' : '公告';
-            } else {
-                navBackText.textContent = isTraditional ? '資料庫' : '资料库';
+                backLabel = isTraditional ? explicitTc : explicitSc;
             }
+        }
+        if (!backLabel) {
+            if (window.location.pathname.includes('/about/') || window.location.pathname.includes('/thanks/')) {
+                backLabel = isTraditional ? '設定' : '设置';
+            } else if (window.location.pathname.includes('/events/')) {
+                backLabel = isTraditional ? '資料庫' : '资料库';
+            } else if (window.location.pathname.includes('/announcement/detail.html')) {
+                backLabel = isTraditional ? '公告' : '公告';
+            } else if (window.location.pathname.includes('/announcement/')) {
+                backLabel = isTraditional ? '主頁' : '主页';
+            } else if (window.location.pathname.includes('/library/language.html')) {
+                backLabel = isTraditional ? '設定' : '设置';
+            } else if (window.location.pathname.includes('/biography/')) {
+                backLabel = isTraditional ? '資料庫' : '资料库';
+            } else if (window.location.pathname.includes('/settings/')) {
+                backLabel = isTraditional ? '主頁' : '主页';
+            } else if (window.location.pathname.includes('/library/')) {
+                backLabel = isTraditional ? '主頁' : '主页';
+            } else {
+                backLabel = isTraditional ? '返回' : '返回';
+            }
+        }
+
+        if (navBackText) {
+            navBackText.textContent = backLabel;
+        }
+        if (desktopBackText) {
+            desktopBackText.textContent = backLabel;
         }
 
         /* Synchronize Apple Native Frosted Top Navigation Bar Title */
