@@ -420,22 +420,26 @@ body {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    color: #ffffff !important;
 }
 
 .ios-badge svg {
     width: 17px;
     height: 17px;
-    fill: currentColor;
+    fill: #ffffff !important;
+    color: #ffffff !important;
     stroke: none;
 }
 
-.ios-badge.badge-blue   { background-color: #007aff; color: #ffffff; }
-.ios-badge.badge-purple { background-color: #5856d6; color: #ffffff; }
-.ios-badge.badge-red    { background-color: #ff2d55; color: #ffffff; }
-.ios-badge.badge-orange { background-color: #ff9500; color: #ffffff; }
-.ios-badge.badge-green  { background-color: #34c759; color: #ffffff; }
-.ios-badge.badge-gray   { background-color: #8e8e93; color: #ffffff; }
-.ios-badge.badge-dark   { background-color: #3a3a3c; color: #ffffff; }
+.ios-badge.badge-blue   { background-color: #007aff; color: #ffffff !important; }
+.ios-badge.badge-purple { background-color: #5856d6; color: #ffffff !important; }
+.ios-badge.badge-red    { background-color: #ff2d55; color: #ffffff !important; }
+.ios-badge.badge-orange { background-color: #ff9500; color: #ffffff !important; }
+.ios-badge.badge-green  { background-color: #34c759; color: #ffffff !important; }
+.ios-badge.badge-gray   { background-color: #8e8e93; color: #ffffff !important; }
+.ios-badge.badge-dark   { background-color: #3a3a3c; color: #ffffff !important; }
+.ios-badge.badge-teal   { background-color: #00c7be; color: #ffffff !important; }
+.ios-badge.badge-indigo { background-color: #5856d6; color: #ffffff !important; }
 
 .ios-row.has-badge:not(:last-child)::after {
     left: 56px;
@@ -573,10 +577,10 @@ body {
 }
 
 /* Badge Color Themes */
-.badge-green { background: linear-gradient(135deg, #34c759 0%, #28cd41 100%) !important; }
-.badge-orange { background: linear-gradient(135deg, #ff9500 0%, #ff9f0a 100%) !important; }
-.badge-teal { background: linear-gradient(135deg, #30b0c7 0%, #00c7be 100%) !important; }
-.badge-indigo { background: linear-gradient(135deg, #5856d6 0%, #3634a3 100%) !important; }
+.badge-green { background: linear-gradient(135deg, #34c759 0%, #28cd41 100%) !important; color: #ffffff !important; }
+.badge-orange { background: linear-gradient(135deg, #ff9500 0%, #ff9f0a 100%) !important; color: #ffffff !important; }
+.badge-teal { background: linear-gradient(135deg, #30b0c7 0%, #00c7be 100%) !important; color: #ffffff !important; }
+.badge-indigo { background: linear-gradient(135deg, #5856d6 0%, #3634a3 100%) !important; color: #ffffff !important; }
 
 /* ============================================================================
  * Responsive Viewport Rules

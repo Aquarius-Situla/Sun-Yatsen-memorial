@@ -211,7 +211,11 @@ export function initSubpage(options) {
 
             if (explicitTc && explicitSc) {
                 navBackText.textContent = isTraditional ? explicitTc : explicitSc;
-            } else if (window.location.pathname.includes('/events/') || window.location.pathname.includes('/announcement/')) {
+            } else if (window.location.pathname.includes('/about/') || window.location.pathname.includes('/thanks/')) {
+                navBackText.textContent = isTraditional ? '設定' : '设置';
+            } else if (window.location.pathname.includes('/events/')) {
+                navBackText.textContent = isTraditional ? '資料庫' : '资料库';
+            } else if (window.location.pathname.includes('/announcement/')) {
                 navBackText.textContent = isTraditional ? '公告' : '公告';
             } else {
                 navBackText.textContent = isTraditional ? '資料庫' : '资料库';

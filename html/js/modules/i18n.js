@@ -18,13 +18,13 @@ export const TAB_DEFINITIONS = {
         { id: 'home',         label: '主頁' },
         { id: 'announcement', label: '公告' },
         { id: 'library',      label: '資料庫' },
-        { id: 'danmaku',      label: '彈幕' }
+        { id: 'settings',     label: '設定' }
     ],
     sc: [
         { id: 'home',         label: '主页' },
         { id: 'announcement', label: '公告' },
         { id: 'library',      label: '资料库' },
-        { id: 'danmaku',      label: '弹幕' }
+        { id: 'settings',     label: '设置' }
     ]
 };
 

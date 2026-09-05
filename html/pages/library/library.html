@@ -50,12 +50,12 @@
     <!-- Desktop Fallback Language Toggle -->
     <button id="lang-btn" class="lang-toggle-btn">切换至简化字</button>
 
-    <!-- iOS Inset Grouped Settings Container (Image 2 Specification) -->
+    <!-- iOS Inset Grouped Settings Container -->
     <div class="ios-group-container">
-        <!-- Section 1: Archives & History -->
-        <div class="ios-section-header" id="section-archives-header">文獻與歷史 (ARCHIVES &amp; HISTORY)</div>
+        <!-- Section 1: Sun Yat-sen Archives & Philosophy -->
+        <div class="ios-section-header" id="section-yatsen-header">國父生平與思想 (SUN YAT-SEN ARCHIVES)</div>
         <div class="ios-card">
-            <a class="ios-row has-badge" href="../biography/biography.html">
+            <a class="ios-row has-badge" href="../biography/biography.html?tab=biography">
                 <div class="ios-row-title">
                     <div class="ios-badge badge-blue">
                         <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
@@ -63,48 +63,96 @@
                     <span id="label-biography">國父生平傳記</span>
                 </div>
                 <div class="ios-row-accessory">
-                    <span class="ios-row-value" id="val-biography">年譜與思想</span>
+                    <span class="ios-row-value" id="val-biography">年譜與歷程</span>
                     <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
                 </div>
             </a>
-            <a class="ios-row has-badge" href="../about/about.html">
+            <a class="ios-row has-badge" href="../biography/biography.html?tab=theories">
+                <div class="ios-row-title">
+                    <div class="ios-badge badge-orange">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm0-4h-2V7h2v7z"/></svg>
+                    </div>
+                    <span id="label-theories">三民主義與思想體系</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <span class="ios-row-value" id="val-theories">核心理論與圖表</span>
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </a>
+            <a class="ios-row has-badge" href="../../events/yatsen/yatsen-birth.html">
                 <div class="ios-row-title">
                     <div class="ios-badge badge-purple">
-                        <svg viewBox="0 0 24 24"><path d="M12 2L2 7v3h20V7L12 2zm8 9h-2v7h2v-7zm-6 0h-2v7h2v-7zm-6 0H6v7h2v-7zm-5 9v2h18v-2H3z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                     </div>
-                    <span id="label-about">關於紀念館與聲明</span>
+                    <span id="label-yatsen-birth">國父誕辰特展</span>
                 </div>
                 <div class="ios-row-accessory">
-                    <span class="ios-row-value" id="val-about">館舍與法規</span>
+                    <span class="ios-row-value" id="val-yatsen-birth">十一月十二日</span>
                     <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
                 </div>
             </a>
-            <a class="ios-row has-badge" href="../thanks/thanks.html">
+            <a class="ios-row has-badge" href="../../events/yatsen/yatsen-passing.html">
                 <div class="ios-row-title">
-                    <div class="ios-badge badge-red">
-                        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    <div class="ios-badge badge-dark">
+                        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
                     </div>
-                    <span id="label-thanks">特別鳴謝名單</span>
+                    <span id="label-yatsen-passing">國父逝世紀念</span>
                 </div>
                 <div class="ios-row-accessory">
-                    <span class="ios-row-value" id="val-thanks">開源與貢獻</span>
+                    <span class="ios-row-value" id="val-yatsen-passing">三月十二日 · 植樹節</span>
                     <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
                 </div>
             </a>
         </div>
 
-        <!-- Section 2: System Preferences -->
-        <div class="ios-section-header" id="section-prefs-header">偏好設定 (PREFERENCES)</div>
+        <!-- Section 2: Historical Memorial Exhibitions -->
+        <div class="ios-section-header" id="section-exhibits-header">民國重大歷史特展 (HISTORICAL EXHIBITIONS)</div>
         <div class="ios-card">
-            <a class="ios-row has-badge" id="lang-toggle-row" href="language.html">
+            <a class="ios-row has-badge" href="../../events/xinhai/xinhai.html">
                 <div class="ios-row-title">
-                    <div class="ios-badge badge-gray">
-                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    <div class="ios-badge badge-red">
+                        <svg viewBox="0 0 24 24"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/></svg>
                     </div>
-                    <span id="label-lang">全域語言 (Language)</span>
+                    <span id="label-xinhai">辛亥革命紀念特刊</span>
                 </div>
                 <div class="ios-row-accessory">
-                    <span class="ios-row-value" id="current-lang-text">正體中文</span>
+                    <span class="ios-row-value" id="val-xinhai">十月十日 · 雙十節</span>
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </a>
+            <a class="ios-row has-badge" href="../../events/whampoa/whampoa.html">
+                <div class="ios-row-title">
+                    <div class="ios-badge badge-indigo">
+                        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                    </div>
+                    <span id="label-whampoa">黃埔建軍百年專頁</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <span class="ios-row-value" id="val-whampoa">六月十六日</span>
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </a>
+            <a class="ios-row has-badge" href="../../events/militaries/militaries.html">
+                <div class="ios-row-title">
+                    <div class="ios-badge badge-teal">
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    </div>
+                    <span id="label-militaries">三軍抗戰勝利紀念</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <span class="ios-row-value" id="val-militaries">九月三日 · 軍人節</span>
+                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </a>
+            <a class="ios-row has-badge" href="../../events/mayfourth/mayfourth.html">
+                <div class="ios-row-title">
+                    <div class="ios-badge badge-green">
+                        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                    </div>
+                    <span id="label-mayfourth">五四運動與新文化</span>
+                </div>
+                <div class="ios-row-accessory">
+                    <span class="ios-row-value" id="val-mayfourth">五月四日</span>
                     <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
                 </div>
             </a>
@@ -131,11 +179,11 @@
             </div>
             <div class="tab-label">資料庫</div>
         </a>
-        <a href="../../index.html?open=danmaku" class="tab-item" data-tab-id="danmaku" aria-label="彈幕">
+        <a href="../settings/settings.html" class="tab-item" data-tab-id="settings" aria-label="設定">
             <div class="tab-icon">
-                <svg viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 3C6.477 3 2 6.806 2 11.5C2 13.914 3.193 16.084 5.12 17.587C4.646 19.344 3.842 20.373 3.14 20.893C2.923 21.054 3.037 21.4 3.308 21.4C5.556 21.4 7.848 20.187 9.07 19.26C10.007 19.736 10.982 20 12 20C17.523 20 22 16.194 22 11.5C22 6.806 17.523 3 12 3Z"/></svg>
+                <svg viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zm7.43-2.91a8.1 8.1 0 0 0 .05-1.18c0-.4-.02-.8-.05-1.18l2.06-1.61c.19-.15.24-.42.12-.64l-1.95-3.38a.502.502 0 0 0-.61-.22l-2.43.98c-.5-.39-1.05-.72-1.64-.97l-.37-2.58a.499.499 0 0 0-.49-.41h-3.9a.5.5 0 0 0-.49.41l-.37 2.58c-.59.25-1.14.58-1.64.97l-2.43-.98a.498.498 0 0 0-.61.22L2.79 8c-.12.22-.07.49.12.64l2.06 1.61c-.03.38-.05.78-.05 1.18 0 .4.02.8.05 1.18L2.91 14.22c-.19.15-.24.42-.12.64l1.95 3.38c.12.21.38.3.61.22l2.43-.98c.5.39 1.05.72 1.64.97l.37 2.58c.05.24.25.41.49.41h3.9c.24 0 .44-.17.49-.41l.37-2.58c.59-.25 1.14-.58 1.64-.97l2.43.98c.23.09.49 0 .61-.22l1.95-3.38c.12-.22.07-.49-.12-.64l-2.06-1.61z"/></svg>
             </div>
-            <div class="tab-label">彈幕</div>
+            <div class="tab-label">設定</div>
         </a>
     </nav>
 
@@ -150,31 +198,47 @@
             tc: {
                 pageTitle: '資料庫 - 私立中山紀念堂',
                 topNavTitle: '資料庫',
-                archivesHeader: '文獻與歷史 (ARCHIVES & HISTORY)',
-                prefsHeader: '偏好設定 (PREFERENCES)',
-                biography: '國父生平傳記',
-                valBiography: '年譜與思想',
-                about: '關於紀念館與聲明',
-                valAbout: '館舍與法規',
-                thanks: '特別鳴謝名單',
-                valThanks: '開源與貢獻',
-                lang: '全域語言 (Language)',
-                langText: '正體中文',
+                secYatsenHeader: '國父生平與思想 (SUN YAT-SEN ARCHIVES)',
+                secExhibitsHeader: '民國重大歷史特展 (HISTORICAL EXHIBITIONS)',
+                labelBiography: '國父生平傳記',
+                valBiography: '年譜與歷程',
+                labelTheories: '三民主義與思想體系',
+                valTheories: '核心理論與圖表',
+                labelYatsenBirth: '國父誕辰特展',
+                valYatsenBirth: '十一月十二日',
+                labelYatsenPassing: '國父逝世紀念',
+                valYatsenPassing: '三月十二日 · 植樹節',
+                labelXinhai: '辛亥革命紀念特刊',
+                valXinhai: '十月十日 · 雙十節',
+                labelWhampoa: '黃埔建軍百年專頁',
+                valWhampoa: '六月十六日',
+                labelMilitaries: '三軍抗戰勝利紀念',
+                valMilitaries: '九月三日 · 軍人節',
+                labelMayfourth: '五四運動與新文化',
+                valMayfourth: '五月四日',
                 toggleBtn: '切换至简化字'
             },
             sc: {
                 pageTitle: '资料库 - 私立中山纪念堂',
                 topNavTitle: '资料库',
-                archivesHeader: '文献与历史 (ARCHIVES & HISTORY)',
-                prefsHeader: '偏好设置 (PREFERENCES)',
-                biography: '国父生平传记',
-                valBiography: '年谱与思想',
-                about: '关于纪念馆与声明',
-                valAbout: '馆舍与法规',
-                thanks: '特别鸣谢名单',
-                valThanks: '开源与贡献',
-                lang: '全局语言 (Language)',
-                langText: '简体中文',
+                secYatsenHeader: '国父生平与思想 (SUN YAT-SEN ARCHIVES)',
+                secExhibitsHeader: '民国重大历史特展 (HISTORICAL EXHIBITIONS)',
+                labelBiography: '国父生平传记',
+                valBiography: '年谱与历程',
+                labelTheories: '三民主义与思想体系',
+                valTheories: '核心理论与图表',
+                labelYatsenBirth: '国父诞辰特展',
+                valYatsenBirth: '十一月十二日',
+                labelYatsenPassing: '国父逝世纪念',
+                valYatsenPassing: '三月十二日 · 植树节',
+                labelXinhai: '辛亥革命纪念特刊',
+                valXinhai: '十月十日 · 双十节',
+                labelWhampoa: '黄埔建军百年专页',
+                valWhampoa: '六月十六日',
+                labelMilitaries: '三军抗战胜利纪念',
+                valMilitaries: '九月三日 · 军人节',
+                labelMayfourth: '五四运动与新文化',
+                valMayfourth: '五月四日',
                 toggleBtn: '切換至正體字'
             }
         };
@@ -182,38 +246,63 @@
         function updateTexts(lang) {
             const strings = i18nStrings[lang] || i18nStrings.tc;
             document.title = strings.pageTitle;
+
             const topNavTitle = document.getElementById('top-nav-title');
             if (topNavTitle) topNavTitle.textContent = strings.topNavTitle;
 
-            const archivesHeader = document.getElementById('section-archives-header');
-            if (archivesHeader) archivesHeader.textContent = strings.archivesHeader;
+            const secYatsenHeader = document.getElementById('section-yatsen-header');
+            if (secYatsenHeader) secYatsenHeader.textContent = strings.secYatsenHeader;
 
-            const prefsHeader = document.getElementById('section-prefs-header');
-            if (prefsHeader) prefsHeader.textContent = strings.prefsHeader;
+            const secExhibitsHeader = document.getElementById('section-exhibits-header');
+            if (secExhibitsHeader) secExhibitsHeader.textContent = strings.secExhibitsHeader;
 
             const labelBiography = document.getElementById('label-biography');
-            if (labelBiography) labelBiography.textContent = strings.biography;
+            if (labelBiography) labelBiography.textContent = strings.labelBiography;
 
             const valBiography = document.getElementById('val-biography');
             if (valBiography) valBiography.textContent = strings.valBiography;
 
-            const labelAbout = document.getElementById('label-about');
-            if (labelAbout) labelAbout.textContent = strings.about;
+            const labelTheories = document.getElementById('label-theories');
+            if (labelTheories) labelTheories.textContent = strings.labelTheories;
 
-            const valAbout = document.getElementById('val-about');
-            if (valAbout) valAbout.textContent = strings.valAbout;
+            const valTheories = document.getElementById('val-theories');
+            if (valTheories) valTheories.textContent = strings.valTheories;
 
-            const labelThanks = document.getElementById('label-thanks');
-            if (labelThanks) labelThanks.textContent = strings.thanks;
+            const labelYatsenBirth = document.getElementById('label-yatsen-birth');
+            if (labelYatsenBirth) labelYatsenBirth.textContent = strings.labelYatsenBirth;
 
-            const valThanks = document.getElementById('val-thanks');
-            if (valThanks) valThanks.textContent = strings.valThanks;
+            const valYatsenBirth = document.getElementById('val-yatsen-birth');
+            if (valYatsenBirth) valYatsenBirth.textContent = strings.valYatsenBirth;
 
-            const labelLang = document.getElementById('label-lang');
-            if (labelLang) labelLang.textContent = strings.lang;
+            const labelYatsenPassing = document.getElementById('label-yatsen-passing');
+            if (labelYatsenPassing) labelYatsenPassing.textContent = strings.labelYatsenPassing;
 
-            const langText = document.getElementById('current-lang-text');
-            if (langText) langText.textContent = strings.langText;
+            const valYatsenPassing = document.getElementById('val-yatsen-passing');
+            if (valYatsenPassing) valYatsenPassing.textContent = strings.valYatsenPassing;
+
+            const labelXinhai = document.getElementById('label-xinhai');
+            if (labelXinhai) labelXinhai.textContent = strings.labelXinhai;
+
+            const valXinhai = document.getElementById('val-xinhai');
+            if (valXinhai) valXinhai.textContent = strings.valXinhai;
+
+            const labelWhampoa = document.getElementById('label-whampoa');
+            if (labelWhampoa) labelWhampoa.textContent = strings.labelWhampoa;
+
+            const valWhampoa = document.getElementById('val-whampoa');
+            if (valWhampoa) valWhampoa.textContent = strings.valWhampoa;
+
+            const labelMilitaries = document.getElementById('label-militaries');
+            if (labelMilitaries) labelMilitaries.textContent = strings.labelMilitaries;
+
+            const valMilitaries = document.getElementById('val-militaries');
+            if (valMilitaries) valMilitaries.textContent = strings.valMilitaries;
+
+            const labelMayfourth = document.getElementById('label-mayfourth');
+            if (labelMayfourth) labelMayfourth.textContent = strings.labelMayfourth;
+
+            const valMayfourth = document.getElementById('val-mayfourth');
+            if (valMayfourth) valMayfourth.textContent = strings.valMayfourth;
 
             const langBtn = document.getElementById('lang-btn');
             if (langBtn) langBtn.textContent = strings.toggleBtn;
@@ -224,7 +313,6 @@
         const currentLang = getCurrentLang();
         updateTexts(currentLang);
         syncStandaloneTabBar();
-
 
         const langBtn = document.getElementById('lang-btn');
         if (langBtn) {

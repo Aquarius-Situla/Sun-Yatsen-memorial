@@ -36,10 +36,10 @@ export const TAB_ICONS = {
             <path fill-rule="evenodd" clip-rule="evenodd" d="M3.4 9A1.4 1.4 0 0 0 2 10.45l1.15 9.2A2.4 2.4 0 0 0 5.53 21.8h12.94a2.4 2.4 0 0 0 2.38-2.15l1.15-9.2A1.4 1.4 0 0 0 20.6 9H3.4zm5.1 3.5a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5h-5.5a.75.75 0 0 1-.75-.75zm0 3a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5h-5.5a.75.75 0 0 1-.75-.75zm1.5 3a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75z"/>
         </svg>
     `,
-    /* SF Symbol: message.fill (Apple Native iMessage Speech Bubble) */
-    danmaku: `
+    /* SF Symbol: gearshape.fill (Apple Native Settings Cog) */
+    settings: `
         <svg viewBox="0 0 24 24" fill="currentColor">
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 3C6.477 3 2 6.806 2 11.5C2 13.914 3.193 16.084 5.12 17.587C4.646 19.344 3.842 20.373 3.14 20.893C2.923 21.054 3.037 21.4 3.308 21.4C5.556 21.4 7.848 20.187 9.07 19.26C10.007 19.736 10.982 20 12 20C17.523 20 22 16.194 22 11.5C22 6.806 17.523 3 12 3Z"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zm7.43-2.91a8.1 8.1 0 0 0 .05-1.18c0-.4-.02-.8-.05-1.18l2.06-1.61c.19-.15.24-.42.12-.64l-1.95-3.38a.502.502 0 0 0-.61-.22l-2.43.98c-.5-.39-1.05-.72-1.64-.97l-.37-2.58a.499.499 0 0 0-.49-.41h-3.9a.5.5 0 0 0-.49.41l-.37 2.58c-.59.25-1.14.58-1.64.97l-2.43-.98a.498.498 0 0 0-.61.22L2.79 8c-.12.22-.07.49.12.64l2.06 1.61c-.03.38-.05.78-.05 1.18 0 .4.02.8.05 1.18L2.91 14.22c-.19.15-.24.42-.12.64l1.95 3.38c.12.21.38.3.61.22l2.43-.98c.5.39 1.05.72 1.64.97l.37 2.58c.05.24.25.41.49.41h3.9c.24 0 .44-.17.49-.41l.37-2.58c.59-.25 1.14-.58 1.64-.97l2.43.98c.23.09.49 0 .61-.22l1.95-3.38c.12-.22.07-.49-.12-.64l-2.06-1.61z"/>
         </svg>
     `
 };
@@ -60,7 +60,7 @@ export function initTabBar(options = {}) {
         home:         basePath === './' ? 'index.html' : `${basePath}index.html`,
         announcement: basePath === './' ? 'pages/announcement/announcement.html' : `${basePath}pages/announcement/announcement.html`,
         library:      basePath === './' ? 'pages/library/library.html' : `${basePath}pages/library/library.html`,
-        danmaku:      basePath === './' ? 'index.html?open=danmaku' : `${basePath}index.html?open=danmaku`
+        settings:     basePath === './' ? 'pages/settings/settings.html' : `${basePath}pages/settings/settings.html`
     };
 
     /* Inject DOM if not already statically rendered */
@@ -96,22 +96,6 @@ export function initTabBar(options = {}) {
     /* Listen for language change events globally */
     window.addEventListener('sys-lang-change', () => {
         syncTabBarLabels(tabBarEl);
-    });
-
-    /* Interactive click handling for Danmaku sheet trigger */
-    tabBarEl.addEventListener('click', (e) => {
-        const danmakuItem = e.target.closest('[data-tab-id="danmaku"]');
-        if (danmakuItem) {
-            const messageModal = document.getElementById('message-modal');
-            if (messageModal) {
-                e.preventDefault();
-                messageModal.classList.add('active');
-                const messageInput = document.getElementById('message-input');
-                if (messageInput) {
-                    setTimeout(() => messageInput.focus(), 150);
-                }
-            }
-        }
     });
 
     /* Synchronize standalone positioning immediately after mounting or binding */

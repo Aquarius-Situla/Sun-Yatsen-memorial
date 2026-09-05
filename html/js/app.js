@@ -263,14 +263,6 @@ function initApp() {
 
         window.openDanmakuModal = triggerDanmakuModal;
 
-        const danmakuTabBtn = document.querySelector('[data-tab-id="danmaku"]');
-        if (danmakuTabBtn) {
-            danmakuTabBtn.addEventListener('click', triggerDanmakuModal);
-            danmakuTabBtn.addEventListener('touchend', (e) => {
-                triggerDanmakuModal(e);
-            }, { passive: false });
-        }
-
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('open') === 'danmaku' && messageModal) {
             setTimeout(() => {
