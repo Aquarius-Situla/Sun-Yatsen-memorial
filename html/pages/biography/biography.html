@@ -143,8 +143,10 @@
     <script type="module">
         import { getCurrentLang, setGlobalLang } from '../../js/modules/i18n.js?v=2025';
         import { initTabBar } from '../../js/modules/tab-bar.js?v=2025';
+        import { initIOSNavTransition } from '../../js/modules/ios-nav-transition.js?v=2025';
 
         initTabBar({ activeTab: 'biography', basePath: '../../' });
+        initIOSNavTransition();
 
         const langBtn = document.getElementById('lang-btn');
         const mdViewer = document.getElementById('md-viewer');

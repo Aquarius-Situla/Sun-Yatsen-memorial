@@ -121,12 +121,14 @@
     <script type="module">
         import { getCurrentLang, setGlobalLang, syncTabBarLabels } from '../../js/modules/i18n.js?v=2025';
         import { initTabBar, syncStandaloneTabBar } from '../../js/modules/tab-bar.js?v=2025';
+        import { initIOSNavTransition } from '../../js/modules/ios-nav-transition.js?v=2025';
 
         initTabBar({
             activeTab: 'settings',
             basePath: '../../'
         });
         syncStandaloneTabBar();
+        initIOSNavTransition();
 
         const strings = {
             tc: {

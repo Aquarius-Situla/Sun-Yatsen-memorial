@@ -73,6 +73,7 @@ function getMarkdownStyles(isLight) {
 import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=2025';
 import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=2025';
 import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=2025';
+import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=2025';
 
 /* ============================================================================
  * Subpage Initialization Engine
@@ -386,6 +387,9 @@ export function initSubpage(options) {
 
     /* Initial Render */
     updateContent();
+
+    /* Initialize iOS Native Navigation Slide-Out Animation & Edge-Swipe Gesture */
+    initIOSNavTransition();
 
     return {
         isTraditional: () => isTraditional,

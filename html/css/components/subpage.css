@@ -95,7 +95,53 @@ body {
 }
 
 .apple-top-nav .nav-back-link:active {
-    opacity: 0.5;
+    opacity: 0.35;
+    transition: opacity 0.08s ease;
+}
+
+/* ============================================================================
+ * iOS Native Navigation Transition & Gesture Classes
+ * ============================================================================ */
+.ios-view-layer {
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    box-sizing: border-box;
+    will-change: transform;
+}
+
+.ios-page-sliding-out {
+    transform: translate3d(100%, 0, 0) !important;
+    transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1) !important;
+    box-shadow: -15px 0 35px rgba(0, 0, 0, 0.55) !important;
+    pointer-events: none;
+}
+
+.ios-page-dragging {
+    transition: none !important;
+    box-shadow: -12px 0 30px rgba(0, 0, 0, 0.45) !important;
+    will-change: transform;
+}
+
+.ios-nav-chevron-exit {
+    transform: translate3d(-15px, 0, 0) !important;
+    opacity: 0 !important;
+    transition: transform 0.24s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.24s ease !important;
+}
+
+.ios-nav-label-exit {
+    transform: translate3d(20px, 0, 0) !important;
+    opacity: 0 !important;
+    transition: transform 0.24s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.24s ease !important;
+}
+
+.ios-nav-title-exit {
+    transform: translate3d(50px, 0, 0) !important;
+    opacity: 0 !important;
+    transition: transform 0.26s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.26s ease !important;
 }
 
 /* ============================================================================
@@ -782,6 +828,11 @@ body {
 
     .ios-option-item:not(:last-child) {
         border-bottom-color: rgba(0, 0, 0, 0.06);
+    }
+
+    .ios-page-sliding-out,
+    .ios-page-dragging {
+        box-shadow: -10px 0 25px rgba(0, 0, 0, 0.18) !important;
     }
 
     @media (hover: hover) and (pointer: fine) {
