@@ -4,7 +4,7 @@
  * Private Sun Yat-sen Memorial Hall — Base Styles (base.css)
  * ============================================================================
  * COMMENTING STANDARDS
- * 1. Block comments only. Inline comments (//) are strictly prohibited.
+ * 1. Block comments only. Inline comments are strictly prohibited.
  * 2. Section dividers use the === banner format.
  * 3. All prose is written in English.
  * ============================================================================ */
@@ -12,7 +12,7 @@
 /* ============================================================================
  * Component Imports
  * ============================================================================ */
-@import url('./components/desktop-shell.css?v=20260906a');
+@import url('./components/desktop-shell.css?v=20260906c');
 
 *,
 *::before,
