@@ -207,9 +207,6 @@ export function initDesktopShell(options = {}) {
 
     /* Add layout helper class to body for wide desktop viewports */
     document.body.classList.add('has-desktop-sidebar');
-    if (activeTab === 'home') {
-        document.body.classList.add('desktop-home-body');
-    }
 
     /* Check if sidebar already exists */
     let sidebarEl = document.getElementById('desktop-sidebar');
@@ -220,9 +217,6 @@ export function initDesktopShell(options = {}) {
 
     /* Bind Search Input and Dropdown */
     setupDesktopSearch(sidebarEl, basePath);
-
-    /* Bind Hero Showcase Interactive Buttons on Home */
-    setupDesktopHeroActions();
 
     /* Sync Sidebar Language Labels */
     syncSidebarLabels(sidebarEl);
@@ -405,39 +399,6 @@ function setupDesktopSearch(sidebarEl, basePath) {
     });
 }
 
-/* ============================================================================
- * Hero Showcase Actions Controller
- * ============================================================================ */
-function setupDesktopHeroActions() {
-    const heroBowBtn = document.getElementById('desktop-hero-bow-btn');
-    if (heroBowBtn) {
-        heroBowBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (window.handlePortraitClick) {
-                window.handlePortraitClick();
-            } else {
-                const portraitBtn = document.getElementById('portrait-btn');
-                if (portraitBtn) portraitBtn.click();
-            }
-        });
-    }
-
-    const heroMsgBtn = document.getElementById('desktop-hero-msg-btn');
-    if (heroMsgBtn) {
-        heroMsgBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const openMessageBtn = document.getElementById('open-message-btn');
-            const messageModal = document.getElementById('message-modal');
-            const messageInput = document.getElementById('message-input');
-            if (openMessageBtn) {
-                openMessageBtn.click();
-            } else if (messageModal) {
-                messageModal.classList.add('active');
-                if (messageInput) setTimeout(() => messageInput.focus(), 150);
-            }
-        });
-    }
-}
 
 /* ============================================================================
  * Label Synchronization (i18n)
@@ -494,7 +455,6 @@ function syncSidebarStatus(sidebarEl) {
     if (!sidebarEl) return;
 
     const statusText = sidebarEl.querySelector('#desktop-status-text');
-    const heroAttendanceVal = document.getElementById('desktop-hero-attendance-val');
 
     function update() {
         const pageAttendance = document.getElementById('attendanceCount');
@@ -507,10 +467,6 @@ function syncSidebarStatus(sidebarEl) {
 
         if (statusText) {
             statusText.textContent = `參典人次：${count} · 民國 ${minguoYear} 年`;
-        }
-
-        if (heroAttendanceVal) {
-            heroAttendanceVal.textContent = count;
         }
     }
 

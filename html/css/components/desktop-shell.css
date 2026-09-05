@@ -17,9 +17,7 @@
  * ============================================================================ */
 @media (max-width: 768px) {
     .desktop-sidebar,
-    .desktop-search-dropdown,
-    .desktop-only,
-    .desktop-home-canvas {
+    .desktop-search-dropdown {
         display: none !important;
     }
 }
@@ -28,10 +26,8 @@
  * Section 2: Desktop Layout & Authentic Apple Sidebar (Screens > 768px)
  * ============================================================================ */
 @media (min-width: 769px) {
-    /* Hide legacy mobile elements */
-    .mobile-only,
-    .stealth-footer,
-    .top-hover-trigger {
+    /* Hide mobile bottom tab bar on desktop */
+    .apple-tab-bar {
         display: none !important;
     }
 
@@ -409,424 +405,54 @@
 }
 
 /* ============================================================================
- * Section 3: Homepage Apple Desktop Canvas (> 768px)
+ * Section 3: Desktop Home Ceremonial Hall Integration (> 768px)
  * ============================================================================ */
 @media (min-width: 769px) {
-    body.desktop-home-body {
+    /* Top ceremonial and festival banner on home page */
+    body.has-desktop-sidebar .top-hover-trigger {
+        position: fixed !important;
+        top: 0 !important;
+        left: 240px !important;
+        width: calc(100% - 240px) !important;
+        height: 15px !important;
+        display: block !important;
+        z-index: 20000 !important;
+    }
+
+    body.has-desktop-sidebar .dropdown-nav-bar {
+        left: 0 !important;
+        width: 100% !important;
+    }
+
+    body:not(.banner-active) .top-hover-trigger:hover .dropdown-nav-bar,
+    body:not(.banner-active) .dropdown-nav-bar:hover {
+        transform: translateY(0) !important;
+    }
+
+    body.has-desktop-sidebar .memorial-banner,
+    body.has-desktop-sidebar .status-banner {
+        left: 240px !important;
+        width: calc(100% - 240px) !important;
+    }
+
+    /* Centered stealth footer in right workspace */
+    body.has-desktop-sidebar .stealth-footer {
+        position: fixed !important;
+        bottom: 28px !important;
+        left: calc(50% + 120px) !important;
+        transform: translateX(-50%) !important;
         display: flex !important;
-        flex-direction: row !important;
-        justify-content: flex-start !important;
-        align-items: stretch !important;
-        padding: 0 !important;
-        overflow: hidden !important;
-        min-height: 100vh !important;
-        background-color: var(--sys-bg, #111111) !important;
+        z-index: 10000 !important;
     }
 
-    .desktop-home-canvas {
-        margin-left: 240px;
-        width: calc(100% - 240px);
-        height: 100vh;
-        height: 100dvh;
-        overflow-y: auto;
-        padding: 36px 48px 60px 48px;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        gap: 36px;
-    }
-
-    /* Page Header */
-    .desktop-page-header {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .desktop-page-title {
-        font-size: 34px;
-        font-weight: 700;
-        letter-spacing: -0.6px;
-        color: #ffffff;
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang TC", sans-serif;
-    }
-
-    @media (prefers-color-scheme: light) {
-        .desktop-page-title {
-            color: #1c1c1e;
-        }
-    }
-
-    .desktop-page-subtitle {
-        font-size: 14px;
-        color: rgba(255, 255, 255, 0.45);
-    }
-
-    @media (prefers-color-scheme: light) {
-        .desktop-page-subtitle {
-            color: rgba(0, 0, 0, 0.45);
-        }
-    }
-
-    /* ========================================================================
-     * Hero Section: Sacred Memorial Sanctuary Showcase Card
-     * ======================================================================== */
-    .desktop-hero-showcase {
-        width: 100%;
-        background: linear-gradient(135deg, rgba(34, 34, 38, 0.85) 0%, rgba(22, 22, 24, 0.95) 100%);
-        border: 0.5px solid rgba(255, 255, 255, 0.1);
-        border-radius: 18px;
-        padding: 28px 32px;
-        box-sizing: border-box;
-        display: flex;
-        gap: 36px;
-        align-items: center;
-        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
-    }
-
-    @media (prefers-color-scheme: light) {
-        .desktop-hero-showcase {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(244, 244, 246, 0.95) 100%);
-            border: 0.5px solid rgba(0, 0, 0, 0.08);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-        }
-    }
-
-    .desktop-hero-portrait-col {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        flex-shrink: 0;
-    }
-
-    .desktop-hero-portrait-col .wood-frame {
-        padding: 10px;
-        border-radius: 4px;
-    }
-
-    .desktop-hero-portrait-col .portrait-img {
-        height: 200px !important;
-        width: auto !important;
-        aspect-ratio: 320 / 440;
-    }
-
-    .desktop-hero-attendance {
-        margin-top: 10px;
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.6);
-        background: rgba(255, 255, 255, 0.06);
-        padding: 4px 12px;
-        border-radius: 12px;
-    }
-
-    @media (prefers-color-scheme: light) {
-        .desktop-hero-attendance {
-            color: rgba(0, 0, 0, 0.6);
-            background: rgba(0, 0, 0, 0.05);
-        }
-    }
-
-    .desktop-hero-content-col {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        flex: 1;
-    }
-
-    .desktop-hero-badge {
-        font-size: 11.5px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        color: #fa586a;
-    }
-
-    .desktop-hero-title {
-        font-size: 24px;
-        font-weight: 700;
-        color: #ffffff;
-        margin: 0;
-        letter-spacing: -0.3px;
-    }
-
-    @media (prefers-color-scheme: light) {
-        .desktop-hero-title {
-            color: #1c1c1e;
-        }
-    }
-
-    .desktop-hero-quote {
-        margin: 0;
-        font-family: "BiauKai", "Kaiti TC", "KaiTi", "標楷體", serif;
-        font-size: 14.5px;
-        line-height: 1.7;
-        color: rgba(255, 255, 255, 0.82);
-        background: rgba(255, 255, 255, 0.04);
-        border-left: 3px solid #fa586a;
-        padding: 10px 16px;
-        border-radius: 0 8px 8px 0;
-    }
-
-    @media (prefers-color-scheme: light) {
-        .desktop-hero-quote {
-            color: rgba(0, 0, 0, 0.82);
-            background: rgba(0, 0, 0, 0.03);
-        }
-    }
-
-    .desktop-hero-actions {
-        display: flex;
-        gap: 12px;
-        margin-top: 4px;
-    }
-
-    .apple-pill-btn {
-        padding: 8px 18px;
-        border-radius: 20px;
-        font-size: 13.5px;
-        font-weight: 600;
-        cursor: pointer;
-        border: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        transition: all 0.2s ease;
-        text-decoration: none;
-    }
-
-    .apple-pill-btn.primary {
-        background: #fa586a;
-        color: #ffffff;
-        box-shadow: 0 4px 14px rgba(250, 88, 106, 0.35);
-    }
-
-    .apple-pill-btn.primary:hover {
-        background: #ff2d55;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(250, 88, 106, 0.45);
-    }
-
-    .apple-pill-btn.secondary {
-        background: rgba(255, 255, 255, 0.1);
-        color: #ffffff;
-    }
-
-    @media (prefers-color-scheme: light) {
-        .apple-pill-btn.secondary {
-            background: rgba(0, 0, 0, 0.08);
-            color: #1c1c1e;
-        }
-    }
-
-    .apple-pill-btn.secondary:hover {
-        background: rgba(255, 255, 255, 0.18);
-    }
-
-    /* ========================================================================
-     * Section 1: Featured Spotlight Carousel (Apple Music Top Row)
-     * ======================================================================== */
-    .desktop-section-header-row {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        margin-bottom: 14px;
-    }
-
-    .desktop-section-title {
-        font-size: 21px;
-        font-weight: 700;
-        color: #ffffff;
-        letter-spacing: -0.3px;
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang TC", sans-serif;
-    }
-
-    @media (prefers-color-scheme: light) {
-        .desktop-section-title {
-            color: #1c1c1e;
-        }
-    }
-
-    .desktop-section-more {
-        font-size: 13px;
-        font-weight: 500;
-        color: #fa586a;
-        text-decoration: none;
-    }
-
-    .desktop-section-more:hover {
-        text-decoration: underline;
-    }
-
-    .desktop-featured-row {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 18px;
-    }
-
-    @media (max-width: 1200px) {
-        .desktop-featured-row {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    .desktop-poster-card {
-        height: 230px;
-        border-radius: 14px;
-        padding: 18px;
-        box-sizing: border-box;
-        text-decoration: none;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
-        transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.25s ease;
-    }
-
-    .desktop-poster-card:hover {
-        transform: scale(1.025) translateY(-3px);
-        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
-    }
-
-    /* Poster Card Gradients */
-    .poster-coral {
-        background: linear-gradient(145deg, #d31027 0%, #ea384d 50%, #7b0010 100%);
-    }
-
-    .poster-amber {
-        background: linear-gradient(145deg, #f7971e 0%, #ff8008 100%);
-    }
-
-    .poster-sunset {
-        background: linear-gradient(145deg, #c0392b 0%, #8e44ad 100%);
-    }
-
-    .poster-crimson {
-        background: linear-gradient(145deg, #870000 0%, #190a05 100%);
-    }
-
-    .desktop-poster-badge {
-        align-self: flex-start;
-        padding: 3px 8px;
-        border-radius: 5px;
-        font-size: 10.5px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-        background: rgba(0, 0, 0, 0.3);
-        color: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(8px);
-    }
-
-    .desktop-poster-footer {
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-    }
-
-    .desktop-poster-title {
-        font-size: 19px;
-        font-weight: 700;
-        color: #ffffff;
-        margin: 0;
-        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-        letter-spacing: -0.2px;
-    }
-
-    .desktop-poster-sub {
-        font-size: 12.5px;
-        color: rgba(255, 255, 255, 0.85);
-        margin: 0;
-        line-height: 1.35;
-        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
-    }
-
-    /* ========================================================================
-     * Section 2: Square Cover Art Grid (Apple Music Bottom Row)
-     * ======================================================================== */
-    .desktop-album-grid {
-        display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        gap: 18px;
-    }
-
-    @media (max-width: 1300px) {
-        .desktop-album-grid {
-            grid-template-columns: repeat(3, 1fr);
-        }
-    }
-
-    @media (max-width: 950px) {
-        .desktop-album-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    .desktop-album-card {
-        display: flex;
-        flex-direction: column;
-        text-decoration: none;
-    }
-
-    .desktop-album-cover {
-        width: 100%;
-        aspect-ratio: 1;
-        border-radius: 12px;
-        background: #242426;
-        border: 0.5px solid rgba(255, 255, 255, 0.08);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 38px;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-        transition: transform 0.22s ease, box-shadow 0.22s ease;
-    }
-
-    @media (prefers-color-scheme: light) {
-        .desktop-album-cover {
-            background: #e5e5ea;
-            border: 0.5px solid rgba(0, 0, 0, 0.08);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-        }
-    }
-
-    .desktop-album-card:hover .desktop-album-cover {
-        transform: scale(1.035) translateY(-2px);
-        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
-    }
-
-    .desktop-album-title {
-        font-size: 13.5px;
-        font-weight: 600;
-        color: #ffffff;
-        margin: 8px 0 0 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    @media (prefers-color-scheme: light) {
-        .desktop-album-title {
-            color: #1c1c1e;
-        }
-    }
-
-    .desktop-album-sub {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.45);
-        margin: 2px 0 0 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    @media (prefers-color-scheme: light) {
-        .desktop-album-sub {
-            color: rgba(0, 0, 0, 0.45);
-        }
+    /* Centered ceremonial container */
+    body.has-desktop-sidebar .container {
+        max-width: 500px !important;
+        margin: auto auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 }
 
