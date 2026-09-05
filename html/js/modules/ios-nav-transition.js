@@ -68,15 +68,8 @@ export function initIOSNavTransition(options = {}) {
 
             prefetchUrl(href);
 
-            /* Animate current page sliding slightly left with subtle dimming */
-            const contentElements = document.querySelectorAll('.ios-group-container, .festival-hero, .charts-container');
-            for (let j = 0; j < contentElements.length; j++) {
-                contentElements[j].classList.add('ios-parent-pushing-out');
-            }
-
-            setTimeout(function() {
-                window.location.href = href;
-            }, 80);
+            /* Immediately navigate without prematurely shifting the parent view */
+            window.location.href = href;
         });
     }
 
@@ -269,8 +262,15 @@ export function initIOSNavTransition(options = {}) {
 
         /* Animate nav bar micro-interactions */
         if (navChevron) navChevron.classList.add('ios-nav-chevron-exit');
-        if (navLabel) navLabel.classList.add('ios-nav-label-exit');
         if (navTitle) navTitle.classList.add('ios-nav-title-exit');
+        if (navLabel) {
+            const rect = navLabel.getBoundingClientRect();
+            const currentCenterX = rect.left + rect.width / 2;
+            const screenCenterX = window.innerWidth / 2;
+            const offset = screenCenterX - currentCenterX;
+            navLabel.style.setProperty('--nav-center-offset', offset + 'px');
+            navLabel.classList.add('ios-nav-label-sliding-center');
+        }
 
         /* Animate view sheet and page content sliding out to the right */
         const slideElements = getSlideElements();
@@ -426,11 +426,26 @@ export function initIOSNavTransition(options = {}) {
                 navChevron.style.opacity = String(1 - progress);
             }
             if (navLabel) {
-                navLabel.style.transform = 'translate3d(' + (130 * progress) + 'px, 0, 0)';
-                navLabel.style.opacity = '1';
+                const rect = navLabel.getBoundingClientRect();
+                const currentCenterX = rect.left + rect.width / 2;
+                const screenCenterX = window.innerWidth / 2;
+                const targetOffset = screenCenterX - currentCenterX;
+                navLabel.style.transform = 'translate3d(' + (targetOffset * progress) + 'px, 0, 0)';
+                if (progress < 0.35) {
+                    navLabel.style.opacity = String(1 - (progress / 0.35));
+                    navLabel.style.color = '';
+                    navLabel.style.fontWeight = '';
+                } else if (progress < 0.65) {
+                    navLabel.style.opacity = '0';
+                } else {
+                    navLabel.style.opacity = String((progress - 0.65) / 0.35);
+                    const isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+                    navLabel.style.color = isLight ? '#000000' : '#ffffff';
+                    navLabel.style.fontWeight = '600';
+                }
             }
             if (navTitle) {
-                navTitle.style.transform = 'translate3d(' + (50 * progress) + 'px, 0, 0)';
+                navTitle.style.transform = 'translate3d(' + (60 * progress) + 'px, 0, 0)';
                 navTitle.style.opacity = String(1 - progress);
             }
         }
@@ -483,12 +498,20 @@ export function initIOSNavTransition(options = {}) {
                 navChevron.style.opacity = '0';
             }
             if (navLabel) {
-                navLabel.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
-                navLabel.style.transform = 'translate3d(130px, 0, 0)';
+                const rect = navLabel.getBoundingClientRect();
+                const currentCenterX = rect.left + rect.width / 2;
+                const screenCenterX = window.innerWidth / 2;
+                const targetOffset = screenCenterX - currentCenterX;
+                navLabel.style.transition = 'transform 0.2s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.2s ease, color 0.15s ease';
+                navLabel.style.transform = 'translate3d(' + targetOffset + 'px, 0, 0)';
+                const isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+                navLabel.style.color = isLight ? '#000000' : '#ffffff';
+                navLabel.style.fontWeight = '600';
+                navLabel.style.opacity = '1';
             }
             if (navTitle) {
                 navTitle.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
-                navTitle.style.transform = 'translate3d(50px, 0, 0)';
+                navTitle.style.transform = 'translate3d(60px, 0, 0)';
                 navTitle.style.opacity = '0';
             }
 
@@ -517,8 +540,11 @@ export function initIOSNavTransition(options = {}) {
                 navChevron.style.opacity = '1';
             }
             if (navLabel) {
-                navLabel.style.transition = 'transform 0.24s ease, opacity 0.24s ease';
+                navLabel.style.transition = 'transform 0.24s ease, opacity 0.24s ease, color 0.2s ease';
                 navLabel.style.transform = 'translate3d(0, 0, 0)';
+                navLabel.style.opacity = '1';
+                navLabel.style.color = '';
+                navLabel.style.fontWeight = '';
             }
             if (navTitle) {
                 navTitle.style.transition = 'transform 0.24s ease, opacity 0.24s ease';
@@ -546,6 +572,8 @@ export function initIOSNavTransition(options = {}) {
                     navLabel.style.transition = '';
                     navLabel.style.transform = '';
                     navLabel.style.opacity = '';
+                    navLabel.style.color = '';
+                    navLabel.style.fontWeight = '';
                 }
                 if (navTitle) {
                     navTitle.style.transition = '';

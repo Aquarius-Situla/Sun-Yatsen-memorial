@@ -73,7 +73,7 @@ function getMarkdownStyles(isLight) {
 import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=2025';
 import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=2025';
 import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=2025';
-import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260905e';
+import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260905g';
 
 /* ============================================================================
  * Subpage Initialization Engine
