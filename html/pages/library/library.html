@@ -55,7 +55,7 @@
         <!-- Section 1: Sun Yat-sen Archives & Philosophy -->
         <div class="ios-section-header" id="section-yatsen-header">國父生平與思想 (SUN YAT-SEN ARCHIVES)</div>
         <div class="ios-card">
-            <a class="ios-row has-badge" href="../biography/biography.html?tab=biography">
+            <a class="ios-row has-badge" href="../biography/biography.html">
                 <div class="ios-row-title">
                     <div class="ios-badge badge-blue">
                         <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
@@ -63,19 +63,7 @@
                     <span id="label-biography">國父生平傳記</span>
                 </div>
                 <div class="ios-row-accessory">
-                    <span class="ios-row-value" id="val-biography">年譜與歷程</span>
-                    <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-                </div>
-            </a>
-            <a class="ios-row has-badge" href="../biography/biography.html?tab=theories">
-                <div class="ios-row-title">
-                    <div class="ios-badge badge-orange">
-                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm0-4h-2V7h2v7z"/></svg>
-                    </div>
-                    <span id="label-theories">三民主義與思想體系</span>
-                </div>
-                <div class="ios-row-accessory">
-                    <span class="ios-row-value" id="val-theories">核心理論與圖表</span>
+                    <span class="ios-row-value" id="val-biography">年譜與思想</span>
                     <svg class="ios-chevron" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
                 </div>
             </a>
@@ -193,6 +181,7 @@
          * ==================================================================== */
         import { getCurrentLang, setGlobalLang, syncTabBarLabels } from '../../js/modules/i18n.js?v=2025';
         import { syncStandaloneTabBar } from '../../js/modules/tab-bar.js?v=2025';
+        import { initIOSNavTransition } from '../../js/modules/ios-nav-transition.js?v=20260905f';
 
         const i18nStrings = {
             tc: {
@@ -201,9 +190,7 @@
                 secYatsenHeader: '國父生平與思想 (SUN YAT-SEN ARCHIVES)',
                 secExhibitsHeader: '民國重大歷史特展 (HISTORICAL EXHIBITIONS)',
                 labelBiography: '國父生平傳記',
-                valBiography: '年譜與歷程',
-                labelTheories: '三民主義與思想體系',
-                valTheories: '核心理論與圖表',
+                valBiography: '年譜與思想',
                 labelYatsenBirth: '國父誕辰特展',
                 valYatsenBirth: '十一月十二日',
                 labelYatsenPassing: '國父逝世紀念',
@@ -224,9 +211,7 @@
                 secYatsenHeader: '国父生平与思想 (SUN YAT-SEN ARCHIVES)',
                 secExhibitsHeader: '民国重大历史特展 (HISTORICAL EXHIBITIONS)',
                 labelBiography: '国父生平传记',
-                valBiography: '年谱与历程',
-                labelTheories: '三民主义与思想体系',
-                valTheories: '核心理论与图表',
+                valBiography: '年谱与思想',
                 labelYatsenBirth: '国父诞辰特展',
                 valYatsenBirth: '十一月十二日',
                 labelYatsenPassing: '国父逝世纪念',
@@ -261,12 +246,6 @@
 
             const valBiography = document.getElementById('val-biography');
             if (valBiography) valBiography.textContent = strings.valBiography;
-
-            const labelTheories = document.getElementById('label-theories');
-            if (labelTheories) labelTheories.textContent = strings.labelTheories;
-
-            const valTheories = document.getElementById('val-theories');
-            if (valTheories) valTheories.textContent = strings.valTheories;
 
             const labelYatsenBirth = document.getElementById('label-yatsen-birth');
             if (labelYatsenBirth) labelYatsenBirth.textContent = strings.labelYatsenBirth;
@@ -313,6 +292,7 @@
         const currentLang = getCurrentLang();
         updateTexts(currentLang);
         syncStandaloneTabBar();
+        initIOSNavTransition();
 
         const langBtn = document.getElementById('lang-btn');
         if (langBtn) {

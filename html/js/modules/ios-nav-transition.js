@@ -13,6 +13,76 @@ export function initIOSNavTransition(options = {}) {
         desktopBackButtonSelector = '.top-back-btn'
     } = options;
 
+    function prefetchUrl(url) {
+        if (!url) return;
+        try {
+            const link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.href = url;
+            document.head.appendChild(link);
+            if (window.fetch) {
+                fetch(url, { priority: 'low' }).catch(function() {});
+            }
+        } catch (e) {
+            /* Ignore prefetch failures */
+        }
+    }
+
+    /* ========================================================================
+     * Section 1: Hub & Parent Page Handling (Snapshot Caching & Forward Push)
+     * ======================================================================== */
+    const currentGroup = document.querySelector('.ios-group-container');
+    if (currentGroup) {
+        try {
+            const sanitizedSnapshot = currentGroup.outerHTML.replace(/\s+id="[^"]*"/g, '');
+            sessionStorage.setItem('sys_last_group_html', sanitizedSnapshot);
+            const pathname = window.location.pathname || '';
+            sessionStorage.setItem('sys_underlay_' + pathname, sanitizedSnapshot);
+        } catch (e) {
+            /* Ignore storage quota or access errors */
+        }
+    }
+
+    /* Attach forward push listener to clickable rows */
+    const rowLinks = document.querySelectorAll('.ios-row[href], a.has-subpage-transition[href]');
+    for (let i = 0; i < rowLinks.length; i++) {
+        const link = rowLinks[i];
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('javascript:')) continue;
+
+        link.addEventListener('click', function(e) {
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.which === 2) return;
+            e.preventDefault();
+
+            try {
+                if (currentGroup) {
+                    const freshSanitized = currentGroup.outerHTML.replace(/\s+id="[^"]*"/g, '');
+                    sessionStorage.setItem('sys_last_group_html', freshSanitized);
+                    const cleanPath = href.split('?')[0].split('#')[0];
+                    sessionStorage.setItem('sys_underlay_' + cleanPath, freshSanitized);
+                }
+                sessionStorage.setItem('sys_nav_action', 'push');
+            } catch (err) {
+                /* Storage fallback */
+            }
+
+            prefetchUrl(href);
+
+            /* Animate current page sliding slightly left with subtle dimming */
+            const contentElements = document.querySelectorAll('.ios-group-container, .festival-hero, .charts-container');
+            for (let j = 0; j < contentElements.length; j++) {
+                contentElements[j].classList.add('ios-parent-pushing-out');
+            }
+
+            setTimeout(function() {
+                window.location.href = href;
+            }, 80);
+        });
+    }
+
+    /* ========================================================================
+     * Section 2: Subpage Detection & Verification
+     * ======================================================================== */
     const navBackBtn = document.querySelector(backButtonSelector);
     const desktopBackBtn = document.querySelector(desktopBackButtonSelector);
 
@@ -54,23 +124,10 @@ export function initIOSNavTransition(options = {}) {
         return list;
     }
 
-    function prefetchUrl(url) {
-        if (!url) return;
-        try {
-            const link = document.createElement('link');
-            link.rel = 'prefetch';
-            link.href = url;
-            document.head.appendChild(link);
-        } catch (e) {
-            /* Ignore prefetch failures */
-        }
-    }
-
     /* ========================================================================
-     * Lazy Underlay Parallax Layer Initialization
-     * Creates a lightweight underlay canvas on-demand with zero network fetch
+     * Section 3: Underlay Parallax Layer Initialization & Seamless Caching
      * ======================================================================== */
-    function ensureUnderlay() {
+    function ensureUnderlay(targetUrl) {
         if (underlayLayer) return;
         underlayLayer = document.querySelector('.ios-underlay-layer');
         if (!underlayLayer) {
@@ -97,17 +154,118 @@ export function initIOSNavTransition(options = {}) {
             viewSheet.className = 'ios-view-sheet';
             document.body.insertBefore(viewSheet, underlayLayer.nextSibling);
         }
+
+        /* Populate underlay content with parent cards snapshot */
+        if (underlayContent && underlayContent.children.length === 0) {
+            let cachedHtml = null;
+            try {
+                if (targetUrl) {
+                    const cleanPath = targetUrl.split('?')[0].split('#')[0];
+                    cachedHtml = sessionStorage.getItem('sys_underlay_' + cleanPath);
+                }
+                if (!cachedHtml) {
+                    cachedHtml = sessionStorage.getItem('sys_last_group_html');
+                }
+            } catch (e) {
+                cachedHtml = null;
+            }
+
+            if (cachedHtml) {
+                underlayContent.innerHTML = cachedHtml.replace(/\s+id="[^"]*"/g, '');
+            } else if (targetUrl && window.fetch) {
+                /* Asynchronously fetch parent page HTML in background to populate underlay */
+                fetch(targetUrl)
+                    .then(function(res) { return res.text(); })
+                    .then(function(html) {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const remoteGroup = doc.querySelector('.ios-group-container');
+                        if (remoteGroup && underlayContent && underlayContent.children.length === 0) {
+                            underlayContent.innerHTML = remoteGroup.outerHTML.replace(/\s+id="[^"]*"/g, '');
+                        }
+                    })
+                    .catch(function() {});
+            }
+        }
+    }
+
+    const initialTarget = getTargetUrl(navBackBtn || desktopBackBtn);
+    ensureUnderlay(initialTarget);
+    prefetchUrl(initialTarget);
+
+    /* ========================================================================
+     * Section 4: Forward Push Entrance Animation Execution
+     * ======================================================================== */
+    let isForwardPush = false;
+    try {
+        if (sessionStorage.getItem('sys_nav_action') === 'push') {
+            isForwardPush = true;
+            sessionStorage.removeItem('sys_nav_action');
+        }
+    } catch (e) {
+        isForwardPush = false;
+    }
+
+    if (isForwardPush) {
+        const enterElements = getSlideElements();
+        for (let i = 0; i < enterElements.length; i++) {
+            enterElements[i].classList.add('ios-content-entering');
+        }
+        if (navTitle) navTitle.classList.add('ios-nav-title-enter');
+        if (navChevron) navChevron.classList.add('ios-nav-back-enter');
+        if (navLabel) navLabel.classList.add('ios-nav-back-enter');
+
+        if (underlayLayer) {
+            underlayLayer.style.transform = 'translate3d(0, 0, 0)';
+            underlayLayer.style.transition = 'none';
+        }
+        if (underlayScrim) {
+            underlayScrim.style.opacity = '0';
+            underlayScrim.style.transition = 'none';
+        }
+
+        requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+                for (let i = 0; i < enterElements.length; i++) {
+                    enterElements[i].classList.remove('ios-content-entering');
+                    enterElements[i].classList.add('ios-content-enter-active');
+                }
+                if (navTitle) navTitle.classList.add('ios-nav-title-enter-active');
+                if (navChevron) navChevron.classList.add('ios-nav-back-enter-active');
+                if (navLabel) navLabel.classList.add('ios-nav-back-enter-active');
+
+                if (underlayLayer) {
+                    underlayLayer.style.transition = 'transform 0.28s cubic-bezier(0.32, 0.72, 0, 1)';
+                    underlayLayer.style.transform = 'translate3d(-30%, 0, 0)';
+                }
+                if (underlayScrim) {
+                    underlayScrim.style.transition = 'opacity 0.28s cubic-bezier(0.32, 0.72, 0, 1)';
+                    underlayScrim.style.opacity = '0.3';
+                }
+
+                setTimeout(function() {
+                    for (let i = 0; i < enterElements.length; i++) {
+                        enterElements[i].classList.remove('ios-content-enter-active');
+                    }
+                    if (navTitle) navTitle.classList.remove('ios-nav-title-enter', 'ios-nav-title-enter-active');
+                    if (navChevron) navChevron.classList.remove('ios-nav-back-enter', 'ios-nav-back-enter-active');
+                    if (navLabel) navLabel.classList.remove('ios-nav-back-enter', 'ios-nav-back-enter-active');
+                    if (underlayLayer) underlayLayer.style.transition = '';
+                    if (underlayScrim) underlayScrim.style.transition = '';
+                }, 300);
+            });
+        });
     }
 
     /* ========================================================================
-     * Navigation Exit Transition (Button Trigger)
+     * Section 5: Navigation Exit Transition (Button Trigger)
      * ======================================================================== */
     function triggerPopTransition(targetUrl) {
         if (isNavigating || !targetUrl) return;
         isNavigating = true;
 
         prefetchUrl(targetUrl);
-        ensureUnderlay();
+        ensureUnderlay(targetUrl);
 
         /* Animate nav bar micro-interactions */
         if (navChevron) navChevron.classList.add('ios-nav-chevron-exit');
@@ -128,10 +286,10 @@ export function initIOSNavTransition(options = {}) {
             underlayScrim.style.opacity = '0';
         }
 
-        /* Navigate when exit animation reaches peak */
+        /* Navigate when exit animation completes */
         setTimeout(function() {
             window.location.href = targetUrl;
-        }, 240);
+        }, 220);
 
         /* Fallback guarantee */
         setTimeout(function() {
@@ -176,7 +334,7 @@ export function initIOSNavTransition(options = {}) {
     }
 
     /* ========================================================================
-     * Interactive Left-Edge Swipe Gesture (iOS Native Interactive Pop)
+     * Section 6: Interactive Left-Edge Swipe Gesture (iOS Native Pop)
      * ======================================================================== */
     let touchStartX = 0;
     let touchStartY = 0;
@@ -195,7 +353,7 @@ export function initIOSNavTransition(options = {}) {
 
         const touch = e.touches[0];
 
-        /* CRITICAL: Never intercept touches on navigation headers or buttons */
+        /* Never intercept touches on navigation headers or buttons */
         if (touch.clientY < 60 || (e.target && e.target.closest && e.target.closest('.apple-top-nav, .top-back-btn, .apple-tab-bar'))) {
             return;
         }
@@ -220,14 +378,14 @@ export function initIOSNavTransition(options = {}) {
 
         if (!isSwiping) {
             if (Math.abs(deltaY) > Math.abs(deltaX)) {
-                /* Vertical scroll intent: immediately cancel edge tracking and restore native scroll */
+                /* Vertical scroll intent: immediately cancel edge tracking */
                 stopTracking();
                 return;
             }
             if (deltaX > 8 && Math.abs(deltaX) > Math.abs(deltaY)) {
                 /* Horizontal swipe intent confirmed */
                 isSwiping = true;
-                ensureUnderlay();
+                ensureUnderlay(initialTarget);
                 const slideElements = getSlideElements();
                 for (let i = 0; i < slideElements.length; i++) {
                     slideElements[i].classList.add('ios-content-dragging');
@@ -402,14 +560,16 @@ export function initIOSNavTransition(options = {}) {
     window.addEventListener('touchend', onTouchEnd, { passive: true });
     window.addEventListener('touchcancel', onTouchEnd, { passive: true });
 
-    /* Handle bfcache restore */
+    /* ========================================================================
+     * Section 7: BFCache & History Restore Handlers
+     * ======================================================================== */
     window.addEventListener('pageshow', function(e) {
         if (e.persisted) {
             if (navBackBtn) navBackBtn.style.opacity = '';
             if (desktopBackBtn) desktopBackBtn.style.opacity = '';
             const slideElements = getSlideElements();
             for (let i = 0; i < slideElements.length; i++) {
-                slideElements[i].classList.remove('ios-content-sliding-out', 'ios-content-dragging');
+                slideElements[i].classList.remove('ios-content-sliding-out', 'ios-content-dragging', 'ios-content-entering', 'ios-content-enter-active', 'ios-parent-pushing-out');
                 slideElements[i].style.transform = '';
                 slideElements[i].style.transition = '';
             }
@@ -423,17 +583,17 @@ export function initIOSNavTransition(options = {}) {
                 underlayScrim.style.transition = '';
             }
             if (navChevron) {
-                navChevron.classList.remove('ios-nav-chevron-exit');
+                navChevron.classList.remove('ios-nav-chevron-exit', 'ios-nav-back-enter', 'ios-nav-back-enter-active');
                 navChevron.style.transform = '';
                 navChevron.style.opacity = '';
             }
             if (navLabel) {
-                navLabel.classList.remove('ios-nav-label-exit');
+                navLabel.classList.remove('ios-nav-label-exit', 'ios-nav-back-enter', 'ios-nav-back-enter-active');
                 navLabel.style.transform = '';
                 navLabel.style.opacity = '';
             }
             if (navTitle) {
-                navTitle.classList.remove('ios-nav-title-exit');
+                navTitle.classList.remove('ios-nav-title-exit', 'ios-nav-title-enter', 'ios-nav-title-enter-active');
                 navTitle.style.transform = '';
                 navTitle.style.opacity = '';
             }
