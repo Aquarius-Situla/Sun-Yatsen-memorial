@@ -28,6 +28,10 @@ export function initIOSNavTransition(options = {}) {
     }
 
     let isNavigating = false;
+    let underlayLayer = null;
+    let underlayContent = null;
+    let underlayScrim = null;
+    let viewSheet = null;
 
     function getTargetUrl(btn) {
         if (btn && btn.getAttribute('href')) {
@@ -42,6 +46,14 @@ export function initIOSNavTransition(options = {}) {
         return null;
     }
 
+    function getSlideElements() {
+        const list = Array.from(getContentElements());
+        if (viewSheet && list.indexOf(viewSheet) === -1) {
+            list.push(viewSheet);
+        }
+        return list;
+    }
+
     function prefetchUrl(url) {
         if (!url) return;
         try {
@@ -54,6 +66,80 @@ export function initIOSNavTransition(options = {}) {
         }
     }
 
+    /* ========================================================================
+     * Underlay Parallax Layer Initialization & Dynamic Pre-population
+     * ======================================================================== */
+    function setupUnderlay(targetUrl) {
+        underlayLayer = document.querySelector('.ios-underlay-layer');
+        if (!underlayLayer) {
+            underlayLayer = document.createElement('div');
+            underlayLayer.className = 'ios-underlay-layer';
+
+            underlayContent = document.createElement('div');
+            underlayContent.className = 'ios-underlay-content';
+
+            underlayScrim = document.createElement('div');
+            underlayScrim.className = 'ios-underlay-scrim';
+
+            underlayLayer.appendChild(underlayContent);
+            underlayLayer.appendChild(underlayScrim);
+            document.body.prepend(underlayLayer);
+        } else {
+            underlayContent = underlayLayer.querySelector('.ios-underlay-content');
+            underlayScrim = underlayLayer.querySelector('.ios-underlay-scrim');
+        }
+
+        viewSheet = document.querySelector('.ios-view-sheet');
+        if (!viewSheet) {
+            viewSheet = document.createElement('div');
+            viewSheet.className = 'ios-view-sheet';
+            document.body.insertBefore(viewSheet, underlayLayer.nextSibling);
+        }
+
+        if (!targetUrl) return;
+
+        /* Fetch parent page asynchronously and populate underlay content */
+        fetch(targetUrl)
+            .then(function(response) {
+                if (!response.ok) throw new Error('Fetch failed');
+                return response.text();
+            })
+            .then(function(html) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                const parentGroup = doc.querySelector('.ios-group-container') ||
+                                    doc.querySelector('.markdown-container, .charts-container, .container, main');
+
+                if (parentGroup && underlayContent) {
+                    const clone = parentGroup.cloneNode(true);
+                    /* Strip IDs to avoid duplicate ID collisions */
+                    const idElements = clone.querySelectorAll('[id]');
+                    for (let i = 0; i < idElements.length; i++) {
+                        idElements[i].removeAttribute('id');
+                    }
+                    underlayContent.innerHTML = '';
+                    underlayContent.appendChild(clone);
+                }
+                if (underlayLayer) {
+                    underlayLayer.classList.add('ready');
+                }
+            })
+            .catch(function() {
+                if (underlayLayer) {
+                    underlayLayer.classList.add('ready');
+                }
+            });
+    }
+
+    const initialTarget = getTargetUrl(navBackBtn) || getTargetUrl(desktopBackBtn);
+    if (initialTarget) {
+        setupUnderlay(initialTarget);
+    }
+
+    /* ========================================================================
+     * Navigation Exit Transition (Button Trigger)
+     * ======================================================================== */
     function triggerPopTransition(targetUrl) {
         if (isNavigating || !targetUrl) return;
         isNavigating = true;
@@ -65,24 +151,47 @@ export function initIOSNavTransition(options = {}) {
         if (navLabel) navLabel.classList.add('ios-nav-label-exit');
         if (navTitle) navTitle.classList.add('ios-nav-title-exit');
 
-        /* Animate page content sliding out to the right */
-        const contents = getContentElements();
-        contents.forEach(el => el.classList.add('ios-content-sliding-out'));
+        /* Animate view sheet and page content sliding out to the right */
+        const slideElements = getSlideElements();
+        for (let i = 0; i < slideElements.length; i++) {
+            slideElements[i].classList.add('ios-content-sliding-out');
+        }
+
+        /* Animate underlay sliding into position and fade scrim */
+        if (underlayLayer) {
+            underlayLayer.classList.add('ios-underlay-sliding-in');
+        }
+        if (underlayScrim) {
+            underlayScrim.style.opacity = '0';
+        }
 
         /* Navigate when exit animation reaches peak */
-        setTimeout(() => {
+        setTimeout(function() {
             window.location.href = targetUrl;
         }, 240);
 
         /* Fallback guarantee */
-        setTimeout(() => {
+        setTimeout(function() {
             window.location.href = targetUrl;
         }, 500);
     }
 
     function attachClickHandler(btn) {
         if (!btn) return;
-        btn.addEventListener('click', (e) => {
+
+        btn.addEventListener('touchstart', function() {
+            btn.style.opacity = '0.35';
+        }, { passive: true });
+
+        btn.addEventListener('touchend', function() {
+            if (!isNavigating) {
+                setTimeout(function() {
+                    if (!isNavigating) btn.style.opacity = '';
+                }, 150);
+            }
+        }, { passive: true });
+
+        btn.addEventListener('click', function(e) {
             if (e.metaKey || e.ctrlKey || e.shiftKey || e.which === 2) return;
             const url = getTargetUrl(btn);
             if (url && !url.startsWith('#') && !url.startsWith('javascript:')) {
@@ -93,8 +202,15 @@ export function initIOSNavTransition(options = {}) {
         });
     }
 
-    attachClickHandler(navBackBtn);
-    attachClickHandler(desktopBackBtn);
+    const backButtons = document.querySelectorAll(backButtonSelector);
+    for (let i = 0; i < backButtons.length; i++) {
+        attachClickHandler(backButtons[i]);
+    }
+
+    const desktopBackButtons = document.querySelectorAll(desktopBackButtonSelector);
+    for (let i = 0; i < desktopBackButtons.length; i++) {
+        attachClickHandler(desktopBackButtons[i]);
+    }
 
     /* ========================================================================
      * Interactive Left-Edge Swipe Gesture (iOS Native Interactive Pop)
@@ -111,7 +227,7 @@ export function initIOSNavTransition(options = {}) {
         const touch = e.touches[0];
 
         /* CRITICAL: Never intercept touches on navigation headers or buttons */
-        if (touch.clientY < 60 || (e.target && e.target.closest && e.target.closest('.apple-top-nav, .top-back-btn'))) {
+        if (touch.clientY < 60 || (e.target && e.target.closest && e.target.closest('.apple-top-nav, .top-back-btn, .apple-tab-bar'))) {
             return;
         }
 
@@ -141,8 +257,10 @@ export function initIOSNavTransition(options = {}) {
             if (deltaX > 8 && Math.abs(deltaX) > Math.abs(deltaY)) {
                 /* Horizontal swipe intent confirmed */
                 isSwiping = true;
-                const contents = getContentElements();
-                contents.forEach(el => el.classList.add('ios-content-dragging'));
+                const slideElements = getSlideElements();
+                for (let i = 0; i < slideElements.length; i++) {
+                    slideElements[i].classList.add('ios-content-dragging');
+                }
                 const target = getTargetUrl(navBackBtn);
                 if (target) prefetchUrl(target);
             }
@@ -152,20 +270,35 @@ export function initIOSNavTransition(options = {}) {
             if (e.cancelable) e.preventDefault();
 
             const currentX = Math.max(0, deltaX);
-            const progress = Math.min(1, currentX / (window.innerWidth || 375));
+            const screenWidth = window.innerWidth || 375;
+            const progress = Math.min(1, currentX / screenWidth);
 
-            const contents = getContentElements();
-            contents.forEach(el => {
-                el.style.transform = 'translate3d(' + currentX + 'px, 0, 0)';
-            });
+            const slideElements = getSlideElements();
+            for (let i = 0; i < slideElements.length; i++) {
+                slideElements[i].style.transform = 'translate3d(' + currentX + 'px, 0, 0)';
+            }
 
+            /* Underlay parallax sliding from -30% to 0% */
+            if (underlayLayer) {
+                const underlayPercent = -30 * (1 - progress);
+                underlayLayer.style.transform = 'translate3d(' + underlayPercent + '%, 0, 0)';
+                underlayLayer.style.transition = 'none';
+            }
+
+            /* Underlay scrim fade from 0.3 to 0 */
+            if (underlayScrim) {
+                underlayScrim.style.opacity = String(0.3 * (1 - progress));
+                underlayScrim.style.transition = 'none';
+            }
+
+            /* Micro-interactions in the top nav bar */
             if (navChevron) {
-                navChevron.style.transform = 'translate3d(' + (-14 * (1 - progress)) + 'px, 0, 0)';
+                navChevron.style.transform = 'translate3d(' + (-14 * progress) + 'px, 0, 0)';
                 navChevron.style.opacity = String(1 - progress);
             }
             if (navLabel) {
-                navLabel.style.transform = 'translate3d(' + (24 * progress) + 'px, 0, 0)';
-                navLabel.style.opacity = String(1 - progress * 0.8);
+                navLabel.style.transform = 'translate3d(' + (130 * progress) + 'px, 0, 0)';
+                navLabel.style.opacity = '1';
             }
             if (navTitle) {
                 navTitle.style.transform = 'translate3d(' + (50 * progress) + 'px, 0, 0)';
@@ -191,16 +324,27 @@ export function initIOSNavTransition(options = {}) {
 
         const shouldCommit = (deltaX > screenWidth * 0.3) || (deltaX > 40 && velocity > 0.35);
         const target = getTargetUrl(navBackBtn);
-        const contents = getContentElements();
+        const slideElements = getSlideElements();
 
-        contents.forEach(el => el.classList.remove('ios-content-dragging'));
+        for (let i = 0; i < slideElements.length; i++) {
+            slideElements[i].classList.remove('ios-content-dragging');
+        }
 
         if (shouldCommit && target) {
             isNavigating = true;
-            contents.forEach(el => {
-                el.style.transition = 'transform 0.22s cubic-bezier(0.32, 0.72, 0, 1)';
-                el.style.transform = 'translate3d(100%, 0, 0)';
-            });
+            for (let i = 0; i < slideElements.length; i++) {
+                slideElements[i].style.transition = 'transform 0.22s cubic-bezier(0.32, 0.72, 0, 1)';
+                slideElements[i].style.transform = 'translate3d(100%, 0, 0)';
+            }
+
+            if (underlayLayer) {
+                underlayLayer.style.transition = 'transform 0.22s cubic-bezier(0.32, 0.72, 0, 1)';
+                underlayLayer.style.transform = 'translate3d(0, 0, 0)';
+            }
+            if (underlayScrim) {
+                underlayScrim.style.transition = 'opacity 0.22s cubic-bezier(0.32, 0.72, 0, 1)';
+                underlayScrim.style.opacity = '0';
+            }
 
             if (navChevron) {
                 navChevron.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
@@ -209,8 +353,7 @@ export function initIOSNavTransition(options = {}) {
             }
             if (navLabel) {
                 navLabel.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
-                navLabel.style.transform = 'translate3d(24px, 0, 0)';
-                navLabel.style.opacity = '0';
+                navLabel.style.transform = 'translate3d(130px, 0, 0)';
             }
             if (navTitle) {
                 navTitle.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
@@ -218,15 +361,24 @@ export function initIOSNavTransition(options = {}) {
                 navTitle.style.opacity = '0';
             }
 
-            setTimeout(() => {
+            setTimeout(function() {
                 window.location.href = target;
             }, 210);
         } else {
-            /* Cancel pop */
-            contents.forEach(el => {
-                el.style.transition = 'transform 0.24s cubic-bezier(0.2, 0.9, 0.3, 1)';
-                el.style.transform = 'translate3d(0, 0, 0)';
-            });
+            /* Cancel pop transition */
+            for (let i = 0; i < slideElements.length; i++) {
+                slideElements[i].style.transition = 'transform 0.24s cubic-bezier(0.2, 0.9, 0.3, 1)';
+                slideElements[i].style.transform = 'translate3d(0, 0, 0)';
+            }
+
+            if (underlayLayer) {
+                underlayLayer.style.transition = 'transform 0.24s cubic-bezier(0.2, 0.9, 0.3, 1)';
+                underlayLayer.style.transform = 'translate3d(-30%, 0, 0)';
+            }
+            if (underlayScrim) {
+                underlayScrim.style.transition = 'opacity 0.24s cubic-bezier(0.2, 0.9, 0.3, 1)';
+                underlayScrim.style.opacity = '0.3';
+            }
 
             if (navChevron) {
                 navChevron.style.transition = 'transform 0.24s ease, opacity 0.24s ease';
@@ -236,7 +388,6 @@ export function initIOSNavTransition(options = {}) {
             if (navLabel) {
                 navLabel.style.transition = 'transform 0.24s ease, opacity 0.24s ease';
                 navLabel.style.transform = 'translate3d(0, 0, 0)';
-                navLabel.style.opacity = '1';
             }
             if (navTitle) {
                 navTitle.style.transition = 'transform 0.24s ease, opacity 0.24s ease';
@@ -244,11 +395,17 @@ export function initIOSNavTransition(options = {}) {
                 navTitle.style.opacity = '1';
             }
 
-            setTimeout(() => {
-                contents.forEach(el => {
-                    el.style.transition = '';
-                    el.style.transform = '';
-                });
+            setTimeout(function() {
+                for (let i = 0; i < slideElements.length; i++) {
+                    slideElements[i].style.transition = '';
+                    slideElements[i].style.transform = '';
+                }
+                if (underlayLayer) {
+                    underlayLayer.style.transition = '';
+                }
+                if (underlayScrim) {
+                    underlayScrim.style.transition = '';
+                }
                 if (navChevron) {
                     navChevron.style.transition = '';
                     navChevron.style.transform = '';
@@ -274,16 +431,25 @@ export function initIOSNavTransition(options = {}) {
     window.addEventListener('touchcancel', onTouchEnd, { passive: true });
 
     /* Handle bfcache restore */
-    window.addEventListener('pageshow', (e) => {
+    window.addEventListener('pageshow', function(e) {
         if (e.persisted) {
             if (navBackBtn) navBackBtn.style.opacity = '';
             if (desktopBackBtn) desktopBackBtn.style.opacity = '';
-            const contents = getContentElements();
-            contents.forEach(el => {
-                el.classList.remove('ios-content-sliding-out', 'ios-content-dragging');
-                el.style.transform = '';
-                el.style.transition = '';
-            });
+            const slideElements = getSlideElements();
+            for (let i = 0; i < slideElements.length; i++) {
+                slideElements[i].classList.remove('ios-content-sliding-out', 'ios-content-dragging');
+                slideElements[i].style.transform = '';
+                slideElements[i].style.transition = '';
+            }
+            if (underlayLayer) {
+                underlayLayer.classList.remove('ios-underlay-sliding-in');
+                underlayLayer.style.transform = 'translate3d(-30%, 0, 0)';
+                underlayLayer.style.transition = '';
+            }
+            if (underlayScrim) {
+                underlayScrim.style.opacity = '0.3';
+                underlayScrim.style.transition = '';
+            }
             if (navChevron) {
                 navChevron.classList.remove('ios-nav-chevron-exit');
                 navChevron.style.transform = '';
