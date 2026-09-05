@@ -113,117 +113,139 @@
         </div>
     </div>
 
-    <!-- Main Content Canvas (Responsive Home Dashboard) -->
-    <main class="desktop-home-canvas">
-        <!-- Desktop Header (Desktop only) -->
-        <div class="desktop-page-header desktop-only">
+    <!-- Mobile Ceremonial Sanctuary (Mobile Only: Screens <= 768px) -->
+    <div class="mobile-only container">
+        <div class="frame-container" id="portrait-btn" role="button" tabindex="0" onclick="window.handlePortraitClick && window.handlePortraitClick()" aria-label="點擊行禮奏樂">
+            <div class="wood-frame">
+                <img src="main/portrait.jpg" alt="國父遺像" class="portrait-img">
+            </div>
+        </div>
+
+        <div class="attendance-box">
+            <span class="attendance-label">總參典人次：</span>
+            <span class="attendance-count" id="attendanceCount">0</span><span class="attendance-unit">人次</span>
+        </div>
+
+        <div class="testament-box">
+            <div class="testament-text" id="testament-content">
+             余致力國民革命，凡四十年，其目的在求中國之自由平等。積四十年之經驗，深知欲達到此目的，必須喚起民眾及聯合世界上以平等待我之民族，共同奮鬥。現在革命尚未成功，凡我同志，務須依照余所著建國方略、建國大綱、三民主義及第一次全國代表大會宣言，繼續努力，以求貫徹。最近主張開國民會議及廢除不平等條約，尤須於最短期間，促其實現。是所至囑！
+            </div>
+        </div>
+    </div>
+
+    <!-- Apple Desktop Main Canvas (Desktop Only: Screens > 768px) -->
+    <main class="desktop-only desktop-home-canvas">
+        <!-- Page Header -->
+        <header class="desktop-page-header">
             <h1 class="desktop-page-title">主頁</h1>
-            <span class="desktop-page-subtitle" id="desktop-header-date">私立中山紀念堂 · 瞻仰行禮大廳</span>
-        </div>
+            <div class="desktop-page-subtitle">私立中山紀念堂 · 數位大廳與文獻展廳</div>
+        </header>
 
-        <div class="desktop-home-main-grid">
-            <!-- Left Column: Sacred Memorial Sanctuary -->
-            <div class="desktop-sanctuary-column container">
-                <div class="frame-container" id="portrait-btn" role="button" tabindex="0" onclick="window.handlePortraitClick && window.handlePortraitClick()" aria-label="點擊行禮奏樂">
-                    <div class="wood-frame">
-                        <img src="main/portrait.jpg" alt="國父遺像" class="portrait-img">
-                    </div>
+        <!-- Hero Showcase: Sacred Memorial Sanctuary -->
+        <section class="desktop-hero-showcase">
+            <div class="desktop-hero-portrait-col">
+                <div class="wood-frame">
+                    <img src="main/portrait.jpg" alt="國父遺像" class="portrait-img">
                 </div>
-
-                <div class="attendance-box">
-                    <span class="attendance-label">總參典人次：</span>
-                    <span class="attendance-count" id="attendanceCount">0</span><span class="attendance-unit">人次</span>
-                </div>
-
-                <div class="testament-box">
-                    <div class="testament-text" id="testament-content">
-                     余致力國民革命，凡四十年，其目的在求中國之自由平等。積四十年之經驗，深知欲達到此目的，必須喚起民眾及聯合世界上以平等待我之民族，共同奮鬥。現在革命尚未成功，凡我同志，務須依照余所著建國方略、建國大綱、三民主義及第一次全國代表大會宣言，繼續努力，以求貫徹。最近主張開國民會議及廢除不平等條約，尤須於最短期間，促其實現。是所至囑！
-                    </div>
-                </div>
-
-                <button class="desktop-bow-btn desktop-only" onclick="window.handlePortraitClick && window.handlePortraitClick()">
-                    向國父遺像行三鞠躬禮
-                </button>
-            </div>
-
-            <!-- Right Column: Ported Content for Announcements, Library, and Settings (Desktop only) -->
-            <div class="desktop-portal-column desktop-only">
-                <!-- Section 1: Latest Announcements -->
-                <div class="desktop-portal-section">
-                    <div class="desktop-section-header">
-                        <span>📢 最新館務公告</span>
-                        <a href="pages/announcement/announcement.html" class="desktop-section-link">查看全部公告 &rsaquo;</a>
-                    </div>
-                    <div class="desktop-card-grid">
-                        <a href="pages/announcement/detail.html?id=status" class="desktop-feature-card">
-                            <div class="desktop-card-badge" style="background: rgba(48, 209, 88, 0.15); color: #30d158;">📢</div>
-                            <h3 class="desktop-card-title">紀念堂數位化進展公告</h3>
-                            <p class="desktop-card-desc">最新服務狀態、資料庫更新及系統維護通知。</p>
-                        </a>
-                        <a href="pages/announcement/announcement.html" class="desktop-feature-card">
-                            <div class="desktop-card-badge" style="background: rgba(255, 159, 10, 0.15); color: #ff9f0a;">📜</div>
-                            <h3 class="desktop-card-title">歷史紀念日巡禮</h3>
-                            <p class="desktop-card-desc">回顧重要革命紀念活動，銘記先烈崇高精神。</p>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Section 2: Library & Exhibitions -->
-                <div class="desktop-portal-section">
-                    <div class="desktop-section-header">
-                        <span>📚 文獻資料庫與特展</span>
-                        <a href="pages/library/library.html" class="desktop-section-link">瀏覽完整資料庫 &rsaquo;</a>
-                    </div>
-                    <div class="desktop-card-grid">
-                        <a href="pages/biography/biography.html" class="desktop-feature-card">
-                            <div class="desktop-card-badge" style="background: rgba(10, 132, 255, 0.15); color: #0a84ff;">📜</div>
-                            <h3 class="desktop-card-title">國父生平傳記</h3>
-                            <p class="desktop-card-desc">詳實記錄中山先生波瀾壯闊的革命生涯與崇高理想。</p>
-                        </a>
-                        <a href="events/xinhai/xinhai.html" class="desktop-feature-card">
-                            <div class="desktop-card-badge" style="background: rgba(255, 69, 58, 0.15); color: #ff453a;">⚔️</div>
-                            <h3 class="desktop-card-title">辛亥革命風雲</h3>
-                            <p class="desktop-card-desc">武昌起義、推翻帝制、建立亞洲首個民主共和國。</p>
-                        </a>
-                        <a href="events/whampoa/whampoa.html" class="desktop-feature-card">
-                            <div class="desktop-card-badge" style="background: rgba(255, 214, 10, 0.15); color: #ffd60a;">🎖️</div>
-                            <h3 class="desktop-card-title">黃埔建軍歲月</h3>
-                            <p class="desktop-card-desc">親創陸軍軍官學校，東征北伐之崢嶸歲月。</p>
-                        </a>
-                        <a href="events/mayfourth/mayfourth.html" class="desktop-feature-card">
-                            <div class="desktop-card-badge" style="background: rgba(191, 90, 242, 0.15); color: #bf5af2;">🕊️</div>
-                            <h3 class="desktop-card-title">五四新文化運動</h3>
-                            <p class="desktop-card-desc">德先生與賽先生、啟迪民智、青年覺醒與新思潮。</p>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Section 3: Settings & Guestbook -->
-                <div class="desktop-portal-section">
-                    <div class="desktop-section-header">
-                        <span>⚙️ 系統設定與互動</span>
-                        <a href="pages/settings/settings.html" class="desktop-section-link">偏好設定 &rsaquo;</a>
-                    </div>
-                    <div class="desktop-card-grid">
-                        <a href="javascript:void(0);" class="desktop-feature-card" id="desktop-open-msg-card">
-                            <div class="desktop-card-badge" style="background: rgba(100, 210, 255, 0.15); color: #64d2ff;">✍️</div>
-                            <h3 class="desktop-card-title">參典留言簿</h3>
-                            <p class="desktop-card-desc">緬懷先烈功績，寫下您的追思與感言。</p>
-                        </a>
-                        <a href="pages/library/language.html" class="desktop-feature-card">
-                            <div class="desktop-card-badge" style="background: rgba(50, 215, 75, 0.15); color: #32d74b;">🌐</div>
-                            <h3 class="desktop-card-title">語言偏好設定</h3>
-                            <p class="desktop-card-desc">切換正體中文 / 簡化字顯示偏好。</p>
-                        </a>
-                        <a href="pages/thanks/thanks.html" class="desktop-feature-card">
-                            <div class="desktop-card-badge" style="background: rgba(255, 55, 95, 0.15); color: #ff375f;">🙏</div>
-                            <h3 class="desktop-card-title">特別鳴謝名錄</h3>
-                            <p class="desktop-card-desc">紀念堂志工名單與數位化貢獻者名冊。</p>
-                        </a>
-                    </div>
+                <div class="desktop-hero-attendance">
+                    總參典：<strong id="desktop-hero-attendance-val">0</strong> 人次
                 </div>
             </div>
-        </div>
+
+            <div class="desktop-hero-content-col">
+                <div class="desktop-hero-badge">🏛️ 瞻仰大廳 · 禮儀專區</div>
+                <h2 class="desktop-hero-title">國父孫中山先生遺像與遺囑</h2>
+                <blockquote class="desktop-hero-quote">
+                    「余致力國民革命，凡四十年，其目的在求中國之自由平等。積四十年之經驗，深知欲達到此目的，必須喚起民眾及聯合世界上以平等待我之民族，共同奮鬥。現在革命尚未成功，凡我同志，務須依照余所著建國方略、建國大綱、三民主義及第一次全國代表大會宣言，繼續努力，以求貫徹。最近主張開國民會議及廢除不平等條約，尤須於最短期間，促其實現。是所至囑！」
+                </blockquote>
+                <div class="desktop-hero-actions">
+                    <button id="desktop-hero-bow-btn" class="apple-pill-btn primary">
+                        🏛️ 向國父遺像行三鞠躬禮
+                    </button>
+                    <button id="desktop-hero-msg-btn" class="apple-pill-btn secondary">
+                        ✍️ 參典留言
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 1: Featured Carousel (Apple Music Top Row) -->
+        <section class="desktop-section-block">
+            <div class="desktop-section-header-row">
+                <h2 class="desktop-section-title">專案精選推薦</h2>
+                <a href="pages/library/library.html" class="desktop-section-more">瀏覽全部 &rsaquo;</a>
+            </div>
+            <div class="desktop-featured-row">
+                <a href="pages/biography/biography.html" class="desktop-poster-card poster-coral">
+                    <span class="desktop-poster-badge">生平傳記</span>
+                    <div class="desktop-poster-footer">
+                        <h3 class="desktop-poster-title">國父波瀾歲月</h3>
+                        <p class="desktop-poster-sub">立志救國、創立興中會與同盟會之崇高理想</p>
+                    </div>
+                </a>
+                <a href="pages/library/library.html" class="desktop-poster-card poster-amber">
+                    <span class="desktop-poster-badge">建國宏規</span>
+                    <div class="desktop-poster-footer">
+                        <h3 class="desktop-poster-title">三民主義思想</h3>
+                        <p class="desktop-poster-sub">民族、民權、民生與實業計畫之立國藍圖</p>
+                    </div>
+                </a>
+                <a href="events/xinhai/xinhai.html" class="desktop-poster-card poster-sunset">
+                    <span class="desktop-poster-badge">重大特展</span>
+                    <div class="desktop-poster-footer">
+                        <h3 class="desktop-poster-title">辛亥革命風雲</h3>
+                        <p class="desktop-poster-sub">武昌起義、推翻帝制、創立亞洲第一共和國</p>
+                    </div>
+                </a>
+                <a href="events/whampoa/whampoa.html" class="desktop-poster-card poster-crimson">
+                    <span class="desktop-poster-badge">軍事歷程</span>
+                    <div class="desktop-poster-footer">
+                        <h3 class="desktop-poster-title">黃埔建軍歲月</h3>
+                        <p class="desktop-poster-sub">親手創辦陸軍軍官學校、東征北伐之軍魂</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section 2: Square Cover Grid (Apple Music Bottom Row) -->
+        <section class="desktop-section-block">
+            <div class="desktop-section-header-row">
+                <h2 class="desktop-section-title">展廳速覽與文獻資料</h2>
+                <a href="pages/settings/settings.html" class="desktop-section-more">更多設定 &rsaquo;</a>
+            </div>
+            <div class="desktop-album-grid">
+                <a href="pages/announcement/announcement.html" class="desktop-album-card">
+                    <div class="desktop-album-cover">📢</div>
+                    <div class="desktop-album-title">最新館務公告</div>
+                    <div class="desktop-album-sub">數位化進展與維護通知</div>
+                </a>
+                <a href="events/mayfourth/mayfourth.html" class="desktop-album-card">
+                    <div class="desktop-album-cover">🕊️</div>
+                    <div class="desktop-album-title">五四新文化運動</div>
+                    <div class="desktop-album-sub">德先生與賽先生 · 思想啟蒙</div>
+                </a>
+                <a href="events/militaries/militaries.html" class="desktop-album-card">
+                    <div class="desktop-album-cover">🛡️</div>
+                    <div class="desktop-album-title">革命軍事歷程</div>
+                    <div class="desktop-album-sub">抗戰勝利紀實 · 軍歌組曲</div>
+                </a>
+                <a href="events/yatsen/yatsen-birth.html" class="desktop-album-card">
+                    <div class="desktop-album-cover">🎂</div>
+                    <div class="desktop-album-title">國父誕辰特展</div>
+                    <div class="desktop-album-sub">十一月十二日 · 誕辰紀念</div>
+                </a>
+                <a href="pages/library/language.html" class="desktop-album-card">
+                    <div class="desktop-album-cover">🌐</div>
+                    <div class="desktop-album-title">語言偏好設定</div>
+                    <div class="desktop-album-sub">正體中文 / 簡化字切換</div>
+                </a>
+                <a href="pages/thanks/thanks.html" class="desktop-album-card">
+                    <div class="desktop-album-cover">🙏</div>
+                    <div class="desktop-album-title">特別鳴謝名錄</div>
+                    <div class="desktop-album-sub">志工名冊與貢獻芳名錄</div>
+                </a>
+            </div>
+        </section>
     </main>
 
     <div class="stealth-footer">

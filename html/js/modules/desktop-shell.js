@@ -11,13 +11,13 @@ import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js';
 import { TAB_ICONS } from './tab-bar.js';
 
 /* ============================================================================
- * Global Search Index (Covers all core memorial topics and exhibitions)
+ * Global Search Index (Covers all memorial topics, exhibits, and settings)
  * ============================================================================ */
 const SEARCH_INDEX = [
     {
         id: 'home',
-        titleTc: '紀念堂大廳 · 瞻仰行禮',
-        titleSc: '纪念堂大厅 · 瞻仰行礼',
+        titleTc: '紀念大廳 · 瞻仰行禮',
+        titleSc: '纪念大厅 · 瞻仰行礼',
         categoryTc: '主頁',
         categorySc: '主页',
         url: 'index.html',
@@ -162,9 +162,9 @@ const SEARCH_INDEX = [
 const SIDEBAR_STRINGS = {
     tc: {
         brand: '私立中山紀念堂',
-        searchPlaceholder: '搜尋特展、文獻、生平...',
-        menuHeader: '核心選單',
-        exhibitsHeader: '重大特展',
+        searchPlaceholder: '搜尋',
+        menuHeader: '導航',
+        exhibitsHeader: '歷史特展',
         home: '主頁',
         announcement: '最新公告',
         library: '文獻資料庫',
@@ -173,14 +173,15 @@ const SIDEBAR_STRINGS = {
         exhibitWhampoa: '黃埔建軍歲月',
         exhibitMayfourth: '五四新文化運動',
         exhibitBiography: '國父生平傳記',
-        statusAttendance: '總參典人次：',
+        statusAttendance: '總參典：',
+        unitAttendance: '人次',
         noResults: '無相符搜尋結果'
     },
     sc: {
         brand: '私立中山纪念堂',
-        searchPlaceholder: '搜索特展、文献、生平...',
-        menuHeader: '核心菜单',
-        exhibitsHeader: '重大特展',
+        searchPlaceholder: '搜索',
+        menuHeader: '导航',
+        exhibitsHeader: '历史特展',
         home: '主页',
         announcement: '最新公告',
         library: '文献数据库',
@@ -189,7 +190,8 @@ const SIDEBAR_STRINGS = {
         exhibitWhampoa: '黄埔建军岁月',
         exhibitMayfourth: '五四新文化运动',
         exhibitBiography: '国父生平传记',
-        statusAttendance: '总参典人次：',
+        statusAttendance: '总参典：',
+        unitAttendance: '人次',
         noResults: '无相符搜索结果'
     }
 };
@@ -218,6 +220,9 @@ export function initDesktopShell(options = {}) {
 
     /* Bind Search Input and Dropdown */
     setupDesktopSearch(sidebarEl, basePath);
+
+    /* Bind Hero Showcase Interactive Buttons on Home */
+    setupDesktopHeroActions();
 
     /* Sync Sidebar Language Labels */
     syncSidebarLabels(sidebarEl);
@@ -263,7 +268,7 @@ function createSidebarElement(activeTab, basePath) {
                 <div class="desktop-sidebar-brand-text" id="desktop-brand-text">${str.brand}</div>
             </a>
 
-            <!-- Search Container -->
+            <!-- Apple Music Search Box -->
             <div class="desktop-search-box">
                 <div class="desktop-search-input-wrapper">
                     <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -318,12 +323,14 @@ function createSidebarElement(activeTab, basePath) {
             </div>
         </div>
 
-        <!-- Sidebar Footer Status -->
+        <!-- Sidebar Footer Status (Apple Profile Style) -->
         <div class="desktop-sidebar-bottom">
-            <div class="desktop-status-card">
-                <div class="desktop-status-title" id="desktop-status-title">${str.statusAttendance}</div>
-                <div class="desktop-status-val" id="desktop-attendance-val">...</div>
-                <div class="desktop-status-date" id="desktop-date-val">⏳ 讀取曆法...</div>
+            <div class="desktop-profile-card">
+                <div class="desktop-profile-avatar">🏛️</div>
+                <div class="desktop-profile-info">
+                    <div class="desktop-profile-name" id="desktop-brand-title">私立中山紀念堂</div>
+                    <div class="desktop-profile-status" id="desktop-status-text">總參典人次：...</div>
+                </div>
             </div>
         </div>
     `;
@@ -399,6 +406,40 @@ function setupDesktopSearch(sidebarEl, basePath) {
 }
 
 /* ============================================================================
+ * Hero Showcase Actions Controller
+ * ============================================================================ */
+function setupDesktopHeroActions() {
+    const heroBowBtn = document.getElementById('desktop-hero-bow-btn');
+    if (heroBowBtn) {
+        heroBowBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (window.handlePortraitClick) {
+                window.handlePortraitClick();
+            } else {
+                const portraitBtn = document.getElementById('portrait-btn');
+                if (portraitBtn) portraitBtn.click();
+            }
+        });
+    }
+
+    const heroMsgBtn = document.getElementById('desktop-hero-msg-btn');
+    if (heroMsgBtn) {
+        heroMsgBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const openMessageBtn = document.getElementById('open-message-btn');
+            const messageModal = document.getElementById('message-modal');
+            const messageInput = document.getElementById('message-input');
+            if (openMessageBtn) {
+                openMessageBtn.click();
+            } else if (messageModal) {
+                messageModal.classList.add('active');
+                if (messageInput) setTimeout(() => messageInput.focus(), 150);
+            }
+        });
+    }
+}
+
+/* ============================================================================
  * Label Synchronization (i18n)
  * ============================================================================ */
 function syncSidebarLabels(sidebarEl) {
@@ -408,6 +449,9 @@ function syncSidebarLabels(sidebarEl) {
 
     const brandEl = sidebarEl.querySelector('#desktop-brand-text');
     if (brandEl) brandEl.textContent = str.brand;
+
+    const brandTitle = sidebarEl.querySelector('#desktop-brand-title');
+    if (brandTitle) brandTitle.textContent = str.brand;
 
     const searchInput = sidebarEl.querySelector('#desktop-search-input');
     if (searchInput) searchInput.placeholder = str.searchPlaceholder;
@@ -441,36 +485,32 @@ function syncSidebarLabels(sidebarEl) {
 
     const exMay = sidebarEl.querySelector('#label-exhibit-mayfourth');
     if (exMay) exMay.textContent = str.exhibitMayfourth;
-
-    const statusTitle = sidebarEl.querySelector('#desktop-status-title');
-    if (statusTitle) statusTitle.textContent = str.statusAttendance;
 }
 
 /* ============================================================================
- * Attendance & Calendar Status Poller / Synchronizer
+ * Attendance & Calendar Status Synchronizer
  * ============================================================================ */
 function syncSidebarStatus(sidebarEl) {
     if (!sidebarEl) return;
 
-    const attVal = sidebarEl.querySelector('#desktop-attendance-val');
-    const dateVal = sidebarEl.querySelector('#desktop-date-val');
+    const statusText = sidebarEl.querySelector('#desktop-status-text');
+    const heroAttendanceVal = document.getElementById('desktop-hero-attendance-val');
 
     function update() {
         const pageAttendance = document.getElementById('attendanceCount');
-        if (pageAttendance && attVal) {
-            attVal.textContent = pageAttendance.textContent + ' 人次';
+        const count = pageAttendance ? pageAttendance.textContent : '0';
+
+        const now = new Date();
+        const minguoYear = now.getFullYear() - 1911;
+        const month = now.getMonth() + 1;
+        const date = now.getDate();
+
+        if (statusText) {
+            statusText.textContent = `參典人次：${count} · 民國 ${minguoYear} 年`;
         }
 
-        const pageDate = document.getElementById('minguo-date-display');
-        if (pageDate && dateVal) {
-            dateVal.textContent = pageDate.textContent;
-        } else if (dateVal) {
-            /* Compute Minguo date standalone if not on home page */
-            const now = new Date();
-            const minguoYear = now.getFullYear() - 1911;
-            const month = now.getMonth() + 1;
-            const date = now.getDate();
-            dateVal.textContent = `民國 ${minguoYear} 年 ${month} 月 ${date} 日`;
+        if (heroAttendanceVal) {
+            heroAttendanceVal.textContent = count;
         }
     }
 
