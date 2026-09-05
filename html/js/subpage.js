@@ -105,6 +105,7 @@ export function initSubpage(options) {
     const langBtn = document.getElementById('lang-btn');
     const mdViewer = document.getElementById('md-viewer');
     const container = document.querySelector('.markdown-container');
+    if (container) container.classList.add('loaded');
     const heroTitle = document.getElementById('hero-title');
     const heroDate = document.getElementById('hero-date');
     const heroDesc = document.getElementById('hero-desc');
@@ -185,7 +186,6 @@ export function initSubpage(options) {
 
             const newSrc = isTraditional ? currentTabObj.srcTc : currentTabObj.srcSc;
             if (mdViewer && mdViewer.getAttribute('src') !== newSrc) {
-                if (container) container.classList.remove('loaded');
                 mdViewer.setAttribute('src', newSrc);
             }
         } else if (texts) {
@@ -198,7 +198,6 @@ export function initSubpage(options) {
             if (pageTitle && t.pageTitle) pageTitle.textContent = t.pageTitle;
 
             if (mdViewer && t.src && mdViewer.getAttribute('src') !== t.src) {
-                if (container) container.classList.remove('loaded');
                 mdViewer.setAttribute('src', t.src);
             }
         }
@@ -365,8 +364,8 @@ export function initSubpage(options) {
             const link = template.content.querySelector('link');
             if (link) {
                 link.href = isLight
-                    ? 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown.css'
-                    : 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css';
+                    ? basePath + 'css/github-markdown.css'
+                    : basePath + 'css/github-markdown-dark.css';
             }
             const style = template.content.querySelector('style');
             if (style) {

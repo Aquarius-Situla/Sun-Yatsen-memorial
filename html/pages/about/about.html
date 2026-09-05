@@ -21,7 +21,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="國父紀念堂">
 
-    <link rel="preload" href="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js" as="script" crossorigin="anonymous">
+    <link rel="preload" href="../../js/zero-md.min.js" as="script">
     <link rel="preload" href="./about_tc.md" as="fetch" crossorigin="anonymous">
     <!-- Critical inline CSS: eliminates white flash during iOS PWA page transitions -->
     <style>html,body{background-color:#111111;min-height:100.5vh;min-height:calc(100lvh + 1px);}</style>
@@ -31,7 +31,7 @@
     <link rel="stylesheet" href="../../css/base.css?v=2025">
     <link rel="stylesheet" href="../../css/components/tab-bar.css?v=2025">
     <link rel="stylesheet" href="../../css/components/subpage.css?v=20260905d">
-    <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"></script>
+    <script type="module" src="../../js/zero-md.min.js"></script>
 </head>
 <body>
 
@@ -116,10 +116,10 @@
         <button class="tab-btn" data-tab="changelog">更新日誌</button>
     </div>
 
-    <div class="markdown-container">
+    <div class="markdown-container loaded">
         <zero-md id="md-viewer" src="./about_tc.md">
             <template>
-                <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css">
+                <link rel="stylesheet" href="../../css/github-markdown-dark.css">
                 <style>
                     .markdown-body { background-color: transparent !important; }
                 </style>

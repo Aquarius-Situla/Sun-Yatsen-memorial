@@ -21,12 +21,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="國父紀念堂">
 
-    <link rel="preload" href="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js" as="script" crossorigin="anonymous">
+    <link rel="preload" href="../../js/zero-md.min.js" as="script">
     <link rel="preload" href="./biography_tc.md" as="fetch" crossorigin="anonymous">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js" as="script" crossorigin="anonymous">
+    <link rel="preload" href="../../js/chart.min.js" as="script">
 
-    <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="../../js/zero-md.min.js"></script>
+    <script src="../../js/chart.min.js"></script>
     <!-- Critical inline CSS: eliminates white flash during iOS PWA page transitions -->
     <style>html,body{background-color:#111111;min-height:100.5vh;min-height:calc(100lvh + 1px);}</style>
 
@@ -90,7 +90,7 @@
     <div class="markdown-container active" id="md-section">
         <zero-md id="md-viewer" src="./biography_tc.md">
             <template>
-                <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css">
+                <link rel="stylesheet" href="../../css/github-markdown-dark.css">
                 
                 <style>
                     .markdown-body {
@@ -126,7 +126,7 @@
         </zero-md>
     </div>
 
-    <div class="charts-container" id="charts-section">
+    <div class="charts-container" id="charts-section" style="display: none;">
         <div class="chart-box">
             <div class="chart-title" id="chart1-title">革命歷程影響力走勢</div>
             <canvas id="influenceChart"></canvas>
@@ -188,14 +188,30 @@
         }
 
         function renderCharts() {
-            if (influenceChartInstance) influenceChartInstance.destroy();
-            if (sanminChartInstance) sanminChartInstance.destroy();
+            if (typeof Chart === 'undefined') {
+                setTimeout(renderCharts, 100);
+                return;
+            }
 
-            const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            Chart.defaults.color = isDarkMode ? '#aaaaaa' : '#6b4c35';
-            Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif';
+            try {
+                if (influenceChartInstance) {
+                    influenceChartInstance.destroy();
+                    influenceChartInstance = null;
+                }
+                if (sanminChartInstance) {
+                    sanminChartInstance.destroy();
+                    sanminChartInstance = null;
+                }
 
-            const ctx1 = document.getElementById('influenceChart').getContext('2d');
+                const canvas1 = document.getElementById('influenceChart');
+                const canvas2 = document.getElementById('sanminChart');
+                if (!canvas1 || !canvas2) return;
+
+                const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                Chart.defaults.color = isDarkMode ? '#aaaaaa' : '#6b4c35';
+                Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif';
+
+                const ctx1 = canvas1.getContext('2d');
             influenceChartInstance = new Chart(ctx1, {
                 type: 'line',
                 data: {
@@ -360,29 +376,33 @@
                     }
                 }
             });
-            
-            setTimeout(() => {
-                chartsSection.classList.add('loaded');
-            }, 50);
+            } catch (err) {
+                /* Ignore chart rendering failure gracefully */
+            }
+
+            chartsSection.classList.add('loaded');
         }
 
         function updateContent() {
             if (currentTab === 'biography') {
+                chartsSection.style.display = 'none';
                 chartsSection.classList.remove('active', 'loaded');
-                mdSection.classList.add('active');
+                mdSection.style.display = 'block';
+                mdSection.classList.add('active', 'loaded');
                 
                 const suffix = isTraditional ? '_tc.md' : '_sc.md';
                 const newSrc = './biography' + suffix;
                 
                 if (mdViewer.getAttribute('src') !== newSrc) {
-                    mdSection.classList.remove('loaded');
                     mdViewer.setAttribute('src', newSrc);
                 } else {
                     mdSection.classList.add('loaded');
                 }
             } else if (currentTab === 'theories') {
-                mdSection.classList.remove('active', 'loaded');
-                chartsSection.classList.add('active');
+                mdSection.style.display = 'none';
+                mdSection.classList.remove('active');
+                chartsSection.style.display = 'block';
+                chartsSection.classList.add('active', 'loaded');
                 renderCharts();
             }
         }
@@ -517,8 +537,8 @@
                 const link = template.content.querySelector('link');
                 if (link) {
                     link.href = isLight
-                        ? 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown.css'
-                        : 'https://cdn.jsdelivr.net/gh/sindresorhus/github-markdown-css@4/github-markdown-dark.css';
+                        ? '../../css/github-markdown.css'
+                        : '../../css/github-markdown-dark.css';
                 }
                 const style = template.content.querySelector('style');
                 if (style) {

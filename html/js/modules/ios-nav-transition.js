@@ -67,13 +67,15 @@ export function initIOSNavTransition(options = {}) {
     }
 
     /* ========================================================================
-     * Underlay Parallax Layer Initialization & Dynamic Pre-population
+     * Lazy Underlay Parallax Layer Initialization
+     * Creates a lightweight underlay canvas on-demand with zero network fetch
      * ======================================================================== */
-    function setupUnderlay(targetUrl) {
+    function ensureUnderlay() {
+        if (underlayLayer) return;
         underlayLayer = document.querySelector('.ios-underlay-layer');
         if (!underlayLayer) {
             underlayLayer = document.createElement('div');
-            underlayLayer.className = 'ios-underlay-layer';
+            underlayLayer.className = 'ios-underlay-layer ready';
 
             underlayContent = document.createElement('div');
             underlayContent.className = 'ios-underlay-content';
@@ -95,46 +97,6 @@ export function initIOSNavTransition(options = {}) {
             viewSheet.className = 'ios-view-sheet';
             document.body.insertBefore(viewSheet, underlayLayer.nextSibling);
         }
-
-        if (!targetUrl) return;
-
-        /* Fetch parent page asynchronously and populate underlay content */
-        fetch(targetUrl)
-            .then(function(response) {
-                if (!response.ok) throw new Error('Fetch failed');
-                return response.text();
-            })
-            .then(function(html) {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-
-                const parentGroup = doc.querySelector('.ios-group-container') ||
-                                    doc.querySelector('.markdown-container, .charts-container, .container, main');
-
-                if (parentGroup && underlayContent) {
-                    const clone = parentGroup.cloneNode(true);
-                    /* Strip IDs to avoid duplicate ID collisions */
-                    const idElements = clone.querySelectorAll('[id]');
-                    for (let i = 0; i < idElements.length; i++) {
-                        idElements[i].removeAttribute('id');
-                    }
-                    underlayContent.innerHTML = '';
-                    underlayContent.appendChild(clone);
-                }
-                if (underlayLayer) {
-                    underlayLayer.classList.add('ready');
-                }
-            })
-            .catch(function() {
-                if (underlayLayer) {
-                    underlayLayer.classList.add('ready');
-                }
-            });
-    }
-
-    const initialTarget = getTargetUrl(navBackBtn) || getTargetUrl(desktopBackBtn);
-    if (initialTarget) {
-        setupUnderlay(initialTarget);
     }
 
     /* ========================================================================
@@ -145,6 +107,7 @@ export function initIOSNavTransition(options = {}) {
         isNavigating = true;
 
         prefetchUrl(targetUrl);
+        ensureUnderlay();
 
         /* Animate nav bar micro-interactions */
         if (navChevron) navChevron.classList.add('ios-nav-chevron-exit');
@@ -221,6 +184,12 @@ export function initIOSNavTransition(options = {}) {
     let isTrackingEdge = false;
     let isSwiping = false;
 
+    function stopTracking() {
+        isTrackingEdge = false;
+        isSwiping = false;
+        window.removeEventListener('touchmove', onTouchMove);
+    }
+
     function onTouchStart(e) {
         if (isNavigating || e.touches.length !== 1) return;
 
@@ -238,6 +207,7 @@ export function initIOSNavTransition(options = {}) {
             touchStartTime = Date.now();
             isTrackingEdge = true;
             isSwiping = false;
+            window.addEventListener('touchmove', onTouchMove, { passive: false });
         }
     }
 
@@ -250,13 +220,14 @@ export function initIOSNavTransition(options = {}) {
 
         if (!isSwiping) {
             if (Math.abs(deltaY) > Math.abs(deltaX)) {
-                /* Vertical scroll intent: cancel gesture */
-                isTrackingEdge = false;
+                /* Vertical scroll intent: immediately cancel edge tracking and restore native scroll */
+                stopTracking();
                 return;
             }
             if (deltaX > 8 && Math.abs(deltaX) > Math.abs(deltaY)) {
                 /* Horizontal swipe intent confirmed */
                 isSwiping = true;
+                ensureUnderlay();
                 const slideElements = getSlideElements();
                 for (let i = 0; i < slideElements.length; i++) {
                     slideElements[i].classList.add('ios-content-dragging');
@@ -308,11 +279,13 @@ export function initIOSNavTransition(options = {}) {
     }
 
     function onTouchEnd(e) {
-        if (!isTrackingEdge && !isSwiping) return;
+        if (!isTrackingEdge && !isSwiping) {
+            window.removeEventListener('touchmove', onTouchMove);
+            return;
+        }
 
         const wasSwiping = isSwiping;
-        isTrackingEdge = false;
-        isSwiping = false;
+        stopTracking();
 
         if (!wasSwiping) return;
 
@@ -426,7 +399,6 @@ export function initIOSNavTransition(options = {}) {
     }
 
     window.addEventListener('touchstart', onTouchStart, { passive: true });
-    window.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('touchend', onTouchEnd, { passive: true });
     window.addEventListener('touchcancel', onTouchEnd, { passive: true });
 

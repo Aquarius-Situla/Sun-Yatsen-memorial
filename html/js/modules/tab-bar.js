@@ -173,6 +173,7 @@ if (typeof window !== 'undefined') {
 
         /* Intercept internal anchors to prevent bouncing out to mobile Safari */
         document.addEventListener('click', (e) => {
+            if (e.defaultPrevented) return;
             const anchor = e.target.closest('a');
             if (anchor && anchor.href && anchor.href.startsWith(window.location.origin)) {
                 if (!anchor.getAttribute('target') && !anchor.hasAttribute('download')) {
