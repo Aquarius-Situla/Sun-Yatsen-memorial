@@ -4,7 +4,7 @@
  * Private Sun Yat-sen Memorial Hall — Subpage & Event Styles (subpage.css)
  * ============================================================================
  * COMMENTING STANDARDS
- * 1. Block comments only. Inline comments (//) are strictly prohibited.
+ * 1. Block comments only. Inline comments are strictly prohibited.
  * 2. Section dividers use the === banner format.
  * 3. All prose is written in English.
  * ============================================================================ */
@@ -738,9 +738,7 @@ body {
     justify-content: center;
     flex-shrink: 0;
     box-sizing: border-box;
-    /* Dark Mode (Default): Dark background with subtle white border ring */
-    background: #1c1c1e !important;
-    box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.18), 0 1px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: none;
     transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -748,19 +746,39 @@ body {
     width: 17px;
     height: 17px;
     stroke: none;
+    fill: #ffffff !important;
+    color: #ffffff !important;
     transition: fill 0.2s ease, color 0.2s ease;
 }
 
-/* Dark Mode: The glyph takes the accent theme color */
-.ios-badge.badge-blue svg   { fill: #0a84ff !important; color: #0a84ff !important; }
-.ios-badge.badge-purple svg { fill: #bf5af2 !important; color: #bf5af2 !important; }
-.ios-badge.badge-red svg    { fill: #ff453a !important; color: #ff453a !important; }
-.ios-badge.badge-orange svg { fill: #ff9f0a !important; color: #ff9f0a !important; }
-.ios-badge.badge-green svg  { fill: #30d158 !important; color: #30d158 !important; }
-.ios-badge.badge-teal svg   { fill: #64d2ff !important; color: #64d2ff !important; }
-.ios-badge.badge-indigo svg { fill: #5e5ce6 !important; color: #5e5ce6 !important; }
-.ios-badge.badge-gray svg   { fill: #98989d !important; color: #98989d !important; }
-.ios-badge.badge-dark svg   { fill: #ebebf5 !important; color: #ebebf5 !important; }
+/* Light Mode: Classic Apple Colored Backgrounds with Pure White Glyphs */
+.ios-badge.badge-blue   { background-color: #007aff !important; }
+.ios-badge.badge-purple { background-color: #af52de !important; }
+.ios-badge.badge-red    { background-color: #ff3b30 !important; }
+.ios-badge.badge-orange { background-color: #ff9500 !important; }
+.ios-badge.badge-green  { background-color: #34c759 !important; }
+.ios-badge.badge-teal   { background-color: #30b0c7 !important; }
+.ios-badge.badge-indigo { background-color: #5856d6 !important; }
+.ios-badge.badge-gray   { background-color: #8e8e93 !important; }
+.ios-badge.badge-dark   { background-color: #3a3a3c !important; }
+
+/* Dark Mode: Apple iOS 18 Specification (Dark background, white ring border, colored glyph) */
+@media (prefers-color-scheme: dark) {
+    .ios-badge {
+        background: #1c1c1e !important;
+        box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.18), 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .ios-badge.badge-blue svg   { fill: #0a84ff !important; color: #0a84ff !important; }
+    .ios-badge.badge-purple svg { fill: #bf5af2 !important; color: #bf5af2 !important; }
+    .ios-badge.badge-red svg    { fill: #ff453a !important; color: #ff453a !important; }
+    .ios-badge.badge-orange svg { fill: #ff9f0a !important; color: #ff9f0a !important; }
+    .ios-badge.badge-green svg  { fill: #30d158 !important; color: #30d158 !important; }
+    .ios-badge.badge-teal svg   { fill: #64d2ff !important; color: #64d2ff !important; }
+    .ios-badge.badge-indigo svg { fill: #5e5ce6 !important; color: #5e5ce6 !important; }
+    .ios-badge.badge-gray svg   { fill: #98989d !important; color: #98989d !important; }
+    .ios-badge.badge-dark svg   { fill: #ebebf5 !important; color: #ebebf5 !important; }
+}
 
 .ios-row.has-badge:not(:last-child)::after {
     left: 56px;
@@ -1098,17 +1116,18 @@ body {
         box-shadow: none !important;
     }
 
-    .ios-badge svg {
+    .ios-badge svg,
+    .ios-badge[class*="badge-"] svg {
         fill: #ffffff !important;
         color: #ffffff !important;
     }
 
     .ios-badge.badge-blue   { background-color: #007aff !important; }
-    .ios-badge.badge-purple { background-color: #5856d6 !important; }
-    .ios-badge.badge-red    { background-color: #ff2d55 !important; }
+    .ios-badge.badge-purple { background-color: #af52de !important; }
+    .ios-badge.badge-red    { background-color: #ff3b30 !important; }
     .ios-badge.badge-orange { background-color: #ff9500 !important; }
     .ios-badge.badge-green  { background-color: #34c759 !important; }
-    .ios-badge.badge-teal   { background-color: #00c7be !important; }
+    .ios-badge.badge-teal   { background-color: #30b0c7 !important; }
     .ios-badge.badge-indigo { background-color: #5856d6 !important; }
     .ios-badge.badge-gray   { background-color: #8e8e93 !important; }
     .ios-badge.badge-dark   { background-color: #3a3a3c !important; }

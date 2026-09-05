@@ -2,7 +2,7 @@
  * Private Sun Yat-sen Memorial Hall — Application Orchestrator (app.js)
  * ============================================================================
  * COMMENTING STANDARDS
- * 1. Block comments only. Inline comments (//) are strictly prohibited.
+ * 1. Block comments only. Inline comments are strictly prohibited.
  * 2. Section dividers use the === banner format.
  * 3. All prose is written in English.
  * ============================================================================ */
@@ -138,83 +138,46 @@ function initApp() {
      * 5. Danmaku Comment Layer & Mobile Long-Press Trigger
      * ======================================================================== */
     try {
-        if (testamentBox) {
-            testamentBox.style.cursor = 'pointer';
-
-            let longPressTimer = null;
-            let touchStartX = 0;
-            let touchStartY = 0;
-            let isLongPressTriggered = false;
-            const testamentContent = document.getElementById('testament-content');
-
-            testamentBox.addEventListener('touchstart', (e) => {
-                if (e.touches.length !== 1) return;
-                touchStartX = e.touches[0].clientX;
-                touchStartY = e.touches[0].clientY;
-                isLongPressTriggered = false;
-
-                if (testamentContent) {
-                    testamentContent.classList.add('testament-pressing');
-                }
-
-                if (longPressTimer) clearTimeout(longPressTimer);
-                longPressTimer = setTimeout(() => {
-                    isLongPressTriggered = true;
-                    if (testamentContent) {
-                        testamentContent.classList.remove('testament-pressing');
-                    }
-
-                    if (navigator.vibrate) {
-                        try { navigator.vibrate(25); } catch (err) { /* No-op */ }
-                    }
-
-                    if (messageModal) {
-                        messageModal.classList.add('active');
-                        if (messageInput) {
-                            setTimeout(() => messageInput.focus(), 150);
-                        }
-                    }
-                }, 500);
-            }, { passive: true });
-
-            testamentBox.addEventListener('touchmove', (e) => {
-                if (!longPressTimer) return;
-                const deltaX = Math.abs(e.touches[0].clientX - touchStartX);
-                const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
-
-                if (deltaX > 10 || deltaY > 10) {
-                    clearTimeout(longPressTimer);
-                    longPressTimer = null;
-                    if (testamentContent) {
-                        testamentContent.classList.remove('testament-pressing');
-                    }
-                }
-            }, { passive: true });
-
-            const cancelLongPress = () => {
-                if (longPressTimer) {
-                    clearTimeout(longPressTimer);
-                    longPressTimer = null;
-                }
-                if (testamentContent) {
-                    testamentContent.classList.remove('testament-pressing');
-                }
-            };
-
-            testamentBox.addEventListener('touchend', cancelLongPress, { passive: true });
-            testamentBox.addEventListener('touchcancel', cancelLongPress, { passive: true });
-
-            testamentBox.addEventListener('click', (e) => {
-                if (isLongPressTriggered) {
-                    isLongPressTriggered = false;
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return;
-                }
-
+        /* Keyboard shortcut: Press 'D' to toggle danmaku layer on/off */
+        window.addEventListener('keydown', (e) => {
+            const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+            if (tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable)) {
+                return;
+            }
+            if ((e.key === 'd' || e.key === 'D') && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                e.preventDefault();
                 toggleDanmaku(WORKER_API, danmakuContainer, portraitImg, (isEnabled) => {
                     showToast(isEnabled ? '彈幕已開啟' : '彈幕已關閉', 'system');
                 });
+            }
+        });
+
+        /* Click on Testament opens the send danmaku message modal */
+        if (testamentBox) {
+            testamentBox.style.cursor = 'pointer';
+            testamentBox.setAttribute('role', 'button');
+            testamentBox.setAttribute('tabindex', '0');
+            testamentBox.setAttribute('aria-label', '點擊開啟發送彈幕視窗');
+
+            const openDanmakuModal = (e) => {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                if (messageModal) {
+                    messageModal.classList.add('active');
+                    if (messageInput) {
+                        setTimeout(() => messageInput.focus(), 150);
+                    }
+                }
+            };
+
+            testamentBox.addEventListener('click', openDanmakuModal);
+
+            testamentBox.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    openDanmakuModal(e);
+                }
             });
         }
     } catch (err) {
