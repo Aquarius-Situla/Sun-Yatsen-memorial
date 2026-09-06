@@ -7,9 +7,10 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906z';
-import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906z';
-import { resolveSiteUrl, getTabFromUrl } from './desktop-shell.js?v=20260906z';
+import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260907a';
+import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260907a';
+import { resolveSiteUrl, getTabFromUrl } from './desktop-shell.js?v=20260907a';
+import { isMobileLayout, isDesktopLayout } from './device-detect.js?v=20260907a';
 
 /* ============================================================================
  * Authentic Apple SF Symbols Vector Icons (24x24 Pixel-Perfect Fill Glyphs)
@@ -114,7 +115,7 @@ export function initTabBar(options = {}) {
     /* If on a subpage, mark body and hide tab bar on mobile */
     if (isSubpageRoute()) {
         document.body.classList.add('is-subpage');
-        if (tabBarEl && window.innerWidth <= 768) {
+        if (tabBarEl && isMobileLayout()) {
             tabBarEl.style.setProperty('display', 'none', 'important');
         }
     }
@@ -265,12 +266,12 @@ export function updateMobileNavState(targetTabId) {
     if (onSubpage) {
         document.body.classList.add('is-subpage');
         const tabBar = document.getElementById('apple-tab-bar');
-        if (tabBar && window.innerWidth <= 768) {
+        if (tabBar && isMobileLayout()) {
             tabBar.style.setProperty('display', 'none', 'important');
         }
         const topNav = document.querySelector('.apple-top-nav');
         if (topNav) {
-            if (window.innerWidth <= 768) {
+            if (isMobileLayout()) {
                 topNav.classList.remove('nav-hidden');
                 topNav.style.removeProperty('display');
                 topNav.style.setProperty('display', 'flex', 'important');
@@ -356,7 +357,7 @@ export function updateMobileNavState(targetTabId) {
             topNav.innerHTML = '<h1 class="nav-title" id="top-nav-title"></h1>';
             document.body.insertBefore(topNav, document.body.firstChild);
         }
-        if (window.innerWidth <= 768) {
+        if (isMobileLayout()) {
             topNav.classList.remove('nav-hidden');
             topNav.style.setProperty('display', 'flex', 'important');
         } else {
@@ -431,7 +432,7 @@ if (typeof window !== 'undefined') {
 
     /* Instant tactile visual feedback on physical touch contact */
     document.addEventListener('touchstart', (e) => {
-        if (window.innerWidth > 768) return;
+        if (isDesktopLayout()) return;
         const tabItem = e.target.closest('#apple-tab-bar .tab-item');
         if (!tabItem) return;
 
@@ -456,7 +457,7 @@ if (typeof window !== 'undefined') {
 
     /* Click on tab bar: trigger clean navigation */
     document.addEventListener('click', (e) => {
-        if (window.innerWidth > 768) return;
+        if (isDesktopLayout()) return;
         const tabItem = e.target.closest('#apple-tab-bar .tab-item');
         if (!tabItem) return;
 
@@ -474,7 +475,7 @@ if (typeof window !== 'undefined') {
     /* Click on Home page navigation links leaving Home (e.g. dropdown menu or banners):
      * Unload Home top elements and extinguish Home bottom tab without blocking subpages */
     document.addEventListener('click', (e) => {
-        if (window.innerWidth > 768) return;
+        if (isDesktopLayout()) return;
         if (e.target.closest('#apple-tab-bar')) return;
 
         const currentPath = window.location.pathname.replace(/\/index\.html$/, '/');
@@ -525,7 +526,7 @@ if (typeof window !== 'undefined') {
             document.body.classList.add('is-subpage');
             const topNav = document.querySelector('.apple-top-nav');
             if (topNav) {
-                if (window.innerWidth <= 768) {
+                if (isMobileLayout()) {
                     topNav.classList.remove('nav-hidden');
                     topNav.style.removeProperty('display');
                     topNav.style.setProperty('display', 'flex', 'important');
@@ -534,7 +535,7 @@ if (typeof window !== 'undefined') {
                 }
             }
             const tabBar = document.getElementById('apple-tab-bar');
-            if (tabBar && window.innerWidth <= 768) {
+            if (tabBar && isMobileLayout()) {
                 tabBar.style.setProperty('display', 'none', 'important');
             }
             return;

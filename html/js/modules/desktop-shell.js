@@ -7,10 +7,11 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906z';
-import { TAB_ICONS } from './tab-bar.js?v=20260906z';
-import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906z';
-import { getVisitorUuid, generateIdenticonSvg } from './identicon.js?v=20260906z';
+import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260907a';
+import { TAB_ICONS } from './tab-bar.js?v=20260907a';
+import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260907a';
+import { getVisitorUuid, generateIdenticonSvg } from './identicon.js?v=20260907a';
+import { isMobileLayout, isDesktopLayout } from './device-detect.js?v=20260907a';
 
 /* ============================================================================
  * Global Search Index (Covers all memorial topics, exhibits, and settings)
@@ -255,7 +256,7 @@ export function getTabFromUrl(url) {
 
 /* Ensure stylesheet isolation between home and subpages */
 export function ensurePageStylesheets(isHome) {
-    if (window.innerWidth <= 768) return;
+    if (isMobileLayout()) return;
 
     let homeLink = document.getElementById('sys-style-home');
     if (!homeLink) {
@@ -269,7 +270,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(homeLink);
         }
     }
-    homeLink.href = resolveSiteUrl('main/style.css?v=20260906z');
+    homeLink.href = resolveSiteUrl('main/style.css?v=20260907a');
 
     let subpageLink = document.getElementById('sys-style-subpage');
     if (!subpageLink) {
@@ -283,7 +284,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(subpageLink);
         }
     }
-    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260906z');
+    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260907a');
 
     let varLink = document.getElementById('sys-style-variables');
     if (!varLink) {
@@ -297,7 +298,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.insertBefore(varLink, document.head.firstChild);
         }
     }
-    varLink.href = resolveSiteUrl('css/variables.css?v=20260906z');
+    varLink.href = resolveSiteUrl('css/variables.css?v=20260907a');
 
     let baseLink = document.getElementById('sys-style-base');
     if (!baseLink) {
@@ -311,7 +312,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.insertBefore(baseLink, document.head.firstChild);
         }
     }
-    baseLink.href = resolveSiteUrl('css/base.css?v=20260906z');
+    baseLink.href = resolveSiteUrl('css/base.css?v=20260907a');
 
     let indLink = document.getElementById('sys-style-activity');
     if (!indLink) {
@@ -325,7 +326,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(indLink);
         }
     }
-    indLink.href = resolveSiteUrl('css/components/activity-indicator.css?v=20260906z');
+    indLink.href = resolveSiteUrl('css/components/activity-indicator.css?v=20260907a');
 
     if (isHome) {
         homeLink.disabled = false;
@@ -338,7 +339,7 @@ export function ensurePageStylesheets(isHome) {
 
 /* Ensure right-hand content stage container exists */
 function ensureStageContainer() {
-    if (window.innerWidth <= 768) return null;
+    if (isMobileLayout()) return null;
 
     let stage = document.getElementById('desktop-stage');
     if (stage) return stage;
@@ -444,7 +445,7 @@ async function executeStageScripts(doc, targetUrl) {
 let isNavigatingStage = false;
 
 export async function navigateDesktopStage(targetHref, pushState = true, fromSidebar = false) {
-    if (window.innerWidth <= 768) {
+    if (isMobileLayout()) {
         window.location.href = targetHref;
         return;
     }
@@ -595,7 +596,7 @@ function setupDesktopRouter(sidebarEl, basePath) {
         };
 
         if (!link) return;
-        if (window.innerWidth <= 768) return;
+        if (isMobileLayout()) return;
         if (e.button !== 0 && typeof e.button === 'number') return;
         if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
 
@@ -623,7 +624,7 @@ function setupDesktopRouter(sidebarEl, basePath) {
 
     /* Browser back/forward button support */
     window.addEventListener('popstate', () => {
-        if (window.innerWidth <= 768) return;
+        if (isMobileLayout()) return;
         navigateDesktopStage(window.location.href, false);
     });
 }
@@ -632,12 +633,12 @@ function setupDesktopRouter(sidebarEl, basePath) {
  * Desktop Shell Initialization Controller
  * ============================================================================ */
 export function initDesktopShell(options = {}) {
-    /* Mobile isolation guard: desktop shell is strictly disabled on mobile screens */
-    if (window.innerWidth <= 768) {
+    /* Mobile isolation guard: desktop shell is strictly disabled on mobile/tablet devices or small viewports */
+    if (isMobileLayout()) {
         if (!window.__desktopShellResizeBound) {
             window.__desktopShellResizeBound = true;
             window.addEventListener('resize', () => {
-                if (window.innerWidth > 768) {
+                if (isDesktopLayout()) {
                     initDesktopShell(options);
                 }
             });
@@ -771,7 +772,7 @@ export function initDesktopShell(options = {}) {
     syncSidebarProfile(sidebarEl);
 
     /* Setup Desktop Split View Stage and Router */
-    if (window.innerWidth > 768) {
+    if (isDesktopLayout()) {
         setupDesktopRouter(sidebarEl, basePath);
     }
 
@@ -782,7 +783,7 @@ export function initDesktopShell(options = {}) {
 
     /* Re-sync indicator and stage on window resize */
     window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
+        if (isDesktopLayout()) {
             ensureStageContainer();
             const topNav = document.querySelector('.apple-top-nav');
             if (topNav) {

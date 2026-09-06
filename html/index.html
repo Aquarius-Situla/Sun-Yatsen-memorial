@@ -14,6 +14,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>私立中山紀念堂</title>
 
+    <script>
+        /* Immediate device fingerprinting to eliminate layout flash */
+        (function() {
+            var ua = navigator.userAgent || '';
+            var platform = navigator.platform || '';
+            var isIPad = /iPad/i.test(ua) || /iPad/i.test(platform) || ((platform === 'MacIntel' || ua.indexOf('Macintosh') !== -1) && navigator.maxTouchPoints > 1);
+            var isIPhone = /iPhone|iPod/i.test(ua) || platform === 'iPhone' || platform === 'iPod';
+            var isAndroidMobile = /Android.*Mobile/i.test(ua);
+            var isAndroidTablet = /Android(?!.*Mobile)/i.test(ua);
+            var isPhone = isIPhone || isAndroidMobile || (navigator.maxTouchPoints > 0 && Math.min(window.screen.width, window.screen.height) <= 480);
+            var isTablet = isIPad || isAndroidTablet;
+            var isMobile = isPhone || isTablet || window.innerWidth <= 768;
+            var docEl = document.documentElement;
+            if (isMobile) {
+                docEl.classList.add('device-mobile');
+                if (isTablet) docEl.classList.add('device-tablet');
+                if (isPhone) docEl.classList.add('device-phone');
+                if (isIPad) docEl.classList.add('device-ipad');
+                if (isIPhone) docEl.classList.add('device-iphone');
+            } else {
+                docEl.classList.add('device-desktop');
+            }
+        })();
+    </script>
+
     <link rel="icon" href="main/favicon/favicon.svg" type="image/svg+xml">
     <link rel="alternate icon" href="main/favicon/favicon.ico" type="image/x-icon" sizes="any">
 
@@ -23,13 +48,14 @@
     <!-- Critical inline CSS: eliminates white flash during iOS PWA page transitions -->
     <style>html,body{background-color:#111111;height:100%;min-height:100%;}@media(prefers-color-scheme:light){html,body{background-color:#f5f0e8;}}</style>
 
-    <link id="sys-style-variables" rel="stylesheet" href="css/variables.css?v=20260906z">
-    <link id="sys-style-base" rel="stylesheet" href="css/base.css?v=20260906z">
-    <link id="sys-style-home" rel="stylesheet" href="main/style.css?v=20260906z">
-    <link id="sys-style-subpage" rel="stylesheet" href="css/components/subpage.css?v=20260906z" disabled>
-    <link rel="stylesheet" href="css/components/tab-bar.css?v=20260906z">
-    <link rel="stylesheet" href="css/components/desktop-shell.css?v=20260906z">
-    <link rel="stylesheet" href="css/components/activity-indicator.css?v=20260906z">
+    <link id="sys-style-variables" rel="stylesheet" href="css/variables.css?v=20260907a">
+    <link id="sys-style-base" rel="stylesheet" href="css/base.css?v=20260907a">
+    <link id="sys-style-home" rel="stylesheet" href="main/style.css?v=20260907a">
+    <link id="sys-style-subpage" rel="stylesheet" href="css/components/subpage.css?v=20260907a" disabled>
+    <link rel="stylesheet" href="css/components/tab-bar.css?v=20260907a">
+    <link rel="stylesheet" href="css/components/desktop-shell.css?v=20260907a">
+    <link rel="stylesheet" href="css/components/orientation-guard.css?v=20260907a">
+    <link rel="stylesheet" href="css/components/activity-indicator.css?v=20260907a">
 
     <!-- System Dark/Light theme-color -->
     <meta name="color-scheme" content="light dark">
@@ -197,6 +223,6 @@
         <source src="main/sanmin/sanmin.flac" type="audio/flac">
     </audio>
     <script src="api/env.js"></script>
-    <script type="module" src="js/app.js?v=20260906z"></script>
+    <script type="module" src="js/app.js?v=20260907a"></script>
 </body>
 </html>

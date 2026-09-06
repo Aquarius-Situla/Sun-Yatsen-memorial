@@ -8,6 +8,7 @@
  * ============================================================================ */
 
 import { SPECIAL_MEMORIAL_DAYS } from './audio-player.js';
+import { isMobileLayout } from './device-detect.js?v=20260907a';
 
 /* ============================================================================
  * Republic of China Calendar Formatting
@@ -79,7 +80,7 @@ export function initFestivalBanner(navBannerEl, onFestivalTrigger) {
             navBannerEl.setAttribute('aria-label', `${bannerText}——點擊了解更多`);
             navBannerEl.setAttribute('data-href', festivalPage);
             navBannerEl.addEventListener('click',   (e) => {
-                if (window.innerWidth <= 768 && typeof window.__triggerMobileNav === 'function') {
+                if (isMobileLayout() && typeof window.__triggerMobileNav === 'function') {
                     e.preventDefault();
                     window.__triggerMobileNav(festivalPage, 'library');
                     return;
@@ -89,7 +90,7 @@ export function initFestivalBanner(navBannerEl, onFestivalTrigger) {
             navBannerEl.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    if (window.innerWidth <= 768 && typeof window.__triggerMobileNav === 'function') {
+                    if (isMobileLayout() && typeof window.__triggerMobileNav === 'function') {
                         window.__triggerMobileNav(festivalPage, 'library');
                         return;
                     }

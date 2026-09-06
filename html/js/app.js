@@ -15,11 +15,12 @@ import { initDesktopParallax, initGyroscopeLighting } from './modules/motion.js'
 import { toggleDanmaku } from './modules/danmaku.js';
 import { setupMessageSheet } from './modules/message-sheet.js';
 import { loadAndTriggerFireworks } from './modules/fireworks.js';
-import { syncTabBarLabels, getCurrentLang } from './modules/i18n.js?v=20260906z';
-import { syncStandaloneTabBar } from './modules/tab-bar.js?v=20260906z';
-import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260906z';
-import { initDesktopShell } from './modules/desktop-shell.js?v=20260906z';
-import { hideActivityIndicator } from './modules/activity-indicator.js?v=20260906z';
+import { syncTabBarLabels, getCurrentLang } from './modules/i18n.js?v=20260907a';
+import { syncStandaloneTabBar } from './modules/tab-bar.js?v=20260907a';
+import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260907a';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260907a';
+import { hideActivityIndicator } from './modules/activity-indicator.js?v=20260907a';
+import { initDeviceLayout, initOrientationGuard, isMobileLayout, isDesktopLayout } from './modules/device-detect.js?v=20260907a';
 
 /* Expose fireworks loader globally for legacy triggers */
 window.loadAndTriggerFireworks = loadAndTriggerFireworks;
@@ -127,7 +128,7 @@ export function setupTestamentInteractions(testamentBox) {
         }
 
         /* Mobile single tap: toggle danmaku layer */
-        if (window.innerWidth <= 768) {
+        if (isMobileLayout()) {
             toggleDanmakuLayer();
         } else {
             openDanmakuModal(e);
@@ -144,7 +145,7 @@ export function setupTestamentInteractions(testamentBox) {
             return;
         }
         /* Desktop single click: open send danmaku modal */
-        if (window.innerWidth > 768) {
+        if (isDesktopLayout()) {
             openDanmakuModal(e);
         } else {
             toggleDanmakuLayer();
@@ -154,7 +155,7 @@ export function setupTestamentInteractions(testamentBox) {
     testamentBox.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            if (window.innerWidth > 768) {
+            if (isDesktopLayout()) {
                 openDanmakuModal(e);
             } else {
                 toggleDanmakuLayer();
@@ -247,7 +248,9 @@ export function initApp() {
 
         return;
     }
-    window.__appInitialized = true;
+    /* Initialize device layout classes and smartphone orientation blocker */
+    initDeviceLayout();
+    initOrientationGuard();
 
     setupDiagnosticTrigger();
     const WORKER_API = window.ENV ? window.ENV.WORKER_API : '';

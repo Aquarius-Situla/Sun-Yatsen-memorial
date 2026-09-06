@@ -710,11 +710,11 @@ zero-md {
  * Responsive Viewport Rules
  * ============================================================================ */
 @media (min-width: 769px) {
-    .apple-top-nav {
+    html:not(.device-mobile) .apple-top-nav {
         display: none !important;
     }
-    .icon-ios { display: none; }
-    .icon-macos { display: block; }
+    html:not(.device-mobile) .icon-ios { display: none; }
+    html:not(.device-mobile) .icon-macos { display: block; }
 }
 
 @media (max-width: 768px) {
@@ -756,6 +756,30 @@ zero-md {
             min-height: 100.5vh;
             min-height: calc(100lvh + 1px);
         }
+    }
+
+    /* Mobile & Tablet Device Layout (e.g. iPad, iPhone, Android) */
+    html.device-mobile body {
+        padding: calc(44px + env(safe-area-inset-top, 0px) + 8px) 0 calc(65px + env(safe-area-inset-bottom, 34px)) 0 !important;
+        width: 100%;
+        min-height: 100%;
+        min-height: 100.5vh;
+        min-height: calc(100lvh + 1px);
+        box-sizing: border-box;
+    }
+
+    html.device-mobile body.is-subpage .apple-tab-bar,
+    html.device-mobile body.is-subpage #apple-tab-bar,
+    html.device-mobile body:has(.nav-back-link) .apple-tab-bar,
+    html.device-mobile body:has(.nav-back-link) #apple-tab-bar {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+
+    html.device-mobile body.is-subpage,
+    html.device-mobile body:has(.nav-back-link) {
+        padding-bottom: calc(20px + env(safe-area-inset-bottom, 16px)) !important;
     }
 
     html.is-standalone,

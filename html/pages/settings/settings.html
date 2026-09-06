@@ -12,6 +12,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title id="page-title">設定 - 私立中山紀念堂</title>
+
+    <script>
+        /* Immediate device fingerprinting to eliminate layout flash */
+        (function() {
+            var ua = navigator.userAgent || '';
+            var platform = navigator.platform || '';
+            var isIPad = /iPad/i.test(ua) || /iPad/i.test(platform) || ((platform === 'MacIntel' || ua.indexOf('Macintosh') !== -1) && navigator.maxTouchPoints > 1);
+            var isIPhone = /iPhone|iPod/i.test(ua) || platform === 'iPhone' || platform === 'iPod';
+            var isAndroidMobile = /Android.*Mobile/i.test(ua);
+            var isAndroidTablet = /Android(?!.*Mobile)/i.test(ua);
+            var isPhone = isIPhone || isAndroidMobile || (navigator.maxTouchPoints > 0 && Math.min(window.screen.width, window.screen.height) <= 480);
+            var isTablet = isIPad || isAndroidTablet;
+            var isMobile = isPhone || isTablet || window.innerWidth <= 768;
+            var docEl = document.documentElement;
+            if (isMobile) {
+                docEl.classList.add('device-mobile');
+                if (isTablet) docEl.classList.add('device-tablet');
+                if (isPhone) docEl.classList.add('device-phone');
+                if (isIPad) docEl.classList.add('device-ipad');
+                if (isIPhone) docEl.classList.add('device-iphone');
+            } else {
+                docEl.classList.add('device-desktop');
+            }
+        })();
+    </script>
     <link rel="icon" href="../../main/favicon/favicon.svg" type="image/svg+xml">
     <link rel="alternate icon" href="../../main/favicon/favicon.ico" type="image/x-icon" sizes="any">
 
@@ -24,10 +49,11 @@
     <!-- Critical inline CSS: eliminates white flash and 300ms expansion during iOS PWA launch -->
     <style>html,body{background-color:#111111;min-height:100.5vh;min-height:calc(100lvh + 1px);}@media(prefers-color-scheme:light){html,body{background-color:#f5f0e8;}}</style>
 
-    <link rel="stylesheet" href="../../css/variables.css?v=20260906z">
-    <link rel="stylesheet" href="../../css/base.css?v=20260906z">
-    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=20260906z">
-    <link id="sys-style-subpage" rel="stylesheet" href="../../css/components/subpage.css?v=20260906z">
+    <link rel="stylesheet" href="../../css/variables.css?v=20260907a">
+    <link rel="stylesheet" href="../../css/base.css?v=20260907a">
+    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=20260907a">
+    <link id="sys-style-subpage" rel="stylesheet" href="../../css/components/subpage.css?v=20260907a">
+    <link rel="stylesheet" href="../../css/components/orientation-guard.css?v=20260907a">
 </head>
 <body class="page-settings-menu">
 
@@ -156,10 +182,11 @@
         /* ====================================================================
          * Settings Module Initialization & Dynamic Language Toggle
          * ==================================================================== */
-        import { getCurrentLang, setGlobalLang, syncTabBarLabels } from '../../js/modules/i18n.js?v=20260906z';
-        import { syncStandaloneTabBar } from '../../js/modules/tab-bar.js?v=20260906z';
-        import { initIOSNavTransition } from '../../js/modules/ios-nav-transition.js?v=20260906z';
-        import { initDesktopShell } from '../../js/modules/desktop-shell.js?v=20260906z';
+        import { getCurrentLang, setGlobalLang, syncTabBarLabels } from '../../js/modules/i18n.js?v=20260907a';
+        import { syncStandaloneTabBar } from '../../js/modules/tab-bar.js?v=20260907a';
+        import { initIOSNavTransition } from '../../js/modules/ios-nav-transition.js?v=20260907a';
+        import { initDesktopShell } from '../../js/modules/desktop-shell.js?v=20260907a';
+import { initDeviceLayout, initOrientationGuard } from '../../js/modules/device-detect.js?v=20260907a';
 
         const i18nStrings = {
             tc: {
@@ -256,6 +283,8 @@
         updateTexts(currentLang);
         syncStandaloneTabBar();
         initIOSNavTransition();
+        initDeviceLayout();
+        initOrientationGuard();
         initDesktopShell({ activeTab: 'settings', basePath: '../../' });
 
         const langBtn = document.getElementById('lang-btn');

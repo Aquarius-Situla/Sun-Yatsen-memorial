@@ -10,20 +10,18 @@
  * ============================================================================ */
 
 /* ============================================================================
- * Desktop Isolation: Completely Hide Mobile Shell Bars on Screens > 768px
+ * Desktop Isolation: Completely Hide Mobile Shell Bars on Screens > 768px on Desktop
  * ============================================================================ */
 @media (min-width: 769px) {
-    .apple-tab-bar,
-    .apple-top-nav {
+    html:not(.device-mobile) .apple-tab-bar,
+    html:not(.device-mobile) .apple-top-nav {
         display: none !important;
     }
 }
 
-
 /* ============================================================================
- * Mobile Viewport Rules (<= 768px)
+ * Mobile & Tablet Component Definitions
  * ============================================================================ */
-@media (max-width: 768px) {
     /* Fixed Apple Native Top Navigation Bar (Authentic Frosted Glass Header) */
     .apple-top-nav {
         position: fixed;
@@ -190,12 +188,11 @@
     .apple-tab-bar .tab-item:active {
         opacity: 0.7;
     }
-}
 
 /* ============================================================================
  * Light Theme Color Overrides
  * ============================================================================ */
-@media (prefers-color-scheme: light) and (max-width: 768px) {
+@media (prefers-color-scheme: light) {
     .apple-top-nav {
         background: rgba(255, 255, 255, 0.75);
         backdrop-filter: blur(25px) saturate(190%);
