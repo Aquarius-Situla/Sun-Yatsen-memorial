@@ -7,9 +7,9 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js';
-import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906m';
-import { resolveSiteUrl } from './desktop-shell.js?v=20260906m';
+import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906n';
+import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906n';
+import { resolveSiteUrl } from './desktop-shell.js?v=20260906n';
 
 /* ============================================================================
  * Authentic Apple SF Symbols Vector Icons (24x24 Pixel-Perfect Fill Glyphs)
@@ -223,13 +223,9 @@ if (typeof window !== 'undefined') {
         /* 2. Instant Apple daisy activity indicator feedback */
         showActivityIndicator(document.body);
 
-        /* 3. In standalone PWA mode, navigate via window.location.href to keep within WebClip */
-        const isIOSStandalone = ('standalone' in window.navigator) && window.navigator.standalone;
-        const isPWAStandalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
-        if (isIOSStandalone || isPWAStandalone) {
-            e.preventDefault();
-            window.location.href = targetHref;
-        }
+        /* 3. Clean native navigation */
+        e.preventDefault();
+        window.location.href = targetHref;
     }, false);
 
     /* Hide activity indicator when returning via browser back/forward (bfcache) */

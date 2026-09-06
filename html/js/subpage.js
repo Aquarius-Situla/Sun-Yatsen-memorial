@@ -70,12 +70,12 @@ function getMarkdownStyles(isLight) {
     }
 }
 
-import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=2025';
-import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=20260906k';
-import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=2025';
-import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260906k';
-import { initDesktopShell } from './modules/desktop-shell.js?v=20260906k';
-import { showActivityIndicator, hideActivityIndicator } from './modules/activity-indicator.js?v=20260906k';
+import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=20260906n';
+import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=20260906n';
+import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260906n';
+import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260906n';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260906n';
+import { showActivityIndicator, hideActivityIndicator } from './modules/activity-indicator.js?v=20260906n';
 
 /* ============================================================================
  * Subpage Initialization Engine
