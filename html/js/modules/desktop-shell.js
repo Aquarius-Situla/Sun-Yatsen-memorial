@@ -7,9 +7,10 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906v';
-import { TAB_ICONS } from './tab-bar.js?v=20260906v';
-import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906v';
+import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906w';
+import { TAB_ICONS } from './tab-bar.js?v=20260906w';
+import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906w';
+import { getVisitorUuid, generateIdenticonSvg } from './identicon.js?v=20260906w';
 
 /* ============================================================================
  * Global Search Index (Covers all memorial topics, exhibits, and settings)
@@ -176,7 +177,11 @@ const SIDEBAR_STRINGS = {
         exhibitBiography: '國父生平傳記',
         statusAttendance: '總參典：',
         unitAttendance: '人次',
-        noResults: '無相符搜尋結果'
+        noResults: '無相符搜尋結果',
+        visitorLabel: '訪客身分憑證',
+        popoverTitle: '訪客專屬識別碼 (UUID)',
+        copyHint: '點擊卡片可複製完整代碼',
+        copiedHint: '已複製 UUID 至剪貼簿！'
     },
     sc: {
         brand: '私立中山纪念堂',
@@ -193,7 +198,11 @@ const SIDEBAR_STRINGS = {
         exhibitBiography: '国父生平传记',
         statusAttendance: '总参典：',
         unitAttendance: '人次',
-        noResults: '无相符搜索结果'
+        noResults: '无相符搜索结果',
+        visitorLabel: '访客身份凭证',
+        popoverTitle: '访客专属识别码 (UUID)',
+        copyHint: '点击卡片可复制完整代码',
+        copiedHint: '已复制 UUID 至剪贴板！'
     }
 };
 
@@ -260,7 +269,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(homeLink);
         }
     }
-    homeLink.href = resolveSiteUrl('main/style.css?v=20260906v');
+    homeLink.href = resolveSiteUrl('main/style.css?v=20260906w');
 
     let subpageLink = document.getElementById('sys-style-subpage');
     if (!subpageLink) {
@@ -274,7 +283,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(subpageLink);
         }
     }
-    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260906v');
+    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260906w');
 
     let varLink = document.getElementById('sys-style-variables');
     if (!varLink) {
@@ -288,7 +297,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.insertBefore(varLink, document.head.firstChild);
         }
     }
-    varLink.href = resolveSiteUrl('css/variables.css?v=20260906v');
+    varLink.href = resolveSiteUrl('css/variables.css?v=20260906w');
 
     let baseLink = document.getElementById('sys-style-base');
     if (!baseLink) {
@@ -302,7 +311,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.insertBefore(baseLink, document.head.firstChild);
         }
     }
-    baseLink.href = resolveSiteUrl('css/base.css?v=20260906v');
+    baseLink.href = resolveSiteUrl('css/base.css?v=20260906w');
 
     let indLink = document.getElementById('sys-style-activity');
     if (!indLink) {
@@ -316,7 +325,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(indLink);
         }
     }
-    indLink.href = resolveSiteUrl('css/components/activity-indicator.css?v=20260906v');
+    indLink.href = resolveSiteUrl('css/components/activity-indicator.css?v=20260906w');
 
     if (isHome) {
         homeLink.disabled = false;
@@ -735,6 +744,7 @@ export function initDesktopShell(options = {}) {
     if (sidebarEl && sidebarEl.dataset.initialized === 'true') {
         syncSidebarActiveState(sidebarEl, activeTab);
         syncSidebarLabels(sidebarEl);
+        syncSidebarProfile(sidebarEl);
         if (window.__syncIndicatorPosition) {
             window.__syncIndicatorPosition();
         }
@@ -757,8 +767,8 @@ export function initDesktopShell(options = {}) {
     /* Sync Sidebar Language Labels */
     syncSidebarLabels(sidebarEl);
 
-    /* Sync Status Display with Live Calendar & Attendance */
-    syncSidebarStatus(sidebarEl);
+    /* Sync Visitor Profile with Identicon and UUID */
+    syncSidebarProfile(sidebarEl);
 
     /* Setup Desktop Split View Stage and Router */
     if (window.innerWidth > 768) {
@@ -877,13 +887,18 @@ function createSidebarElement(activeTab, basePath) {
             </div>
         </div>
 
-        <!-- Sidebar Footer Status (Apple Profile Style) -->
+        <!-- Sidebar Footer Visitor Profile (Apple Music Profile Style with Identicon) -->
         <div class="desktop-sidebar-bottom">
-            <div class="desktop-profile-card">
-                <div class="desktop-profile-avatar">🏛️</div>
+            <div class="desktop-profile-card" id="desktop-profile-card" tabindex="0" role="button" aria-label="${str.visitorLabel}">
+                <div class="desktop-profile-avatar" id="desktop-profile-avatar"></div>
                 <div class="desktop-profile-info">
-                    <div class="desktop-profile-name" id="desktop-brand-title">私立中山紀念堂</div>
-                    <div class="desktop-profile-status" id="desktop-status-text">總參典人次：...</div>
+                    <div class="desktop-profile-name" id="desktop-profile-name">${str.visitorLabel}</div>
+                    <div class="desktop-profile-status" id="desktop-profile-uuid"></div>
+                </div>
+                <div class="desktop-profile-popover" id="desktop-profile-popover">
+                    <div class="desktop-popover-title" id="desktop-popover-title">${str.popoverTitle}</div>
+                    <div class="desktop-popover-uuid" id="desktop-popover-uuid"></div>
+                    <div class="desktop-popover-hint" id="desktop-popover-hint">${str.copyHint}</div>
                 </div>
             </div>
         </div>
@@ -1010,32 +1025,85 @@ function syncSidebarLabels(sidebarEl) {
 
     const exMay = sidebarEl.querySelector('#label-exhibit-mayfourth');
     if (exMay) exMay.textContent = str.exhibitMayfourth;
+
+    const profileName = sidebarEl.querySelector('#desktop-profile-name');
+    if (profileName) profileName.textContent = str.visitorLabel;
+
+    const popoverTitle = sidebarEl.querySelector('#desktop-popover-title');
+    if (popoverTitle) popoverTitle.textContent = str.popoverTitle;
+
+    const popoverHint = sidebarEl.querySelector('#desktop-popover-hint');
+    if (popoverHint && !popoverHint.classList.contains('copied')) {
+        popoverHint.textContent = str.copyHint;
+    }
 }
 
 /* ============================================================================
- * Attendance & Calendar Status Synchronizer
+ * Visitor Profile & Identicon Synchronizer (Apple Music Style)
  * ============================================================================ */
-function syncSidebarStatus(sidebarEl) {
+function syncSidebarProfile(sidebarEl) {
     if (!sidebarEl) return;
 
-    const statusText = sidebarEl.querySelector('#desktop-status-text');
+    const card = sidebarEl.querySelector('#desktop-profile-card');
+    const avatarEl = sidebarEl.querySelector('#desktop-profile-avatar');
+    const uuidEl = sidebarEl.querySelector('#desktop-profile-uuid');
+    const popoverUuid = sidebarEl.querySelector('#desktop-popover-uuid');
+    const popoverHint = sidebarEl.querySelector('#desktop-popover-hint');
 
-    function update() {
-        const pageAttendance = document.getElementById('attendanceCount');
-        const count = pageAttendance ? pageAttendance.textContent : '0';
+    const uuid = getVisitorUuid();
 
-        const now = new Date();
-        const minguoYear = now.getFullYear() - 1911;
-        const month = now.getMonth() + 1;
-        const date = now.getDate();
-
-        if (statusText) {
-            statusText.textContent = `參典人次：${count} · 民國 ${minguoYear} 年`;
-        }
+    /* Render 5x5 symmetrical SVG Identicon avatar */
+    if (avatarEl && !avatarEl.querySelector('svg')) {
+        avatarEl.innerHTML = generateIdenticonSvg(uuid, 32);
     }
 
-    update();
-    setInterval(update, 2000);
+    /* Set truncated UUID text with native browser tooltip */
+    if (uuidEl) {
+        uuidEl.textContent = uuid;
+        uuidEl.setAttribute('title', uuid);
+    }
+    if (card) {
+        card.setAttribute('title', uuid);
+    }
+    if (popoverUuid) {
+        popoverUuid.textContent = uuid;
+    }
+
+    /* Interactive click-to-copy handler with fluid Apple UI feedback */
+    if (card && !card.dataset.copyBound) {
+        card.dataset.copyBound = 'true';
+        card.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const currentLang = getCurrentLang();
+            const str = SIDEBAR_STRINGS[currentLang] || SIDEBAR_STRINGS.tc;
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(uuid);
+                } else {
+                    const ta = document.createElement('textarea');
+                    ta.value = uuid;
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                }
+
+                if (popoverHint) {
+                    const originalText = popoverHint.textContent;
+                    popoverHint.textContent = '✓ ' + str.copiedHint;
+                    popoverHint.classList.add('copied');
+                    setTimeout(() => {
+                        popoverHint.textContent = originalText;
+                        popoverHint.classList.remove('copied');
+                    }, 2000);
+                }
+            } catch (err) {
+                /* Copy failure ignored */
+            }
+        });
+    }
 }
 
 /* ============================================================================
