@@ -7,10 +7,10 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906w';
-import { TAB_ICONS } from './tab-bar.js?v=20260906w';
-import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906w';
-import { getVisitorUuid, generateIdenticonSvg } from './identicon.js?v=20260906w';
+import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906x';
+import { TAB_ICONS } from './tab-bar.js?v=20260906x';
+import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906x';
+import { getVisitorUuid, generateIdenticonSvg } from './identicon.js?v=20260906x';
 
 /* ============================================================================
  * Global Search Index (Covers all memorial topics, exhibits, and settings)
@@ -269,7 +269,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(homeLink);
         }
     }
-    homeLink.href = resolveSiteUrl('main/style.css?v=20260906w');
+    homeLink.href = resolveSiteUrl('main/style.css?v=20260906x');
 
     let subpageLink = document.getElementById('sys-style-subpage');
     if (!subpageLink) {
@@ -283,7 +283,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(subpageLink);
         }
     }
-    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260906w');
+    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260906x');
 
     let varLink = document.getElementById('sys-style-variables');
     if (!varLink) {
@@ -297,7 +297,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.insertBefore(varLink, document.head.firstChild);
         }
     }
-    varLink.href = resolveSiteUrl('css/variables.css?v=20260906w');
+    varLink.href = resolveSiteUrl('css/variables.css?v=20260906x');
 
     let baseLink = document.getElementById('sys-style-base');
     if (!baseLink) {
@@ -311,7 +311,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.insertBefore(baseLink, document.head.firstChild);
         }
     }
-    baseLink.href = resolveSiteUrl('css/base.css?v=20260906w');
+    baseLink.href = resolveSiteUrl('css/base.css?v=20260906x');
 
     let indLink = document.getElementById('sys-style-activity');
     if (!indLink) {
@@ -325,7 +325,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(indLink);
         }
     }
-    indLink.href = resolveSiteUrl('css/components/activity-indicator.css?v=20260906w');
+    indLink.href = resolveSiteUrl('css/components/activity-indicator.css?v=20260906x');
 
     if (isHome) {
         homeLink.disabled = false;
