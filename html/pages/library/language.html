@@ -82,6 +82,19 @@
     <div class="ios-group-container">
         <div class="ios-section-header" id="section-header-lang">偏好語言 (PREFERRED LANGUAGES)</div>
         <div class="ios-card">
+            <div class="ios-row ios-option-item" data-lang="auto" id="lang-row-auto">
+                <div class="ios-row-title ios-lang-row-content">
+                    <div class="lang-text-group">
+                        <span class="lang-primary-name" id="lang-auto-title">自動</span>
+                        <span class="lang-secondary-desc" id="lang-auto-desc">跟隨瀏覽器偏好 · Follow Browser</span>
+                    </div>
+                </div>
+                <div class="ios-row-accessory">
+                    <svg class="ios-checkmark" viewBox="0 0 24 24">
+                        <path d="M20 6L9 17l-5-5" fill="none" stroke="#0a84ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
             <div class="ios-row ios-option-item" data-lang="tc" id="lang-row-tc">
                 <div class="ios-row-title ios-lang-row-content">
                     <div class="lang-text-group">
@@ -143,11 +156,11 @@
     </nav>
 
     <script type="module">
-        import { getCurrentLang, setGlobalLang, syncTabBarLabels } from '../../js/modules/i18n.js?v=20260907b';
+        import { getCurrentLang, getLanguageMode, setGlobalLang, syncTabBarLabels, t } from '../../js/modules/i18n.js?v=20260907b';
         import { initTabBar, syncStandaloneTabBar } from '../../js/modules/tab-bar.js?v=20260907b';
         import { initIOSNavTransition } from '../../js/modules/ios-nav-transition.js?v=20260907b';
         import { initDesktopShell } from '../../js/modules/desktop-shell.js?v=20260907b';
-import { initDeviceLayout, initOrientationGuard } from '../../js/modules/device-detect.js?v=20260907b';
+        import { initDeviceLayout, initOrientationGuard } from '../../js/modules/device-detect.js?v=20260907b';
 
         initTabBar({
             activeTab: 'settings',
@@ -159,25 +172,7 @@ import { initDeviceLayout, initOrientationGuard } from '../../js/modules/device-
         initOrientationGuard();
         initDesktopShell({ activeTab: 'settings', basePath: '../../' });
 
-        const strings = {
-            tc: {
-                pageTitle: '語言偏好 - 私立中山紀念堂',
-                topTitle: '語言偏好',
-                backText: '設定',
-                sectionHeader: '偏好語言 (PREFERRED LANGUAGES)',
-                footer: '選擇在私立中山紀念堂中顯示的語言偏好。系統將自動保存您的偏好設定。',
-                toggleBtn: '切换至简化字'
-            },
-            sc: {
-                pageTitle: '语言偏好 - 私立中山纪念堂',
-                topTitle: '语言偏好',
-                backText: '设置',
-                sectionHeader: '偏好语言 (PREFERRED LANGUAGES)',
-                footer: '选择在私立中山纪念堂中显示的语言偏好。系统将自动保存您的偏好设置。',
-                toggleBtn: '切換至正體字'
-            }
-        };
-
+        const rowAuto = document.getElementById('lang-row-auto');
         const rowTc = document.getElementById('lang-row-tc');
         const rowSc = document.getElementById('lang-row-sc');
         const pageTitle = document.getElementById('page-title');
@@ -185,58 +180,78 @@ import { initDeviceLayout, initOrientationGuard } from '../../js/modules/device-
         const navBackText = document.getElementById('nav-back-text');
         const sectionHeader = document.getElementById('section-header-lang');
         const footerText = document.getElementById('lang-footer-text');
+        const autoTitle = document.getElementById('lang-auto-title');
+        const autoDesc = document.getElementById('lang-auto-desc');
         const langBtn = document.getElementById('lang-btn');
 
-        function updateUI(lang) {
-            const isTc = lang === 'tc';
+        function updateUI() {
+            const mode = getLanguageMode();
+            const effectiveLang = getCurrentLang();
+            const isTc = effectiveLang === 'tc';
+
             document.documentElement.lang = isTc ? 'zh-TW' : 'zh-CN';
 
-            if (rowTc && rowSc) {
-                if (isTc) {
-                    rowTc.classList.add('selected');
-                    rowSc.classList.remove('selected');
-                } else {
-                    rowSc.classList.add('selected');
-                    rowTc.classList.remove('selected');
-                }
+            /* Update checkmark selection state for all rows */
+            if (rowAuto) rowAuto.classList.toggle('selected', mode === 'auto');
+            if (rowTc) rowTc.classList.toggle('selected', mode === 'tc');
+            if (rowSc) rowSc.classList.toggle('selected', mode === 'sc');
+
+            /* Update localized texts from modular i18n engine */
+            if (pageTitle) pageTitle.textContent = t('lang_page_title');
+            if (topNavTitle) topNavTitle.textContent = t('lang_top_title');
+            if (navBackText) navBackText.textContent = t('lang_back_text');
+            if (sectionHeader) sectionHeader.textContent = t('lang_section_header');
+            if (footerText) footerText.textContent = t('lang_footer');
+
+            if (autoTitle) autoTitle.textContent = t('lang_opt_auto_title');
+            if (autoDesc) {
+                const effectiveName = isTc ? t('lang_opt_tc_title') : t('lang_opt_sc_title');
+                autoDesc.textContent = t('lang_opt_auto_current', effectiveName);
             }
 
-            const t = strings[lang] || strings.tc;
-            if (pageTitle) pageTitle.textContent = t.pageTitle;
-            if (topNavTitle) topNavTitle.textContent = t.topTitle;
-            if (navBackText) navBackText.textContent = t.backText;
-            if (sectionHeader) sectionHeader.textContent = t.sectionHeader;
-            if (footerText) footerText.textContent = t.footer;
-            if (langBtn) langBtn.textContent = t.toggleBtn;
+            if (langBtn) {
+                langBtn.textContent = isTc ? t('btn_toggle_to_sc') : t('btn_toggle_to_tc');
+            }
 
             syncTabBarLabels();
         }
 
-        const initialLang = getCurrentLang();
-        updateUI(initialLang);
+        /* Initial UI synchronization */
+        updateUI();
 
-        rowTc.addEventListener('click', () => {
-            setGlobalLang('tc');
-            updateUI('tc');
-        });
+        /* Bind click handlers for options */
+        if (rowAuto) {
+            rowAuto.addEventListener('click', () => {
+                setGlobalLang('auto');
+                updateUI();
+            });
+        }
 
-        rowSc.addEventListener('click', () => {
-            setGlobalLang('sc');
-            updateUI('sc');
-        });
+        if (rowTc) {
+            rowTc.addEventListener('click', () => {
+                setGlobalLang('tc');
+                updateUI();
+            });
+        }
+
+        if (rowSc) {
+            rowSc.addEventListener('click', () => {
+                setGlobalLang('sc');
+                updateUI();
+            });
+        }
 
         if (langBtn) {
             langBtn.addEventListener('click', () => {
                 const nextLang = getCurrentLang() === 'tc' ? 'sc' : 'tc';
                 setGlobalLang(nextLang);
-                updateUI(nextLang);
+                updateUI();
             });
         }
 
-        window.addEventListener('sys-lang-change', (e) => {
-            if (e.detail && e.detail.lang) {
-                updateUI(e.detail.lang);
-            }
+        /* Synchronize on global language change event */
+        window.addEventListener('sys-lang-change', () => {
+            updateUI();
         });
     </script>
 </body>

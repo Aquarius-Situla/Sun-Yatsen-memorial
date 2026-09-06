@@ -70,7 +70,7 @@ function getMarkdownStyles(isLight) {
     }
 }
 
-import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=20260907b';
+import { getCurrentLang, getLanguageMode, setGlobalLang } from './modules/i18n.js?v=20260907b';
 import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=20260907b';
 import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260907b';
 import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260907b';
@@ -204,9 +204,10 @@ export function initSubpage(options) {
         }
 
         /* Update iOS Inset Grouped Option Selection (e.g. Language Selector) */
+        const currentMode = (typeof getLanguageMode === 'function') ? getLanguageMode() : (isTraditional ? 'tc' : 'sc');
         iosOptionItems.forEach(opt => {
             const optLang = opt.getAttribute('data-lang');
-            const isSelected = (isTraditional && optLang === 'tc') || (!isTraditional && optLang === 'sc');
+            const isSelected = (optLang === currentMode);
             if (isSelected) {
                 opt.classList.add('selected');
             } else {
