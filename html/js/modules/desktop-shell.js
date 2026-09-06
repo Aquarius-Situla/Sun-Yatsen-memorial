@@ -343,7 +343,6 @@ function createSidebarElement(activeTab, basePath) {
                 </a>
             </div>
         </div>
-        </div>
 
         <!-- Sidebar Footer Status (Apple Profile Style) -->
         <div class="desktop-sidebar-bottom">
@@ -523,10 +522,25 @@ function setupAnimatedNavIndicator(sidebarEl, activeTab) {
     const activeItem = sidebarEl.querySelector(`.desktop-nav-item[data-sidebar-tab="${activeTab}"]`);
 
     function getItemPosition(itemEl) {
-        if (!itemEl) return null;
-        const itemRect = itemEl.getBoundingClientRect();
-        const parentRect = topContainer.getBoundingClientRect();
-        return itemRect.top - parentRect.top + (itemRect.height - 16) / 2;
+        if (!itemEl || !topContainer) return null;
+        let top = 0;
+        let curr = itemEl;
+        let found = false;
+        while (curr && curr !== topContainer) {
+            top += curr.offsetTop;
+            curr = curr.offsetParent;
+            if (curr === topContainer) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            const itemRect = itemEl.getBoundingClientRect();
+            const parentRect = topContainer.getBoundingClientRect();
+            top = itemRect.top - parentRect.top;
+        }
+        const height = itemEl.offsetHeight || 32;
+        return top + (height - 16) / 2;
     }
 
     function moveIndicator(fromY, toY, onFinish) {
@@ -575,7 +589,7 @@ function setupAnimatedNavIndicator(sidebarEl, activeTab) {
         ];
 
         const anim = indicator.animate(keyframes, {
-            duration: 320,
+            duration: 300,
             fill: 'forwards',
             easing: 'linear'
         });
@@ -587,30 +601,28 @@ function setupAnimatedNavIndicator(sidebarEl, activeTab) {
         };
     }
 
-    const lastNavTab = sessionStorage.getItem('sys_last_nav_tab');
+    /* Record session state for active tab */
     sessionStorage.setItem('sys_last_nav_tab', activeTab);
 
-    requestAnimationFrame(() => {
+    /* Direct, rock-solid initial positioning without cross-page jump or offset glitch */
+    function syncIndicatorPosition() {
+        if (!activeItem) return;
         const toPos = getItemPosition(activeItem);
         if (toPos !== null) {
-            if (lastNavTab && lastNavTab !== activeTab) {
-                const prevItem = sidebarEl.querySelector(`.desktop-nav-item[data-sidebar-tab="${lastNavTab}"]`);
-                const fromPos = getItemPosition(prevItem);
-                if (fromPos !== null) {
-                    moveIndicator(fromPos, toPos);
-                } else {
-                    indicator.style.top = `${toPos}px`;
-                    indicator.style.height = '16px';
-                    indicator.style.opacity = '1';
-                }
-            } else {
-                indicator.style.top = `${toPos}px`;
-                indicator.style.height = '16px';
-                indicator.style.opacity = '1';
-            }
+            indicator.style.top = `${toPos}px`;
+            indicator.style.height = '16px';
+            indicator.style.opacity = '1';
         }
-    });
+    }
 
+    requestAnimationFrame(syncIndicatorPosition);
+    setTimeout(syncIndicatorPosition, 50);
+    setTimeout(syncIndicatorPosition, 150);
+
+    /* Re-sync on window resize */
+    window.addEventListener('resize', syncIndicatorPosition);
+
+    /* Apple-style animated glide triggered on explicit user tab clicks */
     navItems.forEach((item) => {
         item.addEventListener('click', (e) => {
             const targetTab = item.getAttribute('data-sidebar-tab');
@@ -632,7 +644,7 @@ function setupAnimatedNavIndicator(sidebarEl, activeTab) {
 
             sessionStorage.setItem('sys_last_nav_tab', targetTab);
 
-            if (fromY !== null && toY !== null) {
+            if (fromY !== null && toY !== null && Math.abs(toY - fromY) >= 1) {
                 moveIndicator(fromY, toY, () => {
                     window.location.href = targetHref;
                 });

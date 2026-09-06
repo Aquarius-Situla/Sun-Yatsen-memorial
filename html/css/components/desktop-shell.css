@@ -56,6 +56,13 @@
         overflow-x: hidden;
     }
 
+    .desktop-sidebar,
+    .desktop-sidebar *,
+    .desktop-sidebar *::before,
+    .desktop-sidebar *::after {
+        box-sizing: border-box;
+    }
+
     /* Light Mode Sidebar */
     @media (prefers-color-scheme: light) {
         .desktop-sidebar {
@@ -66,6 +73,7 @@
 
     /* Sidebar Top Container */
     .desktop-sidebar-top {
+        position: relative;
         display: flex;
         flex-direction: column;
         gap: 14px;
@@ -353,7 +361,7 @@
     /* Apple Fluid Dynamic Sliding Indicator */
     .desktop-nav-indicator {
         position: absolute;
-        left: 14px;
+        left: 2px;
         width: 3.5px;
         height: 16px;
         border-radius: 2px;
