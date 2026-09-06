@@ -244,54 +244,8 @@ body {
 }
 
 /* ============================================================================
- * Apple Native In-Page Subpage Sheet & Master Container
+ * Apple Native Push Entrance Transitions
  * ============================================================================ */
-.ios-master-container {
-    width: 100%;
-    transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.28s ease;
-    will-change: transform;
-}
-
-.ios-master-container.pushed {
-    transform: translate3d(-30%, 0, 0);
-    opacity: 0.8;
-    pointer-events: none;
-}
-
-.ios-subpage-sheet {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--sys-bg, #111111);
-    z-index: 50;
-    transform: translate3d(100%, 0, 0);
-    box-shadow: -15px 0 35px rgba(0, 0, 0, 0.55);
-    box-sizing: border-box;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-top: calc(44px + env(safe-area-inset-top, 0px) + 8px);
-    padding-bottom: calc(65px + env(safe-area-inset-bottom, 34px));
-    display: none;
-}
-
-.ios-subpage-sheet.active {
-    display: block;
-    transform: translate3d(0, 0, 0);
-}
-
-.ios-subpage-sheet.animating {
-    display: block;
-    transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1) !important;
-}
-
-.ios-subpage-sheet.sliding-out {
-    transform: translate3d(100%, 0, 0) !important;
-    transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1) !important;
-}
-
-/* Forward push entrance animations */
 .ios-content-entering {
     transform: translate3d(100%, 0, 0) !important;
     box-shadow: -15px 0 35px rgba(0, 0, 0, 0.55) !important;
@@ -303,94 +257,6 @@ body {
     transform: translate3d(0, 0, 0) !important;
     transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1) !important;
     box-shadow: -15px 0 35px rgba(0, 0, 0, 0.55) !important;
-}
-
-/* ============================================================================
- * iOS Native Parallax Underlay & View Sheet Layer
- * ============================================================================ */
-.ios-underlay-layer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    pointer-events: none;
-    overflow: hidden;
-    background-color: #111111;
-    transform: translate3d(-30%, 0, 0);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-.ios-underlay-layer.ready {
-    opacity: 1;
-}
-
-.ios-underlay-content {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-    padding-top: calc(44px + env(safe-area-inset-top, 0px) + 8px);
-    padding-bottom: calc(65px + env(safe-area-inset-bottom, 34px));
-    overflow-y: hidden;
-}
-
-.ios-underlay-header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: calc(44px + env(safe-area-inset-top, 0px));
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    padding-bottom: 11px;
-    box-sizing: border-box;
-    font-size: 17px;
-    font-weight: 600;
-    color: #ffffff;
-    border-bottom: 0.5px solid rgba(255, 255, 255, 0.15);
-    background: rgba(17, 17, 17, 0.75);
-    backdrop-filter: blur(25px) saturate(190%);
-    -webkit-backdrop-filter: blur(25px) saturate(190%);
-}
-
-.ios-underlay-scrim {
-    position: absolute;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.3);
-    pointer-events: none;
-    transition: opacity 0.28s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-.ios-underlay-sliding-in {
-    transform: translate3d(0, 0, 0) !important;
-    transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1) !important;
-}
-
-.ios-view-sheet {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #111111;
-    z-index: 2;
-    pointer-events: none;
-    box-shadow: -15px 0 35px rgba(0, 0, 0, 0.55);
-}
-
-/* Ensure subpage content layers above sheet */
-.festival-hero,
-.markdown-container,
-.charts-container,
-.ios-group-container {
-    position: relative;
-    z-index: 3;
 }
 
 /* Enforce static tab bar above all transition layers */
@@ -472,52 +338,6 @@ body {
 }
 
 /* ============================================================================
- * Tab Navigation (Desktop Fallback)
- * ============================================================================ */
-.tabs-container {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-    margin-bottom: 15px;
-    width: 100%;
-    max-width: 800px;
-    overflow-x: auto;
-    scrollbar-width: none;
-}
-
-.tabs-container::-webkit-scrollbar {
-    display: none;
-}
-
-.tab-btn {
-    background-color: var(--sys-card-bg, #1a1a1a);
-    color: var(--sys-link, #888888);
-    border: 1px solid var(--sys-border, #333333);
-    padding: 10px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-family: var(--sys-font-family);
-    font-size: 14px;
-    white-space: nowrap;
-    transition: var(--sys-transition-standard, all 0.3s ease);
-    -webkit-tap-highlight-color: transparent;
-}
-
-.tab-btn.active {
-    background-color: #2d1e0d;
-    color: var(--sys-accent-gold, #f1c40f);
-    border-color: var(--sys-accent-gold, #f1c40f);
-    box-shadow: 0 0 10px rgba(241, 196, 15, 0.15);
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .tab-btn:hover:not(.active) {
-        color: var(--sys-link-hover, #cccccc);
-        border-color: #555555;
-    }
-}
-
-/* ============================================================================
  * Markdown Content Card
  * ============================================================================ */
 .markdown-container,
@@ -577,76 +397,6 @@ body {
 
 .show-all-btn:hover {
     border-color: var(--sys-accent-gold, #f1c40f);
-}
-
-/* ============================================================================
- * Desktop Controls: Language Switcher & Back Button
- * ============================================================================ */
-.lang-toggle-btn {
-    position: absolute;
-    top: 25px;
-    right: 25px;
-    background-color: var(--sys-card-bg, #1a1a1a);
-    color: var(--sys-text-muted, #aaaaaa);
-    border: 1px solid var(--sys-border, #333333);
-    padding: 8px 16px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-family: var(--sys-font-family);
-    font-size: 14px;
-    letter-spacing: 1px;
-    transition: var(--sys-transition-standard, all 0.3s ease);
-    z-index: 100;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.top-back-btn {
-    position: absolute;
-    top: 25px;
-    left: 25px;
-    display: inline-flex;
-    align-items: center;
-    color: var(--sys-link, #888888);
-    text-decoration: none;
-    font-size: 15px;
-    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
-    transition: color 0.2s ease, opacity 0.2s ease;
-    cursor: pointer;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    z-index: 100;
-    touch-action: manipulation;
-    padding: 6px 12px;
-    margin: -6px -12px;
-}
-
-.lang-toggle-btn:active {
-    color: var(--sys-accent-gold, #f1c40f);
-    border-color: var(--sys-accent-gold, #f1c40f);
-}
-
-.top-back-btn:active {
-    color: var(--sys-link-hover, #cccccc);
-    opacity: 0.8;
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .lang-toggle-btn:hover {
-        color: var(--sys-accent-gold, #f1c40f);
-        border-color: var(--sys-accent-gold, #f1c40f);
-        box-shadow: 0 0 10px rgba(241, 196, 15, 0.2);
-    }
-    .top-back-btn:hover {
-        color: var(--sys-link-hover, #cccccc);
-        opacity: 0.8;
-    }
-}
-
-.top-back-btn svg {
-    width: 22px;
-    height: 22px;
-    margin-right: 2px;
-    margin-left: -4px;
 }
 
 /* ============================================================================
@@ -953,9 +703,8 @@ body {
         width: 100%;
     }
 
-    /* Completely hide top back and language buttons on mobile */
-    .top-back-btn,
-    .lang-toggle-btn {
+    /* Completely hide top back button on mobile */
+    .top-back-btn {
         display: none !important;
     }
 
@@ -1028,19 +777,6 @@ body {
     .markdown-container {
         background-color: #ffffff;
         border-color: rgba(0, 0, 0, 0.08);
-        box-shadow: none;
-    }
-
-    .tab-btn {
-        background-color: #ffffff;
-        color: #8e8e93;
-        border-color: rgba(0, 0, 0, 0.1);
-    }
-
-    .tab-btn.active {
-        background-color: #f2f2f7;
-        color: #000000;
-        border-color: rgba(0, 0, 0, 0.15);
         box-shadow: none;
     }
 
@@ -1120,19 +856,6 @@ body {
     .ios-badge.badge-gray   { background-color: #8e8e93 !important; }
     .ios-badge.badge-dark   { background-color: #3a3a3c !important; }
 
-    .ios-underlay-layer {
-        background-color: #f2f2f7;
-    }
-
-    .ios-underlay-scrim {
-        background-color: rgba(0, 0, 0, 0.12);
-    }
-
-    .ios-subpage-sheet {
-        background-color: #f2f2f7;
-        box-shadow: -10px 0 25px rgba(0, 0, 0, 0.18);
-    }
-
     @keyframes iosNavLabelToCenter {
         0% {
             transform: translate3d(0, 0, 0);
@@ -1182,12 +905,5 @@ body {
     .ios-content-entering,
     .ios-content-enter-active {
         box-shadow: -10px 0 25px rgba(0, 0, 0, 0.18) !important;
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-        .tab-btn:hover:not(.active) {
-            color: #000000;
-            border-color: rgba(0, 0, 0, 0.2);
-        }
     }
 }

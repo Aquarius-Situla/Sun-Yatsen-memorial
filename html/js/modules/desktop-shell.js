@@ -197,6 +197,330 @@ const SIDEBAR_STRINGS = {
 };
 
 /* ============================================================================
+ * Desktop Split View Router Helpers & Core Architecture
+ * ============================================================================ */
+
+/* Dynamically determine the root base URL of the site */
+function getSiteBaseUrl() {
+    const loc = window.location;
+    const path = loc.pathname;
+    const markerRegex = new RegExp('^(.*\\/)(?:pages|events|captcha|main|css|js)\\/', 'i');
+    const match = path.match(markerRegex);
+    if (match) {
+        return new URL(match[1], loc.origin).href;
+    }
+    const dir = path.substring(0, path.lastIndexOf('/') + 1);
+    return new URL(dir || '/', loc.origin).href;
+}
+
+/* Resolve a site-root-relative path to an absolute URL */
+function resolveSiteUrl(relPath) {
+    return new URL(relPath, getSiteBaseUrl()).href;
+}
+
+/* Map URL to canonical sidebar tab ID */
+function getTabFromUrl(url) {
+    const path = new URL(url, window.location.href).pathname.toLowerCase();
+    if (path.includes('/biography/')) return 'biography';
+    if (path.includes('/events/xinhai/')) return 'xinhai';
+    if (path.includes('/events/whampoa/')) return 'whampoa';
+    if (path.includes('/events/mayfourth/')) return 'mayfourth';
+    if (path.includes('/events/militaries/')) return 'militaries';
+    if (path.includes('/events/yatsen/yatsen-birth.html')) return 'yatsen-birth';
+    if (path.includes('/events/yatsen/yatsen-passing.html')) return 'yatsen-passing';
+    if (path.includes('/pages/library/language.html')) return 'settings';
+    if (path.includes('/pages/library/')) return 'library';
+    if (path.includes('/pages/settings/')) return 'settings';
+    if (path.includes('/pages/about/') || path.includes('/pages/thanks/')) return 'settings';
+    if (path.includes('/pages/announcement/')) return 'announcement';
+    if (path.includes('index.html') || path.endsWith('/') || path.endsWith('/sys-memorial/')) return 'home';
+    return null;
+}
+
+/* Ensure stylesheet isolation between home and subpages */
+function ensurePageStylesheets(isHome) {
+    let homeLink = document.getElementById('sys-style-home');
+    if (!homeLink) {
+        homeLink = document.querySelector('link[href*="main/style.css"]');
+        if (homeLink) {
+            homeLink.id = 'sys-style-home';
+        } else {
+            homeLink = document.createElement('link');
+            homeLink.id = 'sys-style-home';
+            homeLink.rel = 'stylesheet';
+            homeLink.href = resolveSiteUrl('main/style.css?v=20260906g');
+            document.head.appendChild(homeLink);
+        }
+    }
+
+    let subpageLink = document.getElementById('sys-style-subpage');
+    if (!subpageLink) {
+        subpageLink = document.querySelector('link[href*="subpage.css"]');
+        if (subpageLink) {
+            subpageLink.id = 'sys-style-subpage';
+        } else {
+            subpageLink = document.createElement('link');
+            subpageLink.id = 'sys-style-subpage';
+            subpageLink.rel = 'stylesheet';
+            subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260906g');
+            document.head.appendChild(subpageLink);
+        }
+    }
+
+    if (isHome) {
+        homeLink.disabled = false;
+        subpageLink.disabled = true;
+    } else {
+        homeLink.disabled = true;
+        subpageLink.disabled = false;
+    }
+}
+
+/* Ensure right-hand content stage container exists */
+function ensureStageContainer() {
+    let stage = document.getElementById('desktop-stage');
+    if (stage) return stage;
+
+    stage = document.createElement('main');
+    stage.id = 'desktop-stage';
+    stage.className = 'desktop-stage';
+
+    const sidebar = document.getElementById('desktop-sidebar');
+    const nodesToMove = [];
+    const children = Array.from(document.body.childNodes);
+
+    children.forEach(node => {
+        if (node === sidebar) return;
+        if (node.nodeType === Node.ELEMENT_NODE) {
+            const tag = node.tagName.toLowerCase();
+            if (tag === 'script' || tag === 'style' || tag === 'link') return;
+            if (node.id === 'bg-music') return;
+            if (node.classList && (node.classList.contains('apple-top-nav') || node.classList.contains('apple-tab-bar'))) return;
+        }
+        nodesToMove.push(node);
+    });
+
+    nodesToMove.forEach(node => stage.appendChild(node));
+    document.body.appendChild(stage);
+    return stage;
+}
+
+/* Extract content to be injected into the stage from a parsed Document */
+function extractStageContent(doc) {
+    const docStage = doc.getElementById('desktop-stage');
+    if (docStage) {
+        return docStage.innerHTML;
+    }
+
+    const tempWrapper = document.createElement('div');
+    const nodes = Array.from(doc.body.childNodes);
+    nodes.forEach(node => {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+            const tag = node.tagName.toLowerCase();
+            if (tag === 'script' || tag === 'style' || tag === 'link') return;
+            if (node.id === 'desktop-sidebar' || node.id === 'bg-music') return;
+            if (node.classList && (node.classList.contains('apple-top-nav') || node.classList.contains('apple-tab-bar'))) return;
+        }
+        tempWrapper.appendChild(node.cloneNode(true));
+    });
+    return tempWrapper.innerHTML;
+}
+
+/* Synchronize sidebar navigation active indicator and item states */
+function syncSidebarActiveState(sidebarEl, activeTab) {
+    if (!sidebarEl || !activeTab) return;
+    const navItems = sidebarEl.querySelectorAll('.desktop-nav-item');
+    navItems.forEach(item => {
+        if (item.getAttribute('data-sidebar-tab') === activeTab) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+}
+
+/* Execute scripts associated with target page */
+async function executeStageScripts(doc, targetUrl) {
+    /* If target page contains zero-md and it is not registered, dynamically load it */
+    if (doc.querySelector('zero-md') && !window.customElements.get('zero-md')) {
+        const zeroMdUrl = resolveSiteUrl('js/zero-md.min.js');
+        try {
+            await import(zeroMdUrl);
+        } catch (err) {
+            console.error('[Router Zero-MD Load Error]:', err);
+        }
+    }
+
+    const isHome = getTabFromUrl(targetUrl) === 'home';
+    if (isHome) {
+        if (typeof window.initApp === 'function') {
+            try {
+                window.initApp();
+            } catch (err) {
+                console.error('[Router Home Init Error]:', err);
+            }
+        }
+        return;
+    }
+
+    /* Execute inline module scripts extracted from target document */
+    const inlineModules = doc.querySelectorAll('body script[type="module"]:not([src])');
+    inlineModules.forEach(oldScript => {
+        const newScript = document.createElement('script');
+        newScript.type = 'module';
+        newScript.textContent = oldScript.textContent;
+        document.body.appendChild(newScript);
+        setTimeout(() => {
+            if (newScript.parentNode) {
+                newScript.parentNode.removeChild(newScript);
+            }
+        }, 300);
+    });
+}
+
+/* Desktop Split Stage Navigator */
+let isNavigatingStage = false;
+
+export async function navigateDesktopStage(targetHref, pushState = true) {
+    if (window.innerWidth <= 768) {
+        window.location.href = targetHref;
+        return;
+    }
+
+    const targetUrl = new URL(targetHref, window.location.href);
+
+    /* Don't re-navigate to the exact same URL without hash */
+    if (targetUrl.pathname === window.location.pathname && targetUrl.search === window.location.search && !targetUrl.hash) {
+        return;
+    }
+
+    if (isNavigatingStage) return;
+    isNavigatingStage = true;
+    const safetyTimer = setTimeout(() => { isNavigatingStage = false; }, 3000);
+
+    const targetTab = getTabFromUrl(targetUrl.href);
+
+    /* 1. Instant indicator glide with fluid Apple Music compression physics */
+    if (window.__glideNavIndicator && targetTab) {
+        window.__glideNavIndicator(targetTab);
+    }
+
+    /* 2. Fade out current desktop stage */
+    const stage = ensureStageContainer();
+    stage.classList.add('stage-fading');
+
+    try {
+        const res = await fetch(targetUrl.href);
+        if (!res.ok) {
+            window.location.href = targetUrl.href;
+            return;
+        }
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+
+        /* 3. Synchronize browser history and document title */
+        if (pushState) {
+            window.history.pushState({ url: targetUrl.href }, doc.title, targetUrl.href);
+        }
+        document.title = doc.title;
+
+        /* 4. Switch stylesheets between home and subpages */
+        const isHome = targetTab === 'home';
+        ensurePageStylesheets(isHome);
+
+        /* 5. Synchronize document.body classes */
+        document.body.className = doc.body.className;
+        document.body.classList.add('has-desktop-sidebar', 'has-desktop-indicator');
+
+        /* 6. Extract stage content from parsed document */
+        const newContent = extractStageContent(doc);
+
+        /* 7. Allow 180ms for stage fade out */
+        await new Promise(resolve => setTimeout(resolve, 180));
+
+        /* 8. Inject new content into stage */
+        stage.innerHTML = newContent;
+        window.scrollTo(0, 0);
+
+        /* 9. Execute scripts associated with the new page */
+        await executeStageScripts(doc, targetUrl.href);
+
+        /* 10. Fade stage back in */
+        stage.classList.remove('stage-fading');
+
+        /* 11. Sync sidebar active state and language labels */
+        const sidebar = document.getElementById('desktop-sidebar');
+        if (sidebar) {
+            syncSidebarActiveState(sidebar, targetTab);
+            syncSidebarLabels(sidebar);
+            if (window.__syncIndicatorPosition) {
+                window.__syncIndicatorPosition();
+            }
+        }
+    } catch (err) {
+        console.error('[Desktop Split Router Error]:', err);
+        window.location.href = targetUrl.href;
+    } finally {
+        clearTimeout(safetyTimer);
+        isNavigatingStage = false;
+    }
+}
+
+/* Attach Delegated Router Listeners */
+let isRouterBound = false;
+
+function setupDesktopRouter(sidebarEl, basePath) {
+    ensureStageContainer();
+
+    if (isRouterBound) return;
+    isRouterBound = true;
+
+    /* Delegated internal link click handler for desktop */
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        window.__lastClick = {
+            target: e.target ? e.target.tagName : null,
+            button: e.button,
+            innerWidth: window.innerWidth,
+            hasLink: !!link,
+            href: link ? link.getAttribute('href') : null
+        };
+
+        if (!link) return;
+        if (window.innerWidth <= 768) return;
+        if (e.button !== 0 && typeof e.button === 'number') return;
+        if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+        if (link.getAttribute('target') === '_blank' || link.hasAttribute('download')) return;
+
+        const targetUrl = new URL(href, window.location.href);
+        if (targetUrl.origin !== window.location.origin) return;
+
+        /* External anchor or hash only */
+        if (targetUrl.pathname === window.location.pathname && targetUrl.search === window.location.search && targetUrl.hash) {
+            return;
+        }
+
+        /* Prevent reload if clicking the current page */
+        if (targetUrl.pathname === window.location.pathname && targetUrl.search === window.location.search && !targetUrl.hash) {
+            e.preventDefault();
+            return;
+        }
+
+        e.preventDefault();
+        navigateDesktopStage(targetUrl.href, true);
+    });
+
+    /* Browser back/forward button support */
+    window.addEventListener('popstate', () => {
+        if (window.innerWidth <= 768) return;
+        navigateDesktopStage(window.location.href, false);
+    });
+}
+
+/* ============================================================================
  * Desktop Shell Initialization Controller
  * ============================================================================ */
 export function initDesktopShell(options = {}) {
@@ -215,6 +539,12 @@ export function initDesktopShell(options = {}) {
         activeTab = 'whampoa';
     } else if (path.includes('/events/mayfourth/')) {
         activeTab = 'mayfourth';
+    } else if (path.includes('/events/militaries/')) {
+        activeTab = 'militaries';
+    } else if (path.includes('/events/yatsen/yatsen-birth.html')) {
+        activeTab = 'yatsen-birth';
+    } else if (path.includes('/events/yatsen/yatsen-passing.html')) {
+        activeTab = 'yatsen-passing';
     } else if (path.includes('/pages/library/language.html')) {
         activeTab = 'settings';
     } else if (path.includes('/pages/library/')) {
@@ -234,10 +564,21 @@ export function initDesktopShell(options = {}) {
 
     /* Check if sidebar already exists */
     let sidebarEl = document.getElementById('desktop-sidebar');
+    if (sidebarEl && sidebarEl.dataset.initialized === 'true') {
+        syncSidebarActiveState(sidebarEl, activeTab);
+        syncSidebarLabels(sidebarEl);
+        if (window.__syncIndicatorPosition) {
+            window.__syncIndicatorPosition();
+        }
+        return;
+    }
+
     if (!sidebarEl) {
         sidebarEl = createSidebarElement(activeTab, basePath);
         document.body.insertBefore(sidebarEl, document.body.firstChild);
     }
+
+    sidebarEl.dataset.initialized = 'true';
 
     /* Setup Apple-style dynamic red indicator transition */
     setupAnimatedNavIndicator(sidebarEl, activeTab);
@@ -251,9 +592,24 @@ export function initDesktopShell(options = {}) {
     /* Sync Status Display with Live Calendar & Attendance */
     syncSidebarStatus(sidebarEl);
 
+    /* Setup Desktop Split View Stage and Router */
+    if (window.innerWidth > 768) {
+        setupDesktopRouter(sidebarEl, basePath);
+    }
+
     /* Listen for Global Language Changes */
     window.addEventListener('sys-lang-change', () => {
         syncSidebarLabels(sidebarEl);
+    });
+
+    /* Re-sync indicator and stage on window resize */
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            ensureStageContainer();
+            if (window.__syncIndicatorPosition) {
+                window.__syncIndicatorPosition();
+            }
+        }
     });
 }
 
@@ -265,14 +621,14 @@ function createSidebarElement(activeTab, basePath) {
     const str = SIDEBAR_STRINGS[currentLang] || SIDEBAR_STRINGS.tc;
 
     const routes = {
-        home: basePath === './' ? 'index.html' : `${basePath}index.html`,
-        announcement: basePath === './' ? 'pages/announcement/announcement.html' : `${basePath}pages/announcement/announcement.html`,
-        library: basePath === './' ? 'pages/library/library.html' : `${basePath}pages/library/library.html`,
-        settings: basePath === './' ? 'pages/settings/settings.html' : `${basePath}pages/settings/settings.html`,
-        xinhai: basePath === './' ? 'events/xinhai/xinhai.html' : `${basePath}events/xinhai/xinhai.html`,
-        whampoa: basePath === './' ? 'events/whampoa/whampoa.html' : `${basePath}events/whampoa/whampoa.html`,
-        mayfourth: basePath === './' ? 'events/mayfourth/mayfourth.html' : `${basePath}events/mayfourth/mayfourth.html`,
-        biography: basePath === './' ? 'pages/biography/biography.html' : `${basePath}pages/biography/biography.html`
+        home: resolveSiteUrl('index.html'),
+        announcement: resolveSiteUrl('pages/announcement/announcement.html'),
+        library: resolveSiteUrl('pages/library/library.html'),
+        settings: resolveSiteUrl('pages/settings/settings.html'),
+        xinhai: resolveSiteUrl('events/xinhai/xinhai.html'),
+        whampoa: resolveSiteUrl('events/whampoa/whampoa.html'),
+        mayfourth: resolveSiteUrl('events/mayfourth/mayfourth.html'),
+        biography: resolveSiteUrl('pages/biography/biography.html')
     };
 
     const aside = document.createElement('aside');
@@ -394,7 +750,7 @@ function setupDesktopSearch(sidebarEl, basePath) {
         searchDropdown.innerHTML = matched.slice(0, 8).map(item => {
             const title = currentLang === 'sc' ? item.titleSc : item.titleTc;
             const category = currentLang === 'sc' ? item.categorySc : item.categoryTc;
-            const targetUrl = basePath === './' ? item.url : `${basePath}${item.url}`;
+            const targetUrl = resolveSiteUrl(item.url);
 
             return `
                 <a href="${targetUrl}" class="desktop-search-item">
@@ -407,6 +763,10 @@ function setupDesktopSearch(sidebarEl, basePath) {
 
         searchDropdown.classList.add('active');
     }
+
+    searchDropdown.addEventListener('click', () => {
+        searchDropdown.classList.remove('active');
+    });
 
     searchInput.addEventListener('input', (e) => {
         renderResults(e.target.value);
@@ -622,6 +982,38 @@ function setupAnimatedNavIndicator(sidebarEl, activeTab) {
     /* Re-sync on window resize */
     window.addEventListener('resize', syncIndicatorPosition);
 
+    /* Expose fluid glide controller globally for router and subpage transitions */
+    function glideNavIndicator(tabName, onFinish) {
+        const targetItem = sidebarEl.querySelector(`.desktop-nav-item[data-sidebar-tab="${tabName}"]`);
+        if (!targetItem) {
+            if (onFinish) onFinish();
+            return;
+        }
+
+        const currentActive = sidebarEl.querySelector('.desktop-nav-item.active');
+        const fromY = getItemPosition(currentActive);
+        const toY = getItemPosition(targetItem);
+
+        if (currentActive) currentActive.classList.remove('active');
+        targetItem.classList.add('active');
+
+        sessionStorage.setItem('sys_last_nav_tab', tabName);
+
+        if (fromY !== null && toY !== null && Math.abs(toY - fromY) >= 1) {
+            moveIndicator(fromY, toY, onFinish);
+        } else if (toY !== null) {
+            indicator.style.top = `${toY}px`;
+            indicator.style.height = '16px';
+            indicator.style.opacity = '1';
+            if (onFinish) onFinish();
+        } else {
+            if (onFinish) onFinish();
+        }
+    }
+
+    window.__glideNavIndicator = glideNavIndicator;
+    window.__syncIndicatorPosition = syncIndicatorPosition;
+
     /* Apple-style animated glide triggered on explicit user tab clicks */
     navItems.forEach((item) => {
         item.addEventListener('click', (e) => {
@@ -629,31 +1021,15 @@ function setupAnimatedNavIndicator(sidebarEl, activeTab) {
             const targetHref = item.getAttribute('href');
             if (!targetHref || targetHref.startsWith('javascript:')) return;
 
-            if (targetTab === activeTab && window.location.pathname.endsWith(targetHref)) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (targetTab === sessionStorage.getItem('sys_last_nav_tab') && window.location.pathname.endsWith(targetHref)) {
                 return;
             }
 
-            e.preventDefault();
-
-            const currentActive = sidebarEl.querySelector('.desktop-nav-item.active');
-            const fromY = getItemPosition(currentActive);
-            const toY = getItemPosition(item);
-
-            if (currentActive) currentActive.classList.remove('active');
-            item.classList.add('active');
-
-            sessionStorage.setItem('sys_last_nav_tab', targetTab);
-
-            if (fromY !== null && toY !== null && Math.abs(toY - fromY) >= 1) {
-                moveIndicator(fromY, toY, () => {
-                    window.location.href = targetHref;
-                });
-                setTimeout(() => {
-                    window.location.href = targetHref;
-                }, 280);
-            } else {
-                window.location.href = targetHref;
-            }
+            glideNavIndicator(targetTab);
+            navigateDesktopStage(targetHref, true);
         });
     });
 }

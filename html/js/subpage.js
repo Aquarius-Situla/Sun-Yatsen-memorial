@@ -73,8 +73,8 @@ function getMarkdownStyles(isLight) {
 import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=2025';
 import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=2025';
 import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=2025';
-import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260905j';
-import { initDesktopShell } from './modules/desktop-shell.js?v=20260906e';
+import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260906g';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260906g';
 
 /* ============================================================================
  * Subpage Initialization Engine
@@ -115,7 +115,6 @@ export function initSubpage(options) {
     const heroDate = document.getElementById('hero-date');
     const heroDesc = document.getElementById('hero-desc');
     const pageTitle = document.getElementById('page-title');
-    const tabBtns = document.querySelectorAll('.tab-btn');
     const iosRows = document.querySelectorAll('.ios-row[data-tab]');
     const iosOptionItems = document.querySelectorAll('.ios-option-item[data-lang]');
 
@@ -157,22 +156,8 @@ export function initSubpage(options) {
         });
 
         if (tabs && tabs.length > 0) {
-            /* Tabbed layout handling */
-            const currentTabObj = tabs.find(t => t.id === activeTabId) || tabs[0];
-            tabBtns.forEach(btn => {
-                const tabId = btn.getAttribute('data-tab');
-                const tabObj = tabs.find(t => t.id === tabId);
-                if (tabObj) {
-                    btn.textContent = isTraditional ? tabObj.labelTc : tabObj.labelSc;
-                }
-                if (tabId === currentTabObj.id) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-
             /* Synchronize iOS Inset Grouped Rows */
+            const currentTabObj = tabs.find(t => t.id === activeTabId) || tabs[0];
             iosRows.forEach(row => {
                 const tabId = row.getAttribute('data-tab');
                 const tabObj = tabs.find(t => t.id === tabId);
@@ -207,46 +192,41 @@ export function initSubpage(options) {
             }
         }
 
-        /* Synchronize Apple Native Back Button Text (Mobile and Desktop) */
+        /* Synchronize Apple Native Back Button Text (Mobile: 資料庫, Desktop: 文獻資料庫) */
         const navBackText = document.getElementById('nav-back-text');
         const navBackLink = document.getElementById('nav-back-link');
         const desktopBackText = document.querySelector('.top-back-btn span');
-        let backLabel = '';
+        let mobileBackLabel = '';
+        let desktopBackLabel = '';
 
         if (navBackLink) {
             const explicitTc = navBackLink.getAttribute('data-back-text-tc');
             const explicitSc = navBackLink.getAttribute('data-back-text-sc');
             if (explicitTc && explicitSc) {
-                backLabel = isTraditional ? explicitTc : explicitSc;
-            }
-        }
-        if (!backLabel) {
-            if (window.location.pathname.includes('/about/') || window.location.pathname.includes('/thanks/')) {
-                backLabel = isTraditional ? '設定' : '设置';
-            } else if (window.location.pathname.includes('/events/')) {
-                backLabel = isTraditional ? '資料庫' : '资料库';
-            } else if (window.location.pathname.includes('/announcement/detail.html')) {
-                backLabel = isTraditional ? '公告' : '公告';
-            } else if (window.location.pathname.includes('/announcement/')) {
-                backLabel = isTraditional ? '主頁' : '主页';
-            } else if (window.location.pathname.includes('/library/language.html')) {
-                backLabel = isTraditional ? '設定' : '设置';
-            } else if (window.location.pathname.includes('/biography/')) {
-                backLabel = isTraditional ? '資料庫' : '资料库';
-            } else if (window.location.pathname.includes('/settings/')) {
-                backLabel = isTraditional ? '主頁' : '主页';
-            } else if (window.location.pathname.includes('/library/')) {
-                backLabel = isTraditional ? '主頁' : '主页';
-            } else {
-                backLabel = isTraditional ? '返回' : '返回';
+                mobileBackLabel = isTraditional ? explicitTc : explicitSc;
             }
         }
 
+        const path = window.location.pathname;
+        if (path.includes('/events/') || path.includes('/biography/')) {
+            if (!mobileBackLabel) mobileBackLabel = isTraditional ? '資料庫' : '资料库';
+            desktopBackLabel = isTraditional ? '文獻資料庫' : '文献资料库';
+        } else if (path.includes('/about/') || path.includes('/thanks/') || path.includes('/library/language.html')) {
+            if (!mobileBackLabel) mobileBackLabel = isTraditional ? '設定' : '设置';
+            desktopBackLabel = isTraditional ? '系統設定' : '系统设置';
+        } else if (path.includes('/announcement/detail.html')) {
+            if (!mobileBackLabel) mobileBackLabel = isTraditional ? '公告' : '公告';
+            desktopBackLabel = isTraditional ? '堂務公告' : '堂务公告';
+        } else {
+            if (!mobileBackLabel) mobileBackLabel = isTraditional ? '返回' : '返回';
+            desktopBackLabel = isTraditional ? '返回' : '返回';
+        }
+
         if (navBackText) {
-            navBackText.textContent = backLabel;
+            navBackText.textContent = mobileBackLabel;
         }
         if (desktopBackText) {
-            desktopBackText.textContent = backLabel;
+            desktopBackText.textContent = desktopBackLabel;
         }
 
         /* Synchronize Apple Native Frosted Top Navigation Bar Title */
@@ -330,18 +310,6 @@ export function initSubpage(options) {
             isTraditional = !isTraditional;
             setGlobalLang(isTraditional ? 'tc' : 'sc');
             updateContent();
-        });
-    }
-
-    if (tabBtns.length > 0 && tabs) {
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const targetTab = btn.getAttribute('data-tab');
-                if (targetTab && targetTab !== activeTabId) {
-                    activeTabId = targetTab;
-                    updateContent();
-                }
-            });
         });
     }
 

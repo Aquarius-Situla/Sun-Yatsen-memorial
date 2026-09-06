@@ -8,6 +8,11 @@
  * ============================================================================ */
 
 export function initIOSNavTransition(options = {}) {
+    /* Desktop isolation guard: desktop split router handles desktop navigation */
+    if (window.innerWidth > 768) {
+        return;
+    }
+
     const {
         backButtonSelector = '#nav-back-link, .nav-back-link',
         desktopBackButtonSelector = '.top-back-btn'

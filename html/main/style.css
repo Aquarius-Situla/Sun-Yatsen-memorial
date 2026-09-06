@@ -685,10 +685,6 @@ body.banner-active .dropdown-nav-bar {
         padding-bottom: calc(52px + env(safe-area-inset-bottom, 34px));
     }
 
-    .stealth-footer {
-        bottom: calc(15px + env(safe-area-inset-bottom, 0px));
-    }
-
     .portrait-img {
         height: min(240px, 24vh) !important;
         height: min(240px, 24dvh) !important;
@@ -708,50 +704,6 @@ body.banner-active .dropdown-nav-bar {
         height: min(230px, 28dvh) !important;
         font-size: clamp(11px, 2.8vw, 13px) !important;
     }
-}
-
-/* ============================================================================
- * Stealth Footer
- * ============================================================================
- * @tw: fixed bottom-[28px] left-1/2 -translate-x-1/2 flex gap-[15px] items-center z-[10000]
- * ============================================================================ */
-.stealth-footer {
-    position: fixed;
-    bottom: calc(28px + env(safe-area-inset-bottom, 0px));
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: clamp(8px, 2vw, 15px);
-    align-items: center;
-    z-index: 10000;
-}
-
-.stealth-footer a {
-    color: #383838;
-    text-decoration: none;
-    font-size: clamp(10px, 2.5vw, 13px);
-    letter-spacing: 2px;
-    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;
-    transition: color 0.4s ease, text-shadow 0.4s ease;
-    white-space: nowrap;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.stealth-footer span {
-    color: #2a2a2a;
-    font-size: clamp(8px, 2vw, 11px);
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .stealth-footer a:hover {
-        color: #f1c40f;
-        text-shadow: 0 0 8px rgba(241, 196, 15, 0.4);
-    }
-}
-
-.stealth-footer a:active {
-    color: #f1c40f;
-    text-shadow: 0 0 8px rgba(241, 196, 15, 0.4);
 }
 
 /* ============================================================================
@@ -887,26 +839,6 @@ body.banner-active .dropdown-nav-bar {
         border-color: rgba(100, 70, 30, 0.25) !important;
         color: rgba(100, 70, 30, 0.55) !important;
         box-shadow: 0 3px 6px rgba(80, 50, 10, 0.2) !important;
-    }
-
-    .stealth-footer a {
-        color: #c8b898;
-    }
-
-    .stealth-footer span {
-        color: #d4c4a0;
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-        .stealth-footer a:hover {
-            color: #8a6400;
-            text-shadow: 0 0 8px rgba(138, 100, 0, 0.3);
-        }
-    }
-
-    .stealth-footer a:active {
-        color: #8a6400;
-        text-shadow: 0 0 8px rgba(138, 100, 0, 0.3);
     }
 }
 

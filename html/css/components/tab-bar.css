@@ -4,7 +4,7 @@
  * Private Sun Yat-sen Memorial Hall — Apple Native Tab Bar (tab-bar.css)
  * ============================================================================
  * COMMENTING STANDARDS
- * 1. Block comments only. Inline comments (//) are strictly prohibited.
+ * 1. Block comments only. Inline comments are strictly prohibited.
  * 2. Section dividers use the === banner format.
  * 3. All prose is written in English.
  * ============================================================================ */
@@ -23,11 +23,6 @@
  * Mobile Viewport Rules (<= 768px)
  * ============================================================================ */
 @media (max-width: 768px) {
-    /* Hide legacy stealth footer on mobile in favor of Apple native Tab Bar */
-    .stealth-footer {
-        display: none !important;
-    }
-
     /* Fixed Apple Native UITabBar Container (Authentic Translucent Frosted Glass) */
     .apple-tab-bar {
         position: fixed;

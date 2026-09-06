@@ -32,9 +32,9 @@
 
     
     <link rel="stylesheet" href="../../css/variables.css?v=2025">
-    <link rel="stylesheet" href="../../css/base.css?v=20260906e">
-    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=2025">
-    <link rel="stylesheet" href="../../css/components/subpage.css?v=20260906d">
+    <link rel="stylesheet" href="../../css/base.css?v=20260906g">
+    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=20260906g">
+    <link id="sys-style-subpage" rel="stylesheet" href="../../css/components/subpage.css?v=20260906g">
 </head>
 <body>
 
@@ -47,14 +47,14 @@
         <h1 class="nav-title" id="top-nav-title">國父生平</h1>
     </header>
 
-    <a href="../library/library.html" class="top-back-btn" aria-label="返回">
+    <a href="../library/library.html" class="top-back-btn" aria-label="文獻資料庫">
         <svg class="icon-ios" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M15 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <svg class="icon-macos" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M14 17l-5-5 5-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <span>返回</span>
+        <span>文獻資料庫</span>
     </a>
 
 
@@ -79,11 +79,6 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="tabs-container" id="tabs" style="display: none;">
-        <button class="tab-btn active" data-tab="biography">生平傳記</button>
-        <button class="tab-btn" data-tab="theories">思想與歷程</button>
     </div>
 
     <div class="markdown-container active" id="md-section">
@@ -142,8 +137,8 @@
     <script type="module">
         import { getCurrentLang, setGlobalLang } from '../../js/modules/i18n.js?v=2025';
         import { initTabBar } from '../../js/modules/tab-bar.js?v=2025';
-        import { initIOSNavTransition } from '../../js/modules/ios-nav-transition.js?v=20260905j';
-        import { initDesktopShell } from '../../js/modules/desktop-shell.js?v=20260906e';
+        import { initIOSNavTransition } from '../../js/modules/ios-nav-transition.js?v=20260906g';
+        import { initDesktopShell } from '../../js/modules/desktop-shell.js?v=20260906g';
 
         initTabBar({ activeTab: 'biography', basePath: '../../' });
         initIOSNavTransition();
@@ -152,7 +147,6 @@
         const langBtn = document.getElementById('lang-btn');
         const mdViewer = document.getElementById('md-viewer');
         const pageTitle = document.getElementById('page-title');
-        const tabBtns = document.querySelectorAll('.tab-btn');
         const iosRows = document.querySelectorAll('.ios-row[data-tab]');
         const mdSection = document.getElementById('md-section');
         const chartsSection = document.getElementById('charts-section');
@@ -462,25 +456,7 @@
                 if (targetTab === currentTab) return;
                 iosRows.forEach(r => r.classList.remove('expanded'));
                 row.classList.add('expanded');
-                tabBtns.forEach(b => {
-                    if (b.getAttribute('data-tab') === targetTab) b.classList.add('active');
-                    else b.classList.remove('active');
-                });
                 currentTab = targetTab;
-                updateContent();
-            });
-        });
-
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                if(btn.classList.contains('active')) return;
-                tabBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentTab = btn.getAttribute('data-tab');
-                iosRows.forEach(r => {
-                    if (r.getAttribute('data-tab') === currentTab) r.classList.add('expanded');
-                    else r.classList.remove('expanded');
-                });
                 updateContent();
             });
         });
@@ -489,10 +465,6 @@
             iosRows.forEach(r => {
                 if (r.getAttribute('data-tab') === 'theories') r.classList.add('expanded');
                 else r.classList.remove('expanded');
-            });
-            tabBtns.forEach(b => {
-                if (b.getAttribute('data-tab') === 'theories') b.classList.add('active');
-                else b.classList.remove('active');
             });
         }
         updateContent();

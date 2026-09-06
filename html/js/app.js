@@ -18,7 +18,7 @@ import { loadAndTriggerFireworks } from './modules/fireworks.js';
 import { syncTabBarLabels } from './modules/i18n.js?v=2025';
 import { syncStandaloneTabBar } from './modules/tab-bar.js?v=2025';
 import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=2025';
-import { initDesktopShell } from './modules/desktop-shell.js?v=20260906e';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260906g';
 
 /* Expose fireworks loader globally for legacy triggers */
 window.loadAndTriggerFireworks = loadAndTriggerFireworks;
@@ -26,7 +26,8 @@ window.loadAndTriggerFireworks = loadAndTriggerFireworks;
 /* ============================================================================
  * Application Initialization Controller
  * ============================================================================ */
-function initApp() {
+export function initApp() {
+    window.initApp = initApp;
     setupDiagnosticTrigger();
     const WORKER_API = window.ENV ? window.ENV.WORKER_API : '';
 
@@ -139,18 +140,21 @@ function initApp() {
      * ======================================================================== */
     try {
         /* Keyboard shortcut: Press 'D' to toggle danmaku layer on/off */
-        window.addEventListener('keydown', (e) => {
-            const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
-            if (tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable)) {
-                return;
-            }
-            if ((e.key === 'd' || e.key === 'D') && !e.ctrlKey && !e.altKey && !e.metaKey) {
-                e.preventDefault();
-                toggleDanmaku(WORKER_API, danmakuContainer, portraitImg, (isEnabled) => {
-                    showToast(isEnabled ? '彈幕已開啟' : '彈幕已關閉', 'system');
-                });
-            }
-        });
+        if (!window.__danmakuKeydownBound) {
+            window.__danmakuKeydownBound = true;
+            window.addEventListener('keydown', (e) => {
+                const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+                if (tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable)) {
+                    return;
+                }
+                if ((e.key === 'd' || e.key === 'D') && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                    e.preventDefault();
+                    toggleDanmaku(WORKER_API, danmakuContainer, portraitImg, (isEnabled) => {
+                        showToast(isEnabled ? '彈幕已開啟' : '彈幕已關閉', 'system');
+                    });
+                }
+            });
+        }
 
         /* Click on Testament opens the send danmaku message modal */
         if (testamentBox) {
