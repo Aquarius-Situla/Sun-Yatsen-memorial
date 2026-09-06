@@ -71,10 +71,11 @@ function getMarkdownStyles(isLight) {
 }
 
 import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=2025';
-import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=2025';
+import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=20260906k';
 import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=2025';
-import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260906g';
-import { initDesktopShell } from './modules/desktop-shell.js?v=20260906j';
+import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260906k';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260906k';
+import { showActivityIndicator, hideActivityIndicator } from './modules/activity-indicator.js?v=20260906k';
 
 /* ============================================================================
  * Subpage Initialization Engine
@@ -110,7 +111,11 @@ export function initSubpage(options) {
     const langBtn = document.getElementById('lang-btn');
     const mdViewer = document.getElementById('md-viewer');
     const container = document.querySelector('.markdown-container');
-    if (container) container.classList.add('loaded');
+    if (container && mdViewer) {
+        showActivityIndicator(container);
+    } else if (container) {
+        container.classList.add('loaded');
+    }
     const heroTitle = document.getElementById('hero-title');
     const heroDate = document.getElementById('hero-date');
     const heroDesc = document.getElementById('hero-desc');
@@ -315,7 +320,10 @@ export function initSubpage(options) {
 
     if (mdViewer) {
         mdViewer.addEventListener('zero-md-rendered', () => {
-            if (container) container.classList.add('loaded');
+            if (container) {
+                hideActivityIndicator(container);
+                container.classList.add('loaded');
+            }
             if (mdViewer.shadowRoot) {
                 const links = mdViewer.shadowRoot.querySelectorAll('a');
                 links.forEach(link => {

@@ -9,6 +9,7 @@
 
 import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js';
 import { TAB_ICONS } from './tab-bar.js';
+import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906k';
 
 /* ============================================================================
  * Global Search Index (Covers all memorial topics, exhibits, and settings)
@@ -220,12 +221,12 @@ function getSiteBaseUrl() {
 }
 
 /* Resolve a site-root-relative path to an absolute URL */
-function resolveSiteUrl(relPath) {
+export function resolveSiteUrl(relPath) {
     return new URL(relPath, getSiteBaseUrl()).href;
 }
 
 /* Map URL to canonical sidebar tab ID */
-function getTabFromUrl(url) {
+export function getTabFromUrl(url) {
     const path = new URL(url, window.location.href).pathname.toLowerCase();
     if (path.includes('/biography/')) return 'biography';
     if (path.includes('/events/xinhai/')) return 'xinhai';
@@ -244,7 +245,7 @@ function getTabFromUrl(url) {
 }
 
 /* Ensure stylesheet isolation between home and subpages */
-function ensurePageStylesheets(isHome) {
+export function ensurePageStylesheets(isHome) {
     let homeLink = document.getElementById('sys-style-home');
     if (!homeLink) {
         homeLink = document.querySelector('link[href*="main/style.css"]');
@@ -257,7 +258,7 @@ function ensurePageStylesheets(isHome) {
             document.head.appendChild(homeLink);
         }
     }
-    homeLink.href = resolveSiteUrl('main/style.css?v=20260906j');
+    homeLink.href = resolveSiteUrl('main/style.css?v=20260906k');
 
     let subpageLink = document.getElementById('sys-style-subpage');
     if (!subpageLink) {
@@ -271,7 +272,7 @@ function ensurePageStylesheets(isHome) {
             document.head.appendChild(subpageLink);
         }
     }
-    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260906j');
+    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260906k');
 
     let varLink = document.getElementById('sys-style-variables');
     if (!varLink) {
@@ -285,7 +286,7 @@ function ensurePageStylesheets(isHome) {
             document.head.insertBefore(varLink, document.head.firstChild);
         }
     }
-    varLink.href = resolveSiteUrl('css/variables.css?v=20260906j');
+    varLink.href = resolveSiteUrl('css/variables.css?v=20260906k');
 
     let baseLink = document.getElementById('sys-style-base');
     if (!baseLink) {
@@ -299,7 +300,21 @@ function ensurePageStylesheets(isHome) {
             document.head.insertBefore(baseLink, document.head.firstChild);
         }
     }
-    baseLink.href = resolveSiteUrl('css/base.css?v=20260906j');
+    baseLink.href = resolveSiteUrl('css/base.css?v=20260906k');
+
+    let indLink = document.getElementById('sys-style-activity');
+    if (!indLink) {
+        indLink = document.querySelector('link[href*="activity-indicator.css"]');
+        if (indLink) {
+            indLink.id = 'sys-style-activity';
+        } else {
+            indLink = document.createElement('link');
+            indLink.id = 'sys-style-activity';
+            indLink.rel = 'stylesheet';
+            document.head.appendChild(indLink);
+        }
+    }
+    indLink.href = resolveSiteUrl('css/components/activity-indicator.css?v=20260906k');
 
     if (isHome) {
         homeLink.disabled = false;
@@ -430,7 +445,7 @@ export async function navigateDesktopStage(targetHref, pushState = true) {
 
     if (isNavigatingStage) return;
     isNavigatingStage = true;
-    const safetyTimer = setTimeout(() => { isNavigatingStage = false; }, 3000);
+    const safetyTimer = setTimeout(() => { isNavigatingStage = false; }, 4000);
 
     const targetTab = getTabFromUrl(targetUrl.href);
 
@@ -438,6 +453,8 @@ export async function navigateDesktopStage(targetHref, pushState = true) {
     if (window.__glideNavIndicator && targetTab) {
         window.__glideNavIndicator(targetTab);
     }
+    const sidebarEl = document.getElementById('desktop-sidebar');
+    syncSidebarActiveState(sidebarEl, targetTab);
 
     /* 2. Fade out current desktop stage */
     const stage = ensureStageContainer();
@@ -445,21 +462,30 @@ export async function navigateDesktopStage(targetHref, pushState = true) {
 
     try {
         const fetchCtrl = new AbortController();
-        const timeoutId = setTimeout(() => fetchCtrl.abort(), 5000);
-        let resPromise = fetch(targetUrl.href, { signal: fetchCtrl.signal })
+        const timeoutId = setTimeout(() => fetchCtrl.abort(), 8000);
+        let fetchCompleted = false;
+
+        const resPromise = fetch(targetUrl.href, { signal: fetchCtrl.signal })
             .then(res => {
                 clearTimeout(timeoutId);
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 return res.text();
             });
 
-        /* Wait for stage fade out (190ms) to complete BEFORE changing any stylesheet or DOM! */
-        /* During this entire 190ms, the current page's CSS remains 100% active, with zero flash! */
-        const [html] = await Promise.all([
-            resPromise,
-            new Promise(resolve => setTimeout(resolve, 190))
-        ]);
+        resPromise.then(() => { fetchCompleted = true; }).catch(() => {});
 
+        /* Wait 120ms for stage fade out animation to finish */
+        await new Promise(resolve => setTimeout(resolve, 120));
+
+        /* If content has not arrived yet, reveal centered native Apple activity indicator */
+        let indicatorEl = null;
+        if (!fetchCompleted) {
+            stage.innerHTML = '';
+            indicatorEl = showActivityIndicator(stage);
+            stage.classList.remove('stage-fading');
+        }
+
+        const html = await resPromise;
         const doc = new DOMParser().parseFromString(html, 'text/html');
 
         /* 3. Synchronize browser history and document title */
@@ -468,7 +494,7 @@ export async function navigateDesktopStage(targetHref, pushState = true) {
         }
         document.title = doc.title;
 
-        /* 4. Switch stylesheets between home and subpages WHILE STAGE IS FULLY INVISIBLE (opacity 0) */
+        /* 4. Switch stylesheets between home and subpages WHILE STAGE IS FULLY INVISIBLE */
         const isHome = targetTab === 'home';
         ensurePageStylesheets(isHome);
 
@@ -483,8 +509,16 @@ export async function navigateDesktopStage(targetHref, pushState = true) {
             document.body.classList.add('is-desktop-subpage');
         }
 
-        /* 6. Extract stage content from parsed document and inject */
+        /* 6. Extract stage content from parsed document */
         const newContent = extractStageContent(doc);
+
+        /* If indicator was showing, fade it out smoothly */
+        if (indicatorEl) {
+            hideActivityIndicator(stage);
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        stage.classList.add('stage-fading');
         stage.innerHTML = newContent;
         window.scrollTo(0, 0);
 
@@ -497,17 +531,14 @@ export async function navigateDesktopStage(targetHref, pushState = true) {
         /* 9. Fade fully-styled stage back in */
         stage.classList.remove('stage-fading');
 
-        /* 11. Sync sidebar active state and language labels */
-        const sidebar = document.getElementById('desktop-sidebar');
-        if (sidebar) {
-            syncSidebarActiveState(sidebar, targetTab);
-            syncSidebarLabels(sidebar);
-            if (window.__syncIndicatorPosition) {
-                window.__syncIndicatorPosition();
-            }
+        /* 10. Sync sidebar active state and language labels */
+        syncSidebarActiveState(sidebarEl, targetTab);
+        syncSidebarLabels(sidebarEl);
+        if (window.__syncIndicatorPosition) {
+            window.__syncIndicatorPosition();
         }
     } catch (err) {
-        console.error('[Desktop Split Router Error]:', err);
+        console.error('[Stage Navigation Fallback]:', err);
         window.location.href = targetUrl.href;
     } finally {
         clearTimeout(safetyTimer);
@@ -634,6 +665,10 @@ export function initDesktopShell(options = {}) {
             link.href = resolveSiteUrl(cleanPath);
         }
     });
+
+    /* Ensure content stage container exists and stylesheets are properly isolated */
+    ensureStageContainer();
+    ensurePageStylesheets(activeTab === 'home');
 
     /* Check if sidebar already exists */
     let sidebarEl = document.getElementById('desktop-sidebar');

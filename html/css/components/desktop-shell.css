@@ -486,14 +486,68 @@
         width: calc(100% - 240px) !important;
     }
 
-    /* Centered ceremonial container */
-    .container {
+    /* Strict vertical & horizontal centering for desktop ceremonial hall */
+    body.is-desktop-home,
+    body.has-desktop-sidebar.is-desktop-home {
+        padding: 0 0 0 240px !important;
+        width: 100% !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    body.is-desktop-home .desktop-stage,
+    body.has-desktop-sidebar.is-desktop-home .desktop-stage {
+        width: 100% !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Centered ceremonial container within right-hand stage */
+    body.is-desktop-home .container,
+    body.has-desktop-sidebar.is-desktop-home .container {
         max-width: 500px !important;
+        width: 100% !important;
         margin: auto auto !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
+    }
+
+    /* Compact desktop viewports: scale down gracefully to prevent bottom clipping */
+    @media (max-height: 720px) {
+        body.is-desktop-home .portrait-img,
+        body.has-desktop-sidebar.is-desktop-home .portrait-img {
+            height: min(280px, 30vh) !important;
+        }
+        body.is-desktop-home .attendance-box,
+        body.has-desktop-sidebar.is-desktop-home .attendance-box {
+            margin: 0 auto 10px auto !important;
+            padding: 3px 14px !important;
+        }
+        body.is-desktop-home .testament-box,
+        body.has-desktop-sidebar.is-desktop-home .testament-box {
+            margin-top: 6px !important;
+        }
+        body.is-desktop-home .testament-text,
+        body.has-desktop-sidebar.is-desktop-home .testament-text {
+            height: min(200px, 26vh) !important;
+            font-size: clamp(0.75rem, 1.7vh, 0.92rem) !important;
+            letter-spacing: 2px !important;
+            line-height: 1.5 !important;
+        }
     }
 }
 
@@ -521,9 +575,20 @@
     }
 
     /* Desktop Home Ceremonial Hall Background */
+    body.is-desktop-home,
     body.has-desktop-sidebar.is-desktop-home,
+    body.is-desktop-home .desktop-stage,
     body.has-desktop-sidebar.is-desktop-home .desktop-stage {
         background-color: #111111 !important;
+    }
+
+    @media (prefers-color-scheme: light) {
+        body.is-desktop-home,
+        body.has-desktop-sidebar.is-desktop-home,
+        body.is-desktop-home .desktop-stage,
+        body.has-desktop-sidebar.is-desktop-home .desktop-stage {
+            background-color: #f5f0e8 !important;
+        }
     }
 
     .ios-group-container {
@@ -717,6 +782,7 @@
     .desktop-stage {
         width: 100%;
         min-height: 100vh;
+        position: relative;
         transition: opacity 0.18s cubic-bezier(0.25, 1, 0.5, 1);
         will-change: opacity;
     }
