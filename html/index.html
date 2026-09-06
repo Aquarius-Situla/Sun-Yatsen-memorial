@@ -17,7 +17,6 @@
     <link rel="icon" href="main/favicon/favicon.svg" type="image/svg+xml">
     <link rel="alternate icon" href="main/favicon/favicon.ico" type="image/x-icon" sizes="any">
 
-    <link rel="preload" href="webapp/icon/icon-mobile.png" as="image">    
     <link rel="apple-touch-icon" href="webapp/icon/icon-mobile.png">
     
 
@@ -51,16 +50,15 @@
     <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1242x2208.png">
     <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="webapp/splash/splash-750x1334.png">
     <script>
-        /* Dynamically preload the iOS splash screen for the current device to prevent animation loss when added to the home screen */
+        /* Resolve relative head links (manifest, icons, splash) to absolute URLs before router runs */
         (function() {
-            var links = document.querySelectorAll('link[rel="apple-touch-startup-image"]');
-            for (var i = 0; i < links.length; i++) {
-                if (window.matchMedia(links[i].getAttribute('media')).matches) {
-                    var preload = document.createElement('link');
-                    preload.rel = 'preload';
-                    preload.as = 'image';
-                    preload.href = links[i].getAttribute('href');
-                    document.head.appendChild(preload);
+            var slashSlash = String.fromCharCode(47, 47);
+            var siteBase = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/');
+            var headLinks = document.querySelectorAll('link[rel*="icon"], link[rel="manifest"], link[rel*="startup"]');
+            for (var j = 0; j < headLinks.length; j++) {
+                var h = headLinks[j].getAttribute('href');
+                if (h && !h.includes(slashSlash) && !h.startsWith('/')) {
+                    headLinks[j].href = new URL(h, siteBase).href;
                 }
             }
         })();
@@ -195,6 +193,6 @@
         <source src="main/sanmin/sanmin.flac" type="audio/flac">
     </audio>
     <script src="api/env.js"></script>
-    <script type="module" src="js/app.js?v=20260906h"></script>
+    <script type="module" src="js/app.js?v=20260906i"></script>
 </body>
 </html>

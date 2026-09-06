@@ -18,7 +18,7 @@ import { loadAndTriggerFireworks } from './modules/fireworks.js';
 import { syncTabBarLabels } from './modules/i18n.js?v=2025';
 import { syncStandaloneTabBar } from './modules/tab-bar.js?v=2025';
 import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=2025';
-import { initDesktopShell } from './modules/desktop-shell.js?v=20260906h';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260906i';
 
 /* Expose fireworks loader globally for legacy triggers */
 window.loadAndTriggerFireworks = loadAndTriggerFireworks;

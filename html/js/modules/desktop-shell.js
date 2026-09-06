@@ -569,13 +569,20 @@ export function initDesktopShell(options = {}) {
     /* Add layout helper class to body for wide desktop viewports */
     document.body.classList.add('has-desktop-sidebar');
 
-    /* Ensure favicon links in head are absolute to prevent 404 on pushState navigation */
-    const favicons = document.querySelectorAll('link[rel*="icon"]');
+    /* Ensure head links (manifest, icons, splash) are absolute to prevent 404/CORS when pushState alters location */
+    const headLinks = document.querySelectorAll('link[rel*="icon"], link[rel="manifest"], link[rel*="startup"]');
     const slashSlash = String.fromCharCode(47, 47);
-    favicons.forEach(link => {
+    headLinks.forEach(link => {
         const href = link.getAttribute('href');
         if (href && !href.includes(slashSlash) && !href.startsWith('/')) {
-            link.href = resolveSiteUrl(href);
+            let cleanPath = href;
+            while (cleanPath.startsWith('../')) {
+                cleanPath = cleanPath.substring(3);
+            }
+            while (cleanPath.startsWith('./')) {
+                cleanPath = cleanPath.substring(2);
+            }
+            link.href = resolveSiteUrl(cleanPath);
         }
     });
 
