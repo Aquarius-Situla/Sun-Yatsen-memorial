@@ -10,10 +10,11 @@
  * ============================================================================ */
 
 /* ============================================================================
- * Desktop Isolation: Completely Hide Bottom Tab Bar on Screens > 768px
+ * Desktop Isolation: Completely Hide Mobile Shell Bars on Screens > 768px
  * ============================================================================ */
 @media (min-width: 769px) {
-    .apple-tab-bar {
+    .apple-tab-bar,
+    .apple-top-nav {
         display: none !important;
     }
 }
@@ -23,6 +24,49 @@
  * Mobile Viewport Rules (<= 768px)
  * ============================================================================ */
 @media (max-width: 768px) {
+    /* Fixed Apple Native Top Navigation Bar (Authentic Frosted Glass Header) */
+    .apple-top-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: calc(44px + env(safe-area-inset-top, 0px));
+        padding-top: env(safe-area-inset-top, 0px);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        background: rgba(20, 20, 22, 0.88);
+        backdrop-filter: blur(25px) saturate(190%);
+        -webkit-backdrop-filter: blur(25px) saturate(190%);
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+        border-bottom: 0.5px solid rgba(255, 255, 255, 0.15);
+        z-index: 9999;
+        box-sizing: border-box;
+        user-select: none;
+        -webkit-user-select: none;
+        transition: opacity 0.18s ease;
+    }
+
+    .apple-top-nav.nav-hidden {
+        display: none !important;
+    }
+
+    .apple-top-nav .nav-title {
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: -0.3px;
+        color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;
+        margin: 0;
+        padding: 0;
+        height: 44px;
+        line-height: 44px;
+        display: flex;
+        align-items: center;
+        pointer-events: none;
+    }
     /* Fixed Apple Native UITabBar Container (Authentic Translucent Frosted Glass) */
     .apple-tab-bar {
         position: fixed;
@@ -122,6 +166,17 @@
  * Light Theme Color Overrides
  * ============================================================================ */
 @media (prefers-color-scheme: light) and (max-width: 768px) {
+    .apple-top-nav {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(25px) saturate(190%);
+        -webkit-backdrop-filter: blur(25px) saturate(190%);
+        border-bottom-color: rgba(0, 0, 0, 0.12);
+    }
+
+    .apple-top-nav .nav-title {
+        color: #000000;
+    }
+
     .apple-tab-bar {
         background: rgba(255, 255, 255, 0.75);
         backdrop-filter: blur(25px) saturate(190%);

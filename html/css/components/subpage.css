@@ -698,8 +698,12 @@ body {
 
     /* Activate Apple Native Frosted Glass Navigation Bar */
     .apple-top-nav {
-        display: flex !important;
+        display: flex;
         width: 100%;
+    }
+
+    .apple-top-nav.nav-hidden {
+        display: none !important;
     }
 
     /* Completely hide top back button on mobile */

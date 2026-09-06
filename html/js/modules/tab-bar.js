@@ -7,9 +7,9 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906n';
-import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906n';
-import { resolveSiteUrl } from './desktop-shell.js?v=20260906n';
+import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906p';
+import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906p';
+import { resolveSiteUrl } from './desktop-shell.js?v=20260906p';
 
 /* ============================================================================
  * Authentic Apple SF Symbols Vector Icons (24x24 Pixel-Perfect Fill Glyphs)
@@ -187,10 +187,90 @@ const CANONICAL_TAB_ROUTES = {
     settings: 'pages/settings/settings.html'
 };
 
+/* Top Navigation Bar Titles for Mobile Tabs */
+const MOBILE_TOP_TITLES = {
+    tc: {
+        home: '',
+        announcement: '公告',
+        library: '資料庫',
+        settings: '設定'
+    },
+    sc: {
+        home: '',
+        announcement: '公告',
+        library: '资料库',
+        settings: '设置'
+    }
+};
+
+/* Synchronize Tab Bar and Top Nav on Navigation */
+function updateMobileNavState(targetTabId) {
+    /* 1. Instant tab bar selection state feedback */
+    const allTabs = document.querySelectorAll('#apple-tab-bar .tab-item');
+    allTabs.forEach(t => {
+        if (t.getAttribute('data-tab-id') === targetTabId) {
+            t.classList.add('active');
+        } else {
+            t.classList.remove('active');
+        }
+    });
+
+    /* 2. Instant Top Navigation Bar update */
+    let topNav = document.querySelector('.apple-top-nav');
+    if (targetTabId === 'home') {
+        if (topNav) {
+            topNav.classList.add('nav-hidden');
+            topNav.style.setProperty('display', 'none', 'important');
+        }
+    } else {
+        if (!topNav) {
+            topNav = document.createElement('header');
+            topNav.className = 'apple-top-nav';
+            topNav.innerHTML = '<h1 class="nav-title" id="top-nav-title"></h1>';
+            document.body.insertBefore(topNav, document.body.firstChild);
+        }
+        topNav.classList.remove('nav-hidden');
+        topNav.style.setProperty('display', 'flex', 'important');
+        const titleEl = topNav.querySelector('#top-nav-title');
+        if (titleEl) {
+            const lang = getCurrentLang();
+            const dict = MOBILE_TOP_TITLES[lang] || MOBILE_TOP_TITLES.tc;
+            titleEl.textContent = dict[targetTabId] || '';
+        }
+    }
+}
+
+/* Prefetch target URL helper */
+function prefetchUrl(url) {
+    if (!url) return;
+    try {
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = url;
+        document.head.appendChild(link);
+    } catch (err) {
+        /* Silently ignore prefetch issues */
+    }
+}
+
 /* ============================================================================
  * Section 4: Mobile Event Listeners & Clean Navigation Controller
  * ============================================================================ */
 if (typeof window !== 'undefined') {
+    let isMobileNavigating = false;
+
+    /* Pre-load target URL on touch down for lightning-fast responsiveness */
+    document.addEventListener('touchstart', (e) => {
+        if (window.innerWidth > 768) return;
+        const tabItem = e.target.closest('#apple-tab-bar .tab-item');
+        if (!tabItem) return;
+        const tabId = tabItem.getAttribute('data-tab-id');
+        const targetHref = (tabId && CANONICAL_TAB_ROUTES[tabId])
+            ? resolveSiteUrl(CANONICAL_TAB_ROUTES[tabId])
+            : tabItem.getAttribute('href');
+        prefetchUrl(targetHref);
+    }, { passive: true });
+
     /* Handle mobile tab bar interaction with instantaneous feedback and clean navigation */
     document.addEventListener('click', (e) => {
         if (window.innerWidth > 768) return;
@@ -215,22 +295,37 @@ if (typeof window !== 'undefined') {
             return;
         }
 
-        /* 1. Instant tab bar selection state feedback */
-        const allTabs = document.querySelectorAll('#apple-tab-bar .tab-item');
-        allTabs.forEach(t => t.classList.remove('active'));
-        tabItem.classList.add('active');
+        e.preventDefault();
+        if (isMobileNavigating) return;
+        isMobileNavigating = true;
 
-        /* 2. Instant Apple daisy activity indicator feedback */
+        /* 1. Immediately switch tab active state and top nav header to target tab */
+        updateMobileNavState(tabId);
+
+        /* 2. Immediately display authentic Apple activity indicator */
         showActivityIndicator(document.body);
 
-        /* 3. Clean native navigation */
-        e.preventDefault();
-        window.location.href = targetHref;
+        /* 3. Allow browser engine to render the updated frame before full navigation */
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                window.location.href = targetHref;
+            }, 50);
+        });
     }, false);
 
-    /* Hide activity indicator when returning via browser back/forward (bfcache) */
+    /* Restore pristine state on page restore (bfcache) */
     window.addEventListener('pageshow', () => {
+        isMobileNavigating = false;
         hideActivityIndicator(document.body);
+
+        /* Re-sync active tab and top nav according to the restored page's true URL */
+        const path = window.location.pathname.toLowerCase();
+        let currentTab = 'home';
+        if (path.includes('/announcement/')) currentTab = 'announcement';
+        else if (path.includes('/library/')) currentTab = 'library';
+        else if (path.includes('/settings/')) currentTab = 'settings';
+        else if (path.includes('index.html') || path.endsWith('/') || path.endsWith('/sys-memorial/')) currentTab = 'home';
+        updateMobileNavState(currentTab);
     });
 
     /* Non-tab internal anchors in standalone PWA mode */
