@@ -7,9 +7,9 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906t';
-import { TAB_ICONS } from './tab-bar.js?v=20260906t';
-import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906t';
+import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906u';
+import { TAB_ICONS } from './tab-bar.js?v=20260906u';
+import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906u';
 
 /* ============================================================================
  * Global Search Index (Covers all memorial topics, exhibits, and settings)
@@ -260,7 +260,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(homeLink);
         }
     }
-    homeLink.href = resolveSiteUrl('main/style.css?v=20260906t');
+    homeLink.href = resolveSiteUrl('main/style.css?v=20260906u');
 
     let subpageLink = document.getElementById('sys-style-subpage');
     if (!subpageLink) {
@@ -274,7 +274,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(subpageLink);
         }
     }
-    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260906t');
+    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260906u');
 
     let varLink = document.getElementById('sys-style-variables');
     if (!varLink) {
@@ -288,7 +288,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.insertBefore(varLink, document.head.firstChild);
         }
     }
-    varLink.href = resolveSiteUrl('css/variables.css?v=20260906t');
+    varLink.href = resolveSiteUrl('css/variables.css?v=20260906u');
 
     let baseLink = document.getElementById('sys-style-base');
     if (!baseLink) {
@@ -302,7 +302,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.insertBefore(baseLink, document.head.firstChild);
         }
     }
-    baseLink.href = resolveSiteUrl('css/base.css?v=20260906t');
+    baseLink.href = resolveSiteUrl('css/base.css?v=20260906u');
 
     let indLink = document.getElementById('sys-style-activity');
     if (!indLink) {
@@ -316,7 +316,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(indLink);
         }
     }
-    indLink.href = resolveSiteUrl('css/components/activity-indicator.css?v=20260906t');
+    indLink.href = resolveSiteUrl('css/components/activity-indicator.css?v=20260906u');
 
     if (isHome) {
         homeLink.disabled = false;
@@ -434,7 +434,7 @@ async function executeStageScripts(doc, targetUrl) {
 /* Desktop Split Stage Navigator */
 let isNavigatingStage = false;
 
-export async function navigateDesktopStage(targetHref, pushState = true) {
+export async function navigateDesktopStage(targetHref, pushState = true, fromSidebar = false) {
     if (window.innerWidth <= 768) {
         window.location.href = targetHref;
         return;
@@ -511,6 +511,15 @@ export async function navigateDesktopStage(targetHref, pushState = true) {
         } else {
             document.body.classList.remove('is-desktop-home');
             document.body.classList.add('is-desktop-subpage');
+        }
+
+        /* Track navigation source to conditionally show or hide top-back-btn */
+        if (fromSidebar) {
+            document.body.classList.add('nav-from-sidebar');
+            document.body.classList.remove('nav-from-content');
+        } else {
+            document.body.classList.remove('nav-from-sidebar');
+            document.body.classList.add('nav-from-content');
         }
 
         /* 6. Extract stage content from parsed document */
@@ -664,6 +673,26 @@ export function initDesktopShell(options = {}) {
     } else {
         document.body.classList.remove('is-desktop-home');
         document.body.classList.add('is-desktop-subpage');
+    }
+
+    /* Determine navigation source for initial page load.
+     * Exhibit pages (biography, xinhai, whampoa, mayfourth, militaries, yatsen-*) are
+     * accessible both from the sidebar and from the library page. On a hard load we
+     * inspect document.referrer to decide whether to show the top-back-btn. */
+    const exhibitTabs = new Set(['biography', 'xinhai', 'whampoa', 'mayfourth', 'militaries', 'yatsen-birth', 'yatsen-passing']);
+    if (exhibitTabs.has(activeTab)) {
+        const ref = document.referrer;
+        const cameFromLibrary = ref && (ref.includes('/pages/library/') || ref.includes('library.html'));
+        if (cameFromLibrary) {
+            document.body.classList.remove('nav-from-sidebar');
+            document.body.classList.add('nav-from-content');
+        } else {
+            document.body.classList.add('nav-from-sidebar');
+            document.body.classList.remove('nav-from-content');
+        }
+    } else {
+        document.body.classList.remove('nav-from-sidebar');
+        document.body.classList.add('nav-from-content');
     }
 
     /* Ensure head links (manifest, icons, splash, stylesheets) are absolute to prevent 404/CORS when pushState alters location */
@@ -1154,7 +1183,7 @@ function setupAnimatedNavIndicator(sidebarEl, activeTab) {
             }
 
             glideNavIndicator(targetTab);
-            navigateDesktopStage(targetHref, true);
+            navigateDesktopStage(targetHref, true, true);
         });
     });
 }

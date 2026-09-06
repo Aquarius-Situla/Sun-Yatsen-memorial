@@ -814,7 +814,19 @@
         will-change: opacity;
     }
 
+    /* When a top-back-btn is visible (nav-from-content), shift content down
+     * enough to clear the 16px-top + 28px-height button (total: 60px needed). */
+    body.is-desktop-subpage.nav-from-content .desktop-stage {
+        padding-top: 60px !important;
+    }
+
+    /* Hide the top-back-btn when the page was entered from the sidebar */
+    body.nav-from-sidebar .top-back-btn {
+        display: none !important;
+    }
+
     .desktop-stage.stage-fading {
         opacity: 0 !important;
     }
 }
+
