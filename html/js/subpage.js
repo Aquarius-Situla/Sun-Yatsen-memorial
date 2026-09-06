@@ -70,13 +70,13 @@ function getMarkdownStyles(isLight) {
     }
 }
 
-import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=20260907a';
-import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=20260907a';
-import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260907a';
-import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260907a';
-import { initDesktopShell } from './modules/desktop-shell.js?v=20260907a';
-import { showActivityIndicator, hideActivityIndicator } from './modules/activity-indicator.js?v=20260907a';
-import { initDeviceLayout, initOrientationGuard, isMobileLayout, isDesktopLayout } from './modules/device-detect.js?v=20260907a';
+import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=20260907b';
+import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=20260907b';
+import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260907b';
+import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260907b';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260907b';
+import { showActivityIndicator, hideActivityIndicator } from './modules/activity-indicator.js?v=20260907b';
+import { initDeviceLayout, initOrientationGuard, isMobileLayout, isDesktopLayout } from './modules/device-detect.js?v=20260907b';
 
 /* ============================================================================
  * Subpage Initialization Engine

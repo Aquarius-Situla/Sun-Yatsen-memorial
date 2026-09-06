@@ -7,7 +7,7 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang } from './i18n.js?v=20260907a';
+import { getCurrentLang } from './i18n.js?v=20260907b';
 
 /* ============================================================================
  * Device Fingerprint Analysis
@@ -218,16 +218,22 @@ function createOrientationGuard() {
     guard.className = 'sys-orientation-guard';
     guard.setAttribute('aria-hidden', 'true');
 
-    /* Apple-style phone rotation SVG animation */
+    /* Apple SF Symbols-grade phone rotation vector graphic & outer orbit arc */
     guard.innerHTML = `
         <div class="guard-card">
             <div class="guard-icon-box">
-                <svg class="guard-phone-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect class="phone-frame" x="16" y="8" width="32" height="48" rx="8" stroke="currentColor" stroke-width="3" fill="none"/>
-                    <line x1="28" y1="14" x2="36" y2="14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                    <circle cx="32" cy="49" r="2.5" fill="currentColor"/>
-                    <path class="rotation-arrow" d="M49 22C52.5 26.5 54 32 53 37C51.5 44 45.5 50 38 52" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 3"/>
-                    <path class="arrow-head" d="M51 18L49 23L44 21" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg class="guard-phone-icon" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Non-colliding outer orbit guidance arrow -->
+                    <path class="guidance-arrow" d="M8 40 C8 22.33 22.33 8 40 8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 3.5"/>
+                    <path class="guidance-arrow" d="M35 3 L42 8 L35 13" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    
+                    <!-- Unified rotating phone device group -->
+                    <g class="phone-device-group">
+                        <rect x="27" y="16" width="26" height="48" rx="6" stroke="currentColor" stroke-width="2.5" fill="rgba(255, 69, 58, 0.08)"/>
+                        <rect x="29" y="18" width="22" height="44" rx="4.5" stroke="currentColor" stroke-width="0.75" opacity="0.3" fill="none"/>
+                        <rect x="36" y="20.5" width="8" height="2.5" rx="1.25" fill="currentColor"/>
+                        <line x1="35" y1="58" x2="45" y2="58" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </g>
                 </svg>
             </div>
             <h3 class="guard-title">請將裝置旋轉至直向</h3>

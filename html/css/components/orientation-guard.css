@@ -71,8 +71,8 @@ body.is-orientation-blocked {
  * Device Rotation Animation Glyph
  * ============================================================================ */
 .sys-orientation-guard .guard-icon-box {
-    width: 80px;
-    height: 80px;
+    width: 88px;
+    height: 88px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -81,42 +81,42 @@ body.is-orientation-blocked {
 }
 
 .sys-orientation-guard .guard-phone-icon {
-    width: 72px;
-    height: 72px;
+    width: 80px;
+    height: 80px;
     overflow: visible;
 }
 
-.sys-orientation-guard .phone-frame {
-    transform-origin: 32px 32px;
-    animation: phoneRotateAnim 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+.sys-orientation-guard .phone-device-group {
+    transform-box: view-box;
+    transform-origin: 40px 40px;
+    animation: phoneRotateAnim 2.8s cubic-bezier(0.32, 0.72, 0, 1) infinite;
 }
 
-.sys-orientation-guard .rotation-arrow,
-.sys-orientation-guard .arrow-head {
+.sys-orientation-guard .guidance-arrow {
     animation: arrowPulseAnim 2.8s ease-in-out infinite;
 }
 
 @keyframes phoneRotateAnim {
-    0%, 15% {
+    0%, 18% {
         transform: rotate(-90deg);
     }
-    45%, 75% {
+    48%, 78% {
         transform: rotate(0deg);
     }
-    90%, 100% {
+    92%, 100% {
         transform: rotate(-90deg);
     }
 }
 
 @keyframes arrowPulseAnim {
-    0%, 15% {
-        opacity: 0.2;
+    0%, 18% {
+        opacity: 0.55;
     }
-    40%, 75% {
+    45%, 78% {
         opacity: 1;
     }
-    90%, 100% {
-        opacity: 0.2;
+    92%, 100% {
+        opacity: 0.55;
     }
 }
 
