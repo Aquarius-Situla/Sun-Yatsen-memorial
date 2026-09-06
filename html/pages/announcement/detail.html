@@ -26,10 +26,10 @@
     <style>html,body{background-color:#111111;min-height:100.5vh;min-height:calc(100lvh + 1px);}@media(prefers-color-scheme:light){html,body{background-color:#f5f0e8;}}</style>
 
 
-    <link rel="stylesheet" href="../../css/variables.css?v=20260906q">
-    <link rel="stylesheet" href="../../css/base.css?v=20260906q">
-    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=20260906q">
-    <link id="sys-style-subpage" rel="stylesheet" href="../../css/components/subpage.css?v=20260906q">
+    <link rel="stylesheet" href="../../css/variables.css?v=20260906r">
+    <link rel="stylesheet" href="../../css/base.css?v=20260906r">
+    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=20260906r">
+    <link id="sys-style-subpage" rel="stylesheet" href="../../css/components/subpage.css?v=20260906r">
     <script type="module" src="../../js/zero-md.min.js"></script>
 </head>
 <body>
@@ -40,8 +40,29 @@
             <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
             <span id="nav-back-text">公告</span>
         </a>
-        <h1 class="nav-title" id="top-nav-title">公告詳情</h1>
+        <h1 class="nav-title" id="top-nav-title">網站狀態</h1>
     </header>
+    <script>
+        /* Instant synchronous title sync to eliminate layout shift */
+        (function() {
+            try {
+                var params = new URLSearchParams(window.location.search);
+                var item = params.get('item') || 'status';
+                var lang = localStorage.getItem('sys_memorial_lang') || 'tc';
+                var titles = {
+                    status: { tc: '網站狀態', sc: '网站状态' },
+                    memorial: { tc: '紀念日', sc: '纪念日' },
+                    ukraine: { tc: '聲援烏克蘭', sc: '声援乌克兰' },
+                    Ukraine: { tc: '聲援烏克蘭', sc: '声援乌克兰' }
+                };
+                var titleObj = titles[item] || titles.status;
+                var titleText = titleObj[lang] || titleObj.tc;
+                var titleEl = document.getElementById('top-nav-title');
+                if (titleEl) titleEl.textContent = titleText;
+                document.title = titleText + (lang === 'sc' ? ' - 私立中山纪念堂' : ' - 私立中山紀念堂');
+            } catch (e) {}
+        })();
+    </script>
 
     <!-- Desktop Fallback Navigation Links -->
     <a href="announcement.html" class="top-back-btn" aria-label="堂務公告">
@@ -55,8 +76,8 @@
     </a>
 
 
-    <div class="markdown-container loaded">
-        <zero-md id="md-viewer" src="./status_tc.md">
+    <div class="markdown-container">
+        <zero-md id="md-viewer">
             <template>
                 <link rel="stylesheet" href="../../css/github-markdown-dark.css">
                 <style>
@@ -95,8 +116,8 @@
     </nav>
 
     <script type="module">
-        import { initSubpage } from '../../js/subpage.js?v=20260906q';
-        import { syncStandaloneTabBar } from '../../js/modules/tab-bar.js?v=20260906q';
+        import { initSubpage } from '../../js/subpage.js?v=20260906r';
+        import { syncStandaloneTabBar } from '../../js/modules/tab-bar.js?v=20260906r';
 
         const params = new URLSearchParams(window.location.search);
         const item = params.get('item') || 'status';

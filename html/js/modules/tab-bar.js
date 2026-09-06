@@ -7,9 +7,9 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906q';
-import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906q';
-import { resolveSiteUrl, getTabFromUrl } from './desktop-shell.js?v=20260906q';
+import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906r';
+import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906r';
+import { resolveSiteUrl, getTabFromUrl } from './desktop-shell.js?v=20260906r';
 
 /* ============================================================================
  * Authentic Apple SF Symbols Vector Icons (24x24 Pixel-Perfect Fill Glyphs)
@@ -367,7 +367,8 @@ if (typeof window !== 'undefined') {
 
     /* Expose globally for cross-module integration */
     window.__triggerMobileNav = (targetHref, targetTabId) => {
-        navigateMobile(targetHref, targetTabId);
+        updateMobileNavState(targetTabId);
+        window.location.href = targetHref;
     };
 
     /* Instant tactile visual feedback on physical touch contact */
@@ -412,11 +413,21 @@ if (typeof window !== 'undefined') {
         navigateMobile(targetHref, tabId);
     }, false);
 
-    /* Click on any internal anchor or banner: extinguish current tab and navigate */
+    /* Click on Home page navigation links leaving Home (e.g. dropdown menu or banners):
+     * Unload Home top elements and extinguish Home bottom tab without blocking subpages */
     document.addEventListener('click', (e) => {
         if (window.innerWidth > 768) return;
-        const targetLink = e.target.closest('a, [role="link"]');
-        if (!targetLink || targetLink.closest('#apple-tab-bar')) return;
+        if (e.target.closest('#apple-tab-bar')) return;
+
+        const currentPath = window.location.pathname.replace(/\/index\.html$/, '/');
+        const isHomePage = currentPath.endsWith('/') || currentPath.endsWith('/sys-memorial/') || currentPath.includes('index.html');
+        if (!isHomePage) {
+            /* On subpages and hub menus, allow instant native navigation into subpages without outside spinner */
+            return;
+        }
+
+        const targetLink = e.target.closest('.dropdown-nav-bar a, #nav-festival-banner, [data-home-nav]');
+        if (!targetLink) return;
 
         let href = targetLink.getAttribute('href') || targetLink.getAttribute('data-href');
         if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
@@ -425,21 +436,21 @@ if (typeof window !== 'undefined') {
             const targetUrl = new URL(href, window.location.href);
             if (targetUrl.origin !== window.location.origin) return;
 
-            const currentPath = window.location.pathname.replace(/\/index\.html$/, '/');
             const targetPath = targetUrl.pathname.replace(/\/index\.html$/, '/');
             if (currentPath === targetPath) return;
 
-            /* Map target URL to tab ID */
-            const matchedTab = getTabFromUrl(targetUrl.href);
-            let targetTab = 'library';
-            if (matchedTab === 'home' || matchedTab === 'announcement' || matchedTab === 'settings' || matchedTab === 'library') {
-                targetTab = matchedTab;
-            } else if (matchedTab) {
-                targetTab = matchedTab;
+            const matchedTab = getTabFromUrl(targetUrl.href) || 'library';
+
+            /* Immediately unload Home arrow & banners and extinguish Home tab */
+            updateMobileNavState(matchedTab);
+
+            /* For canonical main tabs, show full-page indicator; for subpages, navigate directly so subpage spins inside */
+            if (targetUrl.pathname.endsWith('/announcement.html') || targetUrl.pathname.endsWith('/library.html') || targetUrl.pathname.endsWith('/settings.html')) {
+                showActivityIndicator(document.body);
             }
 
             e.preventDefault();
-            navigateMobile(targetUrl.href, targetTab);
+            window.location.href = targetUrl.href;
         } catch (err) {
             /* Fallback to default browser handling */
         }

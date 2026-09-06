@@ -70,12 +70,12 @@ function getMarkdownStyles(isLight) {
     }
 }
 
-import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=20260906q';
-import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=20260906q';
-import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260906q';
-import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260906q';
-import { initDesktopShell } from './modules/desktop-shell.js?v=20260906q';
-import { showActivityIndicator, hideActivityIndicator } from './modules/activity-indicator.js?v=20260906q';
+import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=20260906r';
+import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=20260906r';
+import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260906r';
+import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260906r';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260906r';
+import { showActivityIndicator, hideActivityIndicator } from './modules/activity-indicator.js?v=20260906r';
 
 /* ============================================================================
  * Subpage Initialization Engine
@@ -115,6 +115,7 @@ export function initSubpage(options) {
     const mdViewer = document.getElementById('md-viewer');
     const container = document.querySelector('.markdown-container');
     if (container && mdViewer) {
+        container.classList.remove('loaded');
         showActivityIndicator(container);
     } else if (container) {
         container.classList.add('loaded');
@@ -321,26 +322,31 @@ export function initSubpage(options) {
         });
     }
 
+    function handleMarkdownRendered() {
+        if (container) {
+            hideActivityIndicator(container);
+            container.classList.add('loaded');
+        }
+        if (mdViewer && mdViewer.shadowRoot) {
+            const links = mdViewer.shadowRoot.querySelectorAll('a');
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && href.startsWith('http')) {
+                    link.setAttribute('target', '_blank');
+                    link.setAttribute('rel', 'noopener noreferrer');
+                }
+            });
+        }
+        if (typeof onRendered === 'function') {
+            onRendered({ isTraditional, activeTabId, mdViewer });
+        }
+    }
+
     if (mdViewer) {
-        mdViewer.addEventListener('zero-md-rendered', () => {
-            if (container) {
-                hideActivityIndicator(container);
-                container.classList.add('loaded');
-            }
-            if (mdViewer.shadowRoot) {
-                const links = mdViewer.shadowRoot.querySelectorAll('a');
-                links.forEach(link => {
-                    const href = link.getAttribute('href');
-                    if (href && href.startsWith('http')) {
-                        link.setAttribute('target', '_blank');
-                        link.setAttribute('rel', 'noopener noreferrer');
-                    }
-                });
-            }
-            if (typeof onRendered === 'function') {
-                onRendered({ isTraditional, activeTabId, mdViewer });
-            }
-        });
+        mdViewer.addEventListener('zero-md-rendered', handleMarkdownRendered);
+        if (mdViewer.shadowRoot && mdViewer.shadowRoot.querySelector('.markdown-body')) {
+            handleMarkdownRendered();
+        }
     }
 
     /* Page Navigation & Back Transition is handled by initIOSNavTransition */

@@ -15,11 +15,11 @@ import { initDesktopParallax, initGyroscopeLighting } from './modules/motion.js'
 import { toggleDanmaku } from './modules/danmaku.js';
 import { setupMessageSheet } from './modules/message-sheet.js';
 import { loadAndTriggerFireworks } from './modules/fireworks.js';
-import { syncTabBarLabels } from './modules/i18n.js?v=20260906q';
-import { syncStandaloneTabBar } from './modules/tab-bar.js?v=20260906q';
-import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260906q';
-import { initDesktopShell } from './modules/desktop-shell.js?v=20260906q';
-import { hideActivityIndicator } from './modules/activity-indicator.js?v=20260906q';
+import { syncTabBarLabels } from './modules/i18n.js?v=20260906r';
+import { syncStandaloneTabBar } from './modules/tab-bar.js?v=20260906r';
+import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260906r';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260906r';
+import { hideActivityIndicator } from './modules/activity-indicator.js?v=20260906r';
 
 /* Expose fireworks loader globally for legacy triggers */
 window.loadAndTriggerFireworks = loadAndTriggerFireworks;
