@@ -7,9 +7,9 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906u';
-import { TAB_ICONS } from './tab-bar.js?v=20260906u';
-import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906u';
+import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906v';
+import { TAB_ICONS } from './tab-bar.js?v=20260906v';
+import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906v';
 
 /* ============================================================================
  * Global Search Index (Covers all memorial topics, exhibits, and settings)
@@ -260,7 +260,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(homeLink);
         }
     }
-    homeLink.href = resolveSiteUrl('main/style.css?v=20260906u');
+    homeLink.href = resolveSiteUrl('main/style.css?v=20260906v');
 
     let subpageLink = document.getElementById('sys-style-subpage');
     if (!subpageLink) {
@@ -274,7 +274,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(subpageLink);
         }
     }
-    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260906u');
+    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260906v');
 
     let varLink = document.getElementById('sys-style-variables');
     if (!varLink) {
@@ -288,7 +288,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.insertBefore(varLink, document.head.firstChild);
         }
     }
-    varLink.href = resolveSiteUrl('css/variables.css?v=20260906u');
+    varLink.href = resolveSiteUrl('css/variables.css?v=20260906v');
 
     let baseLink = document.getElementById('sys-style-base');
     if (!baseLink) {
@@ -302,7 +302,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.insertBefore(baseLink, document.head.firstChild);
         }
     }
-    baseLink.href = resolveSiteUrl('css/base.css?v=20260906u');
+    baseLink.href = resolveSiteUrl('css/base.css?v=20260906v');
 
     let indLink = document.getElementById('sys-style-activity');
     if (!indLink) {
@@ -316,7 +316,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(indLink);
         }
     }
-    indLink.href = resolveSiteUrl('css/components/activity-indicator.css?v=20260906u');
+    indLink.href = resolveSiteUrl('css/components/activity-indicator.css?v=20260906v');
 
     if (isHome) {
         homeLink.disabled = false;
@@ -538,6 +538,12 @@ export async function navigateDesktopStage(targetHref, pushState = true, fromSid
         /* 7. Execute scripts associated with the new page */
         await executeStageScripts(doc, targetUrl.href);
 
+        /* Guarantee mobile top navigation bar is strictly hidden on desktop */
+        const topNav = document.querySelector('.apple-top-nav');
+        if (topNav) {
+            topNav.style.setProperty('display', 'none', 'important');
+        }
+
         /* 8. Allow browser engine to calculate layout and apply styles before revealing */
         await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
@@ -675,24 +681,26 @@ export function initDesktopShell(options = {}) {
         document.body.classList.add('is-desktop-subpage');
     }
 
-    /* Determine navigation source for initial page load.
+    /* Determine navigation source for initial page load if not already set by router.
      * Exhibit pages (biography, xinhai, whampoa, mayfourth, militaries, yatsen-*) are
      * accessible both from the sidebar and from the library page. On a hard load we
      * inspect document.referrer to decide whether to show the top-back-btn. */
-    const exhibitTabs = new Set(['biography', 'xinhai', 'whampoa', 'mayfourth', 'militaries', 'yatsen-birth', 'yatsen-passing']);
-    if (exhibitTabs.has(activeTab)) {
-        const ref = document.referrer;
-        const cameFromLibrary = ref && (ref.includes('/pages/library/') || ref.includes('library.html'));
-        if (cameFromLibrary) {
+    if (!document.body.classList.contains('nav-from-sidebar') && !document.body.classList.contains('nav-from-content')) {
+        const exhibitTabs = new Set(['biography', 'xinhai', 'whampoa', 'mayfourth', 'militaries', 'yatsen-birth', 'yatsen-passing']);
+        if (exhibitTabs.has(activeTab)) {
+            const ref = document.referrer;
+            const cameFromLibrary = ref && (ref.includes('/pages/library/') || ref.includes('library.html'));
+            if (cameFromLibrary) {
+                document.body.classList.remove('nav-from-sidebar');
+                document.body.classList.add('nav-from-content');
+            } else {
+                document.body.classList.add('nav-from-sidebar');
+                document.body.classList.remove('nav-from-content');
+            }
+        } else {
             document.body.classList.remove('nav-from-sidebar');
             document.body.classList.add('nav-from-content');
-        } else {
-            document.body.classList.add('nav-from-sidebar');
-            document.body.classList.remove('nav-from-content');
         }
-    } else {
-        document.body.classList.remove('nav-from-sidebar');
-        document.body.classList.add('nav-from-content');
     }
 
     /* Ensure head links (manifest, icons, splash, stylesheets) are absolute to prevent 404/CORS when pushState alters location */
@@ -715,6 +723,12 @@ export function initDesktopShell(options = {}) {
     /* Ensure content stage container exists and stylesheets are properly isolated */
     ensureStageContainer();
     ensurePageStylesheets(activeTab === 'home');
+
+    /* Guarantee mobile top navigation bar is strictly hidden on desktop */
+    const topNav = document.querySelector('.apple-top-nav');
+    if (topNav) {
+        topNav.style.setProperty('display', 'none', 'important');
+    }
 
     /* Check if sidebar already exists */
     let sidebarEl = document.getElementById('desktop-sidebar');
@@ -760,8 +774,17 @@ export function initDesktopShell(options = {}) {
     window.addEventListener('resize', () => {
         if (window.innerWidth > 768) {
             ensureStageContainer();
+            const topNav = document.querySelector('.apple-top-nav');
+            if (topNav) {
+                topNav.style.setProperty('display', 'none', 'important');
+            }
             if (window.__syncIndicatorPosition) {
                 window.__syncIndicatorPosition();
+            }
+        } else {
+            const topNav = document.querySelector('.apple-top-nav');
+            if (topNav) {
+                topNav.style.removeProperty('display');
             }
         }
     });

@@ -70,12 +70,12 @@ function getMarkdownStyles(isLight) {
     }
 }
 
-import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=20260906u';
-import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=20260906u';
-import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260906u';
-import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260906u';
-import { initDesktopShell } from './modules/desktop-shell.js?v=20260906u';
-import { showActivityIndicator, hideActivityIndicator } from './modules/activity-indicator.js?v=20260906u';
+import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=20260906v';
+import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=20260906v';
+import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260906v';
+import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260906v';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260906v';
+import { showActivityIndicator, hideActivityIndicator } from './modules/activity-indicator.js?v=20260906v';
 
 /* ============================================================================
  * Subpage Initialization Engine
@@ -130,19 +130,27 @@ export function initSubpage(options) {
         }
     }
 
-    /* Guarantee Apple Native Top Navigation Bar and Back Link are visible and interactable */
+    /* Guarantee Apple Native Top Navigation Bar and Back Link are visible and interactable on mobile only */
     const topNav = document.querySelector('.apple-top-nav');
     if (topNav) {
-        topNav.classList.remove('nav-hidden');
-        topNav.style.removeProperty('display');
-        topNav.style.setProperty('display', 'flex', 'important');
+        if (window.innerWidth <= 768) {
+            topNav.classList.remove('nav-hidden');
+            topNav.style.removeProperty('display');
+            topNav.style.setProperty('display', 'flex', 'important');
+        } else {
+            topNav.style.setProperty('display', 'none', 'important');
+        }
     }
     const navBackLink = document.querySelector('.apple-top-nav .nav-back-link');
     if (navBackLink) {
-        navBackLink.style.setProperty('display', 'flex', 'important');
-        navBackLink.style.setProperty('visibility', 'visible', 'important');
-        navBackLink.style.setProperty('opacity', '1', 'important');
-        navBackLink.style.setProperty('pointer-events', 'auto', 'important');
+        if (window.innerWidth <= 768) {
+            navBackLink.style.setProperty('display', 'flex', 'important');
+            navBackLink.style.setProperty('visibility', 'visible', 'important');
+            navBackLink.style.setProperty('opacity', '1', 'important');
+            navBackLink.style.setProperty('pointer-events', 'auto', 'important');
+        } else {
+            navBackLink.style.setProperty('display', 'none', 'important');
+        }
     }
 
     /* Dismiss any full-page activity indicator from prior mobile navigation */

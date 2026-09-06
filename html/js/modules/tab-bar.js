@@ -7,9 +7,9 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906u';
-import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906u';
-import { resolveSiteUrl, getTabFromUrl } from './desktop-shell.js?v=20260906u';
+import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906v';
+import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906v';
+import { resolveSiteUrl, getTabFromUrl } from './desktop-shell.js?v=20260906v';
 
 /* ============================================================================
  * Authentic Apple SF Symbols Vector Icons (24x24 Pixel-Perfect Fill Glyphs)
@@ -270,9 +270,13 @@ export function updateMobileNavState(targetTabId) {
         }
         const topNav = document.querySelector('.apple-top-nav');
         if (topNav) {
-            topNav.classList.remove('nav-hidden');
-            topNav.style.removeProperty('display');
-            topNav.style.setProperty('display', 'flex', 'important');
+            if (window.innerWidth <= 768) {
+                topNav.classList.remove('nav-hidden');
+                topNav.style.removeProperty('display');
+                topNav.style.setProperty('display', 'flex', 'important');
+            } else {
+                topNav.style.setProperty('display', 'none', 'important');
+            }
         }
         return;
     }
@@ -352,8 +356,12 @@ export function updateMobileNavState(targetTabId) {
             topNav.innerHTML = '<h1 class="nav-title" id="top-nav-title"></h1>';
             document.body.insertBefore(topNav, document.body.firstChild);
         }
-        topNav.classList.remove('nav-hidden');
-        topNav.style.setProperty('display', 'flex', 'important');
+        if (window.innerWidth <= 768) {
+            topNav.classList.remove('nav-hidden');
+            topNav.style.setProperty('display', 'flex', 'important');
+        } else {
+            topNav.style.setProperty('display', 'none', 'important');
+        }
         const titleEl = topNav.querySelector('#top-nav-title');
         if (titleEl) {
             const lang = getCurrentLang();
@@ -517,9 +525,13 @@ if (typeof window !== 'undefined') {
             document.body.classList.add('is-subpage');
             const topNav = document.querySelector('.apple-top-nav');
             if (topNav) {
-                topNav.classList.remove('nav-hidden');
-                topNav.style.removeProperty('display');
-                topNav.style.setProperty('display', 'flex', 'important');
+                if (window.innerWidth <= 768) {
+                    topNav.classList.remove('nav-hidden');
+                    topNav.style.removeProperty('display');
+                    topNav.style.setProperty('display', 'flex', 'important');
+                } else {
+                    topNav.style.setProperty('display', 'none', 'important');
+                }
             }
             const tabBar = document.getElementById('apple-tab-bar');
             if (tabBar && window.innerWidth <= 768) {

@@ -30,7 +30,8 @@
  * Section 2: Desktop Layout & Authentic Apple Sidebar (Screens > 768px)
  * ============================================================================ */
 @media (min-width: 769px) {
-    /* Hide mobile bottom tab bar on desktop */
+    /* Hide mobile top navigation bar and bottom tab bar on desktop */
+    .apple-top-nav,
     .apple-tab-bar {
         display: none !important;
     }
