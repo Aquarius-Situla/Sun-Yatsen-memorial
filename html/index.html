@@ -21,11 +21,14 @@
     
 
     <!-- Critical inline CSS: eliminates white flash during iOS PWA page transitions -->
-    <style>html,body{background-color:#111111;height:100%;min-height:100%;}</style>
+    <style>html,body{background-color:#111111;height:100%;min-height:100%;}@media(prefers-color-scheme:light){html,body{background-color:#f5f0e8;}}</style>
 
-    <link id="sys-style-home" rel="stylesheet" href="main/style.css?v=20260906g">
-    <link rel="stylesheet" href="css/components/tab-bar.css?v=20260906g">
-    <link rel="stylesheet" href="css/components/desktop-shell.css?v=20260906g">
+    <link id="sys-style-variables" rel="stylesheet" href="css/variables.css?v=20260906j">
+    <link id="sys-style-base" rel="stylesheet" href="css/base.css?v=20260906j">
+    <link id="sys-style-home" rel="stylesheet" href="main/style.css?v=20260906j">
+    <link id="sys-style-subpage" rel="stylesheet" href="css/components/subpage.css?v=20260906j" disabled>
+    <link rel="stylesheet" href="css/components/tab-bar.css?v=20260906j">
+    <link rel="stylesheet" href="css/components/desktop-shell.css?v=20260906j">
 
     <!-- System Dark/Light theme-color -->
     <meta name="color-scheme" content="light dark">
@@ -193,6 +196,6 @@
         <source src="main/sanmin/sanmin.flac" type="audio/flac">
     </audio>
     <script src="api/env.js"></script>
-    <script type="module" src="js/app.js?v=20260906i"></script>
+    <script type="module" src="js/app.js?v=20260906j"></script>
 </body>
 </html>

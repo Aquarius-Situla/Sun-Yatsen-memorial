@@ -24,13 +24,13 @@
     <link rel="preload" href="../../js/zero-md.min.js" as="script">
     <link rel="preload" href="./thanks_tc.md" as="fetch" crossorigin="anonymous">
     <!-- Critical inline CSS: eliminates white flash during iOS PWA page transitions -->
-    <style>html,body{background-color:#111111;min-height:100.5vh;min-height:calc(100lvh + 1px);}</style>
+    <style>html,body{background-color:#111111;min-height:100.5vh;min-height:calc(100lvh + 1px);}@media(prefers-color-scheme:light){html,body{background-color:#f5f0e8;}}</style>
 
 
     <link rel="stylesheet" href="../../css/variables.css?v=2025">
-    <link rel="stylesheet" href="../../css/base.css?v=20260906g">
-    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=20260906g">
-    <link id="sys-style-subpage" rel="stylesheet" href="../../css/components/subpage.css?v=20260906g">
+    <link rel="stylesheet" href="../../css/base.css?v=20260906j">
+    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=20260906j">
+    <link id="sys-style-subpage" rel="stylesheet" href="../../css/components/subpage.css?v=20260906j">
     <script type="module" src="../../js/zero-md.min.js"></script>
 </head>
 <body>
@@ -110,7 +110,7 @@
     </nav>
 
     <script type="module">
-        import { initSubpage } from '../../js/subpage.js?v=20260906g';
+        import { initSubpage } from '../../js/subpage.js?v=20260906j';
 
         initSubpage({
             activeBottomTab: 'settings',

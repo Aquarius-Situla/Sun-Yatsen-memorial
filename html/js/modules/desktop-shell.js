@@ -200,8 +200,8 @@ const SIDEBAR_STRINGS = {
  * Desktop Split View Router Helpers & Core Architecture
  * ============================================================================ */
 
-/* Dynamically determine the root base URL of the site */
-function getSiteBaseUrl() {
+/* Dynamically determine and cache the root base URL of the site */
+function computeSiteBaseUrl() {
     const loc = window.location;
     const path = loc.pathname;
     const markerRegex = new RegExp('^(.*\\/)(?:pages|events|captcha|main|css|js)\\/', 'i');
@@ -211,6 +211,12 @@ function getSiteBaseUrl() {
     }
     const dir = path.substring(0, path.lastIndexOf('/') + 1);
     return new URL(dir || '/', loc.origin).href;
+}
+
+const siteBaseUrl = computeSiteBaseUrl();
+
+function getSiteBaseUrl() {
+    return siteBaseUrl;
 }
 
 /* Resolve a site-root-relative path to an absolute URL */
@@ -248,10 +254,10 @@ function ensurePageStylesheets(isHome) {
             homeLink = document.createElement('link');
             homeLink.id = 'sys-style-home';
             homeLink.rel = 'stylesheet';
-            homeLink.href = resolveSiteUrl('main/style.css?v=20260906g');
             document.head.appendChild(homeLink);
         }
     }
+    homeLink.href = resolveSiteUrl('main/style.css?v=20260906j');
 
     let subpageLink = document.getElementById('sys-style-subpage');
     if (!subpageLink) {
@@ -262,10 +268,38 @@ function ensurePageStylesheets(isHome) {
             subpageLink = document.createElement('link');
             subpageLink.id = 'sys-style-subpage';
             subpageLink.rel = 'stylesheet';
-            subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260906g');
             document.head.appendChild(subpageLink);
         }
     }
+    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260906j');
+
+    let varLink = document.getElementById('sys-style-variables');
+    if (!varLink) {
+        varLink = document.querySelector('link[href*="variables.css"]');
+        if (varLink) {
+            varLink.id = 'sys-style-variables';
+        } else {
+            varLink = document.createElement('link');
+            varLink.id = 'sys-style-variables';
+            varLink.rel = 'stylesheet';
+            document.head.insertBefore(varLink, document.head.firstChild);
+        }
+    }
+    varLink.href = resolveSiteUrl('css/variables.css?v=20260906j');
+
+    let baseLink = document.getElementById('sys-style-base');
+    if (!baseLink) {
+        baseLink = document.querySelector('link[href*="base.css"]');
+        if (baseLink) {
+            baseLink.id = 'sys-style-base';
+        } else {
+            baseLink = document.createElement('link');
+            baseLink.id = 'sys-style-base';
+            baseLink.rel = 'stylesheet';
+            document.head.insertBefore(baseLink, document.head.firstChild);
+        }
+    }
+    baseLink.href = resolveSiteUrl('css/base.css?v=20260906j');
 
     if (isHome) {
         homeLink.disabled = false;
@@ -412,17 +446,20 @@ export async function navigateDesktopStage(targetHref, pushState = true) {
     try {
         const fetchCtrl = new AbortController();
         const timeoutId = setTimeout(() => fetchCtrl.abort(), 5000);
-        let res;
-        try {
-            res = await fetch(targetUrl.href, { signal: fetchCtrl.signal });
-        } finally {
-            clearTimeout(timeoutId);
-        }
-        if (!res.ok) {
-            window.location.href = targetUrl.href;
-            return;
-        }
-        const html = await res.text();
+        let resPromise = fetch(targetUrl.href, { signal: fetchCtrl.signal })
+            .then(res => {
+                clearTimeout(timeoutId);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.text();
+            });
+
+        /* Wait for stage fade out (190ms) to complete BEFORE changing any stylesheet or DOM! */
+        /* During this entire 190ms, the current page's CSS remains 100% active, with zero flash! */
+        const [html] = await Promise.all([
+            resPromise,
+            new Promise(resolve => setTimeout(resolve, 190))
+        ]);
+
         const doc = new DOMParser().parseFromString(html, 'text/html');
 
         /* 3. Synchronize browser history and document title */
@@ -431,28 +468,33 @@ export async function navigateDesktopStage(targetHref, pushState = true) {
         }
         document.title = doc.title;
 
-        /* 4. Switch stylesheets between home and subpages */
+        /* 4. Switch stylesheets between home and subpages WHILE STAGE IS FULLY INVISIBLE (opacity 0) */
         const isHome = targetTab === 'home';
         ensurePageStylesheets(isHome);
 
         /* 5. Synchronize document.body classes */
         document.body.className = doc.body.className;
         document.body.classList.add('has-desktop-sidebar', 'has-desktop-indicator');
+        if (isHome) {
+            document.body.classList.add('is-desktop-home');
+            document.body.classList.remove('is-desktop-subpage');
+        } else {
+            document.body.classList.remove('is-desktop-home');
+            document.body.classList.add('is-desktop-subpage');
+        }
 
-        /* 6. Extract stage content from parsed document */
+        /* 6. Extract stage content from parsed document and inject */
         const newContent = extractStageContent(doc);
-
-        /* 7. Allow 180ms for stage fade out */
-        await new Promise(resolve => setTimeout(resolve, 180));
-
-        /* 8. Inject new content into stage */
         stage.innerHTML = newContent;
         window.scrollTo(0, 0);
 
-        /* 9. Execute scripts associated with the new page */
+        /* 7. Execute scripts associated with the new page */
         await executeStageScripts(doc, targetUrl.href);
 
-        /* 10. Fade stage back in */
+        /* 8. Allow browser engine to calculate layout and apply styles before revealing */
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+        /* 9. Fade fully-styled stage back in */
         stage.classList.remove('stage-fading');
 
         /* 11. Sync sidebar active state and language labels */
@@ -568,9 +610,16 @@ export function initDesktopShell(options = {}) {
 
     /* Add layout helper class to body for wide desktop viewports */
     document.body.classList.add('has-desktop-sidebar');
+    if (activeTab === 'home') {
+        document.body.classList.add('is-desktop-home');
+        document.body.classList.remove('is-desktop-subpage');
+    } else {
+        document.body.classList.remove('is-desktop-home');
+        document.body.classList.add('is-desktop-subpage');
+    }
 
-    /* Ensure head links (manifest, icons, splash) are absolute to prevent 404/CORS when pushState alters location */
-    const headLinks = document.querySelectorAll('link[rel*="icon"], link[rel="manifest"], link[rel*="startup"]');
+    /* Ensure head links (manifest, icons, splash, stylesheets) are absolute to prevent 404/CORS when pushState alters location */
+    const headLinks = document.querySelectorAll('link[rel*="icon"], link[rel="manifest"], link[rel*="startup"], link[rel*="stylesheet"]');
     const slashSlash = String.fromCharCode(47, 47);
     headLinks.forEach(link => {
         const href = link.getAttribute('href');

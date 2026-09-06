@@ -751,6 +751,11 @@ body {
  * Light Mode Theme Overrides
  * ============================================================================ */
 @media (prefers-color-scheme: light) {
+    body {
+        background-color: #f5f0e8 !important;
+        color: #2c1810 !important;
+    }
+
     .apple-top-nav {
         background: rgba(255, 255, 255, 0.75);
         backdrop-filter: blur(25px) saturate(190%);

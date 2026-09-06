@@ -507,6 +507,25 @@
         box-sizing: border-box !important;
     }
 
+    /* Desktop Subpage Background (macOS Settings Specification) */
+    body.has-desktop-sidebar.is-desktop-subpage,
+    body.has-desktop-sidebar.is-desktop-subpage .desktop-stage {
+        background-color: #1e1e20 !important;
+    }
+
+    @media (prefers-color-scheme: light) {
+        body.has-desktop-sidebar.is-desktop-subpage,
+        body.has-desktop-sidebar.is-desktop-subpage .desktop-stage {
+            background-color: #f2f2f7 !important;
+        }
+    }
+
+    /* Desktop Home Ceremonial Hall Background */
+    body.has-desktop-sidebar.is-desktop-home,
+    body.has-desktop-sidebar.is-desktop-home .desktop-stage {
+        background-color: #111111 !important;
+    }
+
     .ios-group-container {
         max-width: 680px !important;
         width: calc(100% - 64px) !important;
