@@ -31,10 +31,10 @@
     <style>html,body{background-color:#111111;min-height:100.5vh;min-height:calc(100lvh + 1px);}@media(prefers-color-scheme:light){html,body{background-color:#f5f0e8;}}</style>
 
     
-    <link rel="stylesheet" href="../../css/variables.css?v=20260906s">
-    <link rel="stylesheet" href="../../css/base.css?v=20260906s">
-    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=20260906s">
-    <link id="sys-style-subpage" rel="stylesheet" href="../../css/components/subpage.css?v=20260906s">
+    <link rel="stylesheet" href="../../css/variables.css?v=20260906t">
+    <link rel="stylesheet" href="../../css/base.css?v=20260906t">
+    <link rel="stylesheet" href="../../css/components/tab-bar.css?v=20260906t">
+    <link id="sys-style-subpage" rel="stylesheet" href="../../css/components/subpage.css?v=20260906t">
 </head>
 <body class="is-subpage">
 
@@ -62,7 +62,7 @@
     <div class="ios-group-container">
         <div class="ios-section-header">傳記與思想 (BIOGRAPHY &amp; THEORIES)</div>
         <div class="ios-card">
-            <div class="ios-row" data-tab="biography">
+            <div class="ios-row expanded" data-tab="biography">
                 <div class="ios-row-title">
                     <span id="tab-biography-text">生平傳記</span>
                 </div>
@@ -135,10 +135,11 @@
     </div>
 
     <script type="module">
-        import { getCurrentLang, setGlobalLang } from '../../js/modules/i18n.js?v=20260906s';
-        import { initTabBar } from '../../js/modules/tab-bar.js?v=20260906s';
-        import { initIOSNavTransition } from '../../js/modules/ios-nav-transition.js?v=20260906s';
-        import { initDesktopShell } from '../../js/modules/desktop-shell.js?v=20260906s';
+        import { getCurrentLang, setGlobalLang } from '../../js/modules/i18n.js?v=20260906t';
+        import { initTabBar } from '../../js/modules/tab-bar.js?v=20260906t';
+        import { initIOSNavTransition } from '../../js/modules/ios-nav-transition.js?v=20260906t';
+        import { initDesktopShell } from '../../js/modules/desktop-shell.js?v=20260906t';
+        import { showActivityIndicator, hideActivityIndicator } from '../../js/modules/activity-indicator.js?v=20260906t';
 
         initTabBar({ activeTab: 'biography', basePath: '../../' });
         initIOSNavTransition();
@@ -383,19 +384,28 @@
                 chartsSection.style.display = 'none';
                 chartsSection.classList.remove('active', 'loaded');
                 mdSection.style.display = 'block';
-                mdSection.classList.add('active', 'loaded');
+                mdSection.classList.add('active');
                 
                 const suffix = isTraditional ? '_tc.md' : '_sc.md';
                 const newSrc = './biography' + suffix;
                 
                 if (mdViewer.getAttribute('src') !== newSrc) {
+                    mdSection.classList.remove('loaded');
+                    showActivityIndicator(mdSection);
                     mdViewer.setAttribute('src', newSrc);
                 } else {
-                    mdSection.classList.add('loaded');
+                    if (mdViewer.shadowRoot && mdViewer.shadowRoot.querySelector('.markdown-body')) {
+                        hideActivityIndicator(mdSection);
+                        mdSection.classList.add('loaded');
+                    } else {
+                        mdSection.classList.remove('loaded');
+                        showActivityIndicator(mdSection);
+                    }
                 }
             } else if (currentTab === 'theories') {
                 mdSection.style.display = 'none';
                 mdSection.classList.remove('active');
+                hideActivityIndicator(mdSection);
                 chartsSection.style.display = 'block';
                 chartsSection.classList.add('active', 'loaded');
                 renderCharts();
@@ -404,27 +414,31 @@
 
         function applyLanguageLabels() {
             const topNavTitle = document.getElementById('top-nav-title');
+            const desktopBackText = document.querySelector('.top-back-btn span');
+            const navBackText = document.getElementById('nav-back-text');
             if (isTraditional) {
                 if (langBtn) langBtn.textContent = '切换至简化字';
                 document.documentElement.lang = 'zh-TW';
                 if (topNavTitle) topNavTitle.textContent = '國父生平';
-                if (tabBtns[0]) tabBtns[0].textContent = '生平傳記';
-                if (tabBtns[1]) tabBtns[1].textContent = '思想與歷程';
+                if (navBackText) navBackText.textContent = '資料庫';
+                if (desktopBackText) desktopBackText.textContent = '文獻資料庫';
+                if (pageTitle) pageTitle.textContent = '國父生平 - 私立中山紀念堂';
                 if (tabBioText) tabBioText.textContent = '生平傳記';
                 if (tabTheoText) tabTheoText.textContent = '思想與歷程';
-                chart1Title.textContent = '革命歷程影響力走勢';
-                chart2Title.textContent = '三民主義核心結構';
+                if (chart1Title) chart1Title.textContent = '革命歷程影響力走勢';
+                if (chart2Title) chart2Title.textContent = '三民主義核心結構';
                 if (showAllBtn) showAllBtn.textContent = isAllShown ? '隱藏全部' : '顯示全部';
             } else {
                 if (langBtn) langBtn.textContent = '切換至正體字';
                 document.documentElement.lang = 'zh-CN';
                 if (topNavTitle) topNavTitle.textContent = '国父生平';
-                if (tabBtns[0]) tabBtns[0].textContent = '生平传记';
-                if (tabBtns[1]) tabBtns[1].textContent = '思想与历程';
+                if (navBackText) navBackText.textContent = '资料库';
+                if (desktopBackText) desktopBackText.textContent = '文献资料库';
+                if (pageTitle) pageTitle.textContent = '国父生平 - 私立中山纪念堂';
                 if (tabBioText) tabBioText.textContent = '生平传记';
                 if (tabTheoText) tabTheoText.textContent = '思想与历程';
-                chart1Title.textContent = '革命历程影响力走势';
-                chart2Title.textContent = '三民主义核心结构';
+                if (chart1Title) chart1Title.textContent = '革命历程影响力走势';
+                if (chart2Title) chart2Title.textContent = '三民主义核心结构';
                 if (showAllBtn) showAllBtn.textContent = isAllShown ? '隐藏全部' : '显示全部';
             }
         }
@@ -466,22 +480,36 @@
                 if (r.getAttribute('data-tab') === 'theories') r.classList.add('expanded');
                 else r.classList.remove('expanded');
             });
+        } else {
+            iosRows.forEach(r => {
+                if (r.getAttribute('data-tab') === 'biography') r.classList.add('expanded');
+                else r.classList.remove('expanded');
+            });
         }
-        updateContent();
 
-        mdViewer.addEventListener('zero-md-rendered', () => {
+        function onMdRendered() {
             if (currentTab === 'biography') {
+                hideActivityIndicator(mdSection);
                 mdSection.classList.add('loaded');
             }
-            const links = mdViewer.shadowRoot.querySelectorAll('a');
-            links.forEach(link => {
-                const href = link.getAttribute('href');
-                if (href && href.startsWith('http')) {
-                    link.setAttribute('target', '_blank'); 
-                    link.setAttribute('rel', 'noopener noreferrer'); 
-                }
-            });
-        });
+            if (mdViewer && mdViewer.shadowRoot) {
+                const links = mdViewer.shadowRoot.querySelectorAll('a');
+                links.forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (href && href.startsWith('http')) {
+                        link.setAttribute('target', '_blank'); 
+                        link.setAttribute('rel', 'noopener noreferrer'); 
+                    }
+                });
+            }
+        }
+
+        mdViewer.addEventListener('zero-md-rendered', onMdRendered);
+        if (mdViewer.shadowRoot && mdViewer.shadowRoot.querySelector('.markdown-body')) {
+            onMdRendered();
+        }
+
+        updateContent();
 
         const topBackBtn = document.querySelector('.top-back-btn');
         if (topBackBtn) {

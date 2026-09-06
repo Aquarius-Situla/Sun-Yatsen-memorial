@@ -267,7 +267,8 @@ body {
 /* ============================================================================
  * Mobile Long-Press Interaction Feedback
  * ============================================================================ */
-.testament-box {
+.testament-box,
+.testament-text {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
@@ -859,6 +860,10 @@ body.banner-active .dropdown-nav-bar {
     pointer-events: none;
     z-index: 9000;
     overflow: hidden;
+}
+
+#danmaku-container.hidden {
+    display: none !important;
 }
 
 .danmaku-item {

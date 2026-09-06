@@ -15,14 +15,153 @@ import { initDesktopParallax, initGyroscopeLighting } from './modules/motion.js'
 import { toggleDanmaku } from './modules/danmaku.js';
 import { setupMessageSheet } from './modules/message-sheet.js';
 import { loadAndTriggerFireworks } from './modules/fireworks.js';
-import { syncTabBarLabels } from './modules/i18n.js?v=20260906s';
-import { syncStandaloneTabBar } from './modules/tab-bar.js?v=20260906s';
-import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260906s';
-import { initDesktopShell } from './modules/desktop-shell.js?v=20260906s';
-import { hideActivityIndicator } from './modules/activity-indicator.js?v=20260906s';
+import { syncTabBarLabels, getCurrentLang } from './modules/i18n.js?v=20260906t';
+import { syncStandaloneTabBar } from './modules/tab-bar.js?v=20260906t';
+import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260906t';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260906t';
+import { hideActivityIndicator } from './modules/activity-indicator.js?v=20260906t';
 
 /* Expose fireworks loader globally for legacy triggers */
 window.loadAndTriggerFireworks = loadAndTriggerFireworks;
+
+/* ============================================================================
+ * Danmaku & Testament Interaction Controllers
+ * ============================================================================ */
+export function openDanmakuModal(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (e && e.stopPropagation) e.stopPropagation();
+    const messageModal = document.getElementById('message-modal');
+    const messageInput = document.getElementById('message-input');
+    if (messageModal) {
+        messageModal.classList.add('active');
+        if (messageInput) {
+            setTimeout(() => messageInput.focus(), 150);
+        }
+    }
+}
+window.openDanmakuModal = openDanmakuModal;
+
+export function toggleDanmakuLayer() {
+    const WORKER_API = window.ENV ? window.ENV.WORKER_API : '';
+    const danmakuContainer = document.getElementById('danmaku-container');
+    const portraitImg = document.querySelector('.portrait-img');
+    toggleDanmaku(WORKER_API, danmakuContainer, portraitImg, (isEnabled) => {
+        const isTc = getCurrentLang() === 'tc';
+        const msg = isEnabled ? (isTc ? '彈幕已開啟' : '弹幕已开启') : (isTc ? '彈幕已關閉' : '弹幕已关闭');
+        showToast(msg, 'system');
+    });
+}
+window.toggleDanmakuLayer = toggleDanmakuLayer;
+
+export function setupTestamentInteractions(testamentBox) {
+    if (!testamentBox) return;
+    if (testamentBox._interactionsBound) return;
+    testamentBox._interactionsBound = true;
+
+    testamentBox.style.cursor = 'pointer';
+    testamentBox.setAttribute('role', 'button');
+    testamentBox.setAttribute('tabindex', '0');
+    testamentBox.setAttribute('aria-label', '總理遺囑');
+
+    const testamentText = testamentBox.querySelector('.testament-text') || testamentBox;
+
+    let longPressTimer = null;
+    let isLongPress = false;
+    let startX = 0;
+    let startY = 0;
+    let suppressClickUntil = 0;
+
+    const cancelPress = () => {
+        if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+        }
+        testamentText.classList.remove('testament-pressing');
+    };
+
+    testamentBox.addEventListener('touchstart', (e) => {
+        if (e.touches.length > 1) return;
+        isLongPress = false;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        testamentText.classList.add('testament-pressing');
+
+        if (longPressTimer) clearTimeout(longPressTimer);
+        longPressTimer = setTimeout(() => {
+            isLongPress = true;
+            testamentText.classList.remove('testament-pressing');
+            if (navigator.vibrate) {
+                try {
+                    navigator.vibrate(40);
+                } catch (_) {
+                    /* Ignore vibration errors */
+                }
+            }
+            openDanmakuModal();
+        }, 500);
+    }, { passive: true });
+
+    testamentBox.addEventListener('touchmove', (e) => {
+        if (!longPressTimer) return;
+        const moveX = e.touches[0].clientX;
+        const moveY = e.touches[0].clientY;
+        if (Math.hypot(moveX - startX, moveY - startY) > 10) {
+            cancelPress();
+        }
+    }, { passive: true });
+
+    testamentBox.addEventListener('touchend', (e) => {
+        if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+        }
+        testamentText.classList.remove('testament-pressing');
+
+        /* Suppress synthetic click after touch */
+        suppressClickUntil = Date.now() + 450;
+
+        if (isLongPress) {
+            /* Modal was already opened by long-press timer */
+            isLongPress = false;
+            return;
+        }
+
+        /* Mobile single tap: toggle danmaku layer */
+        if (window.innerWidth <= 768) {
+            toggleDanmakuLayer();
+        } else {
+            openDanmakuModal(e);
+        }
+    });
+
+    testamentBox.addEventListener('touchcancel', () => {
+        cancelPress();
+        isLongPress = false;
+    });
+
+    testamentBox.addEventListener('click', (e) => {
+        if (Date.now() < suppressClickUntil) {
+            return;
+        }
+        /* Desktop single click: open send danmaku modal */
+        if (window.innerWidth > 768) {
+            openDanmakuModal(e);
+        } else {
+            toggleDanmakuLayer();
+        }
+    });
+
+    testamentBox.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (window.innerWidth > 768) {
+                openDanmakuModal(e);
+            } else {
+                toggleDanmakuLayer();
+            }
+        }
+    });
+}
 
 /* ============================================================================
  * Application Initialization Controller
@@ -54,17 +193,8 @@ export function initApp() {
             portraitBtn.style.cursor = 'pointer';
             portraitBtn.addEventListener('click', window.handlePortraitClick);
         }
-        if (testamentBox && window.openDanmakuModal) {
-            testamentBox.style.cursor = 'pointer';
-            testamentBox.setAttribute('role', 'button');
-            testamentBox.setAttribute('tabindex', '0');
-            testamentBox.setAttribute('aria-label', '點擊開啟發送彈幕視窗');
-            testamentBox.addEventListener('click', window.openDanmakuModal);
-            testamentBox.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    window.openDanmakuModal(e);
-                }
-            });
+        if (testamentBox) {
+            setupTestamentInteractions(testamentBox);
         }
         if (woodFrame) {
             try {
@@ -210,40 +340,14 @@ export function initApp() {
                 }
                 if ((e.key === 'd' || e.key === 'D') && !e.ctrlKey && !e.altKey && !e.metaKey) {
                     e.preventDefault();
-                    toggleDanmaku(WORKER_API, danmakuContainer, portraitImg, (isEnabled) => {
-                        showToast(isEnabled ? '彈幕已開啟' : '彈幕已關閉', 'system');
-                    });
+                    toggleDanmakuLayer();
                 }
             });
         }
 
-        /* Click on Testament opens the send danmaku message modal */
+        /* Testament interactions: mobile tap = toggle, mobile long press = send modal, desktop click = send modal */
         if (testamentBox) {
-            testamentBox.style.cursor = 'pointer';
-            testamentBox.setAttribute('role', 'button');
-            testamentBox.setAttribute('tabindex', '0');
-            testamentBox.setAttribute('aria-label', '點擊開啟發送彈幕視窗');
-
-            const openDanmakuModal = (e) => {
-                if (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-                if (messageModal) {
-                    messageModal.classList.add('active');
-                    if (messageInput) {
-                        setTimeout(() => messageInput.focus(), 150);
-                    }
-                }
-            };
-
-            testamentBox.addEventListener('click', openDanmakuModal);
-
-            testamentBox.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    openDanmakuModal(e);
-                }
-            });
+            setupTestamentInteractions(testamentBox);
         }
     } catch (err) {
         console.error('[Testament Init Error]:', err);
@@ -280,22 +384,10 @@ export function initApp() {
             syncTabBarLabels();
         });
 
-        const triggerDanmakuModal = (e) => {
-            if (e) e.preventDefault();
-            if (messageModal) {
-                messageModal.classList.add('active');
-                if (messageInput) {
-                    setTimeout(() => messageInput.focus(), 150);
-                }
-            }
-        };
-
-        window.openDanmakuModal = triggerDanmakuModal;
-
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('open') === 'danmaku' && messageModal) {
+        if (urlParams.get('open') === 'danmaku') {
             setTimeout(() => {
-                triggerDanmakuModal();
+                openDanmakuModal();
             }, 300);
         }
     } catch (err) {

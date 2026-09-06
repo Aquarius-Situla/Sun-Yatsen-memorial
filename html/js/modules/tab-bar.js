@@ -7,9 +7,9 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906s';
-import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906s';
-import { resolveSiteUrl, getTabFromUrl } from './desktop-shell.js?v=20260906s';
+import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906t';
+import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906t';
+import { resolveSiteUrl, getTabFromUrl } from './desktop-shell.js?v=20260906t';
 
 /* ============================================================================
  * Authentic Apple SF Symbols Vector Icons (24x24 Pixel-Perfect Fill Glyphs)
