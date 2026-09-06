@@ -126,8 +126,32 @@ export async function retractMessage(id, apiUrl, historyListEl) {
 }
 
 /* ============================================================================
- * Message Sheet Controller Setup
+ * Message Sheet Initialization & Interactive Binding
  * ============================================================================ */
+if (typeof window !== 'undefined' && !window.__modalDelegationBound) {
+    window.__modalDelegationBound = true;
+    document.addEventListener('click', (e) => {
+        const cancelBtn = e.target.closest('#desktop-cancel-btn, .macos-cancel-btn');
+        if (cancelBtn) {
+            const modal = document.getElementById('message-modal');
+            if (modal) modal.classList.remove('active');
+            return;
+        }
+        if (e.target && e.target.id === 'message-modal') {
+            e.target.classList.remove('active');
+        }
+    });
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('message-modal');
+            if (modal && modal.classList.contains('active')) {
+                modal.classList.remove('active');
+            }
+        }
+    });
+}
+
 export function setupMessageSheet(elements, apiUrl) {
     const {
         openMessageBtn,
@@ -142,6 +166,11 @@ export function setupMessageSheet(elements, apiUrl) {
         danmakuContainer,
         portraitImg
     } = elements;
+
+    if (messageModal) {
+        if (messageModal.dataset.sheetBound === 'true') return;
+        messageModal.dataset.sheetBound = 'true';
+    }
 
     loadBannedWords(apiUrl);
 

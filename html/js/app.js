@@ -15,11 +15,11 @@ import { initDesktopParallax, initGyroscopeLighting } from './modules/motion.js'
 import { toggleDanmaku } from './modules/danmaku.js';
 import { setupMessageSheet } from './modules/message-sheet.js';
 import { loadAndTriggerFireworks } from './modules/fireworks.js';
-import { syncTabBarLabels, getCurrentLang } from './modules/i18n.js?v=20260906x';
-import { syncStandaloneTabBar } from './modules/tab-bar.js?v=20260906x';
-import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260906x';
-import { initDesktopShell } from './modules/desktop-shell.js?v=20260906x';
-import { hideActivityIndicator } from './modules/activity-indicator.js?v=20260906x';
+import { syncTabBarLabels, getCurrentLang } from './modules/i18n.js?v=20260906y';
+import { syncStandaloneTabBar } from './modules/tab-bar.js?v=20260906y';
+import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260906y';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260906y';
+import { hideActivityIndicator } from './modules/activity-indicator.js?v=20260906y';
 
 /* Expose fireworks loader globally for legacy triggers */
 window.loadAndTriggerFireworks = loadAndTriggerFireworks;
@@ -215,6 +215,36 @@ export function initApp() {
                 }
             });
         }
+
+        /* Re-bind message modal interactive elements on return */
+        const historyMessageBtn = document.getElementById('history-message-btn');
+        const historyPopover    = document.getElementById('history-popover');
+        const historyList       = document.getElementById('history-list');
+        const charCount         = document.getElementById('char-count');
+        const submitMessageBtn  = document.getElementById('submit-message-btn');
+        const desktopCancelBtn  = document.getElementById('desktop-cancel-btn');
+        const danmakuContainer  = document.getElementById('danmaku-container');
+        const portraitImg       = document.querySelector('.portrait-img');
+        const WORKER_API        = window.ENV ? window.ENV.WORKER_API : '';
+
+        try {
+            setupMessageSheet({
+                openMessageBtn,
+                messageModal,
+                historyMessageBtn,
+                historyPopover,
+                historyList,
+                messageInput,
+                charCount,
+                submitMessageBtn,
+                desktopCancelBtn,
+                danmakuContainer,
+                portraitImg
+            }, WORKER_API);
+        } catch (err) {
+            console.error('[Message Sheet Re-bind Error]:', err);
+        }
+
         return;
     }
     window.__appInitialized = true;

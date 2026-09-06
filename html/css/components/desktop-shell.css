@@ -553,11 +553,22 @@
     }
 
     .desktop-profile-card:hover .desktop-profile-popover,
-    .desktop-profile-card:focus-within .desktop-profile-popover {
+    .desktop-profile-card:focus-visible .desktop-profile-popover {
         opacity: 1;
         visibility: visible;
         transform: translateY(0);
         pointer-events: auto;
+    }
+
+    /* Invisible hover bridge to prevent mouse leave gap */
+    .desktop-profile-popover::before {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        height: 12px;
+        background: transparent;
     }
 
     /* Popover Arrow */
