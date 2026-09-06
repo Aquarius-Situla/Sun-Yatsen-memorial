@@ -7,9 +7,9 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906p';
-import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906p';
-import { resolveSiteUrl } from './desktop-shell.js?v=20260906p';
+import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906q';
+import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906q';
+import { resolveSiteUrl, getTabFromUrl } from './desktop-shell.js?v=20260906q';
 
 /* ============================================================================
  * Authentic Apple SF Symbols Vector Icons (24x24 Pixel-Perfect Fill Glyphs)
@@ -91,7 +91,15 @@ export function initTabBar(options = {}) {
 
         document.body.appendChild(tabBarEl);
     } else {
-        /* Sync existing static element */
+        /* Sync existing static element active states and bilingual labels */
+        const allTabs = tabBarEl.querySelectorAll('.tab-item');
+        allTabs.forEach(t => {
+            if (t.getAttribute('data-tab-id') === activeTab) {
+                t.classList.add('active');
+            } else {
+                t.classList.remove('active');
+            }
+        });
         syncTabBarLabels(tabBarEl);
     }
 
@@ -193,36 +201,101 @@ const MOBILE_TOP_TITLES = {
         home: '',
         announcement: '公告',
         library: '資料庫',
-        settings: '設定'
+        settings: '設定',
+        biography: '傳記',
+        xinhai: '辛亥特展',
+        whampoa: '黃埔特展',
+        mayfourth: '五四特展',
+        militaries: '軍事特展',
+        about: '關於本館',
+        thanks: '特別鳴謝'
     },
     sc: {
         home: '',
         announcement: '公告',
         library: '资料库',
-        settings: '设置'
+        settings: '设置',
+        biography: '传记',
+        xinhai: '辛亥特展',
+        whampoa: '黄埔特展',
+        mayfourth: '五四特展',
+        militaries: '军事特展',
+        about: '关于本馆',
+        thanks: '特别鸣谢'
     }
 };
 
 /* Synchronize Tab Bar and Top Nav on Navigation */
-function updateMobileNavState(targetTabId) {
-    /* 1. Instant tab bar selection state feedback */
+export function updateMobileNavState(targetTabId) {
+    /* Map subpage pseudo-tabs to canonical bottom tabs */
+    let activeBottomTabId = targetTabId;
+    if (targetTabId === 'biography' || targetTabId === 'xinhai' || targetTabId === 'whampoa' || targetTabId === 'mayfourth' || targetTabId === 'militaries') {
+        activeBottomTabId = 'library';
+    } else if (targetTabId === 'about' || targetTabId === 'thanks') {
+        activeBottomTabId = 'settings';
+    }
+
+    /* 1. Instant tab bar selection state feedback: extinguish current tab, illuminate target tab */
     const allTabs = document.querySelectorAll('#apple-tab-bar .tab-item');
     allTabs.forEach(t => {
-        if (t.getAttribute('data-tab-id') === targetTabId) {
+        if (t.getAttribute('data-tab-id') === activeBottomTabId) {
             t.classList.add('active');
         } else {
             t.classList.remove('active');
         }
     });
 
-    /* 2. Instant Top Navigation Bar update */
+    /* 2. Instant Top Navigation Bar update & Clean Unloading of Home Elements */
     let topNav = document.querySelector('.apple-top-nav');
     if (targetTabId === 'home') {
         if (topNav) {
             topNav.classList.add('nav-hidden');
             topNav.style.setProperty('display', 'none', 'important');
         }
+        /* Restore home top elements */
+        const homeTopTrigger = document.querySelector('.top-hover-trigger');
+        if (homeTopTrigger) {
+            homeTopTrigger.classList.remove('nav-hidden');
+            homeTopTrigger.style.removeProperty('display');
+            homeTopTrigger.style.removeProperty('opacity');
+            homeTopTrigger.style.removeProperty('visibility');
+            homeTopTrigger.style.removeProperty('pointer-events');
+        }
+        const mobileArrow = document.getElementById('mobile-arrow-btn');
+        if (mobileArrow) {
+            mobileArrow.classList.remove('nav-hidden');
+            mobileArrow.style.removeProperty('display');
+            mobileArrow.style.removeProperty('opacity');
+            mobileArrow.style.removeProperty('visibility');
+            mobileArrow.style.removeProperty('pointer-events');
+        }
+        const dropdownNav = document.querySelector('.dropdown-nav-bar');
+        if (dropdownNav) {
+            dropdownNav.classList.remove('nav-hidden');
+            dropdownNav.style.removeProperty('display');
+            dropdownNav.style.removeProperty('opacity');
+            dropdownNav.style.removeProperty('visibility');
+            dropdownNav.style.removeProperty('pointer-events');
+        }
     } else {
+        /* Immediately unload and hide Home page dropdown navigation bar, arrow hint, and status banners */
+        const homeElementsToHide = [
+            document.querySelector('.top-hover-trigger'),
+            document.getElementById('mobile-arrow-btn'),
+            document.querySelector('.dropdown-nav-bar'),
+            document.getElementById('memorial-banner'),
+            document.getElementById('sit-down-banner')
+        ];
+        homeElementsToHide.forEach(el => {
+            if (el) {
+                el.classList.add('nav-hidden');
+                el.style.setProperty('display', 'none', 'important');
+                el.style.setProperty('opacity', '0', 'important');
+                el.style.setProperty('visibility', 'hidden', 'important');
+                el.style.setProperty('pointer-events', 'none', 'important');
+            }
+        });
+
         if (!topNav) {
             topNav = document.createElement('header');
             topNav.className = 'apple-top-nav';
@@ -235,7 +308,7 @@ function updateMobileNavState(targetTabId) {
         if (titleEl) {
             const lang = getCurrentLang();
             const dict = MOBILE_TOP_TITLES[lang] || MOBILE_TOP_TITLES.tc;
-            titleEl.textContent = dict[targetTabId] || '';
+            titleEl.textContent = dict[targetTabId] || dict[activeBottomTabId] || '';
         }
     }
 }
@@ -259,20 +332,46 @@ function prefetchUrl(url) {
 if (typeof window !== 'undefined') {
     let isMobileNavigating = false;
 
-    /* Pre-load target URL on touch down for lightning-fast responsiveness */
-    document.addEventListener('touchstart', (e) => {
-        if (window.innerWidth > 768) return;
-        const tabItem = e.target.closest('#apple-tab-bar .tab-item');
-        if (!tabItem) return;
-        const tabId = tabItem.getAttribute('data-tab-id');
-        const targetHref = (tabId && CANONICAL_TAB_ROUTES[tabId])
-            ? resolveSiteUrl(CANONICAL_TAB_ROUTES[tabId])
-            : tabItem.getAttribute('href');
-        prefetchUrl(targetHref);
-    }, { passive: true });
+    function navigateMobile(targetHref, targetTabId) {
+        if (!targetHref || targetHref.startsWith('#') || targetHref.startsWith('javascript:')) return;
 
-    /* Handle mobile tab bar interaction with instantaneous feedback and clean navigation */
-    document.addEventListener('click', (e) => {
+        const currentPath = window.location.pathname.replace(/\/index\.html$/, '/');
+        const targetUrl = new URL(targetHref, window.location.href);
+        const targetPath = targetUrl.pathname.replace(/\/index\.html$/, '/');
+
+        /* If tapping the currently active tab on the same page, smooth scroll to top */
+        if (currentPath === targetPath) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+
+        if (isMobileNavigating) return;
+        isMobileNavigating = true;
+
+        /* 1. Mark body as navigating */
+        document.body.classList.add('tab-navigating');
+
+        /* 2. Instant visual feedback: extinguish this page's tab, light up target tab, hide home arrow/banner */
+        updateMobileNavState(targetTabId);
+
+        /* 3. Instant center activity indicator */
+        showActivityIndicator(document.body);
+
+        /* 4. Let browser engine render the updated frame before full navigation */
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                window.location.href = targetHref;
+            }, 50);
+        });
+    }
+
+    /* Expose globally for cross-module integration */
+    window.__triggerMobileNav = (targetHref, targetTabId) => {
+        navigateMobile(targetHref, targetTabId);
+    };
+
+    /* Instant tactile visual feedback on physical touch contact */
+    document.addEventListener('touchstart', (e) => {
         if (window.innerWidth > 768) return;
         const tabItem = e.target.closest('#apple-tab-bar .tab-item');
         if (!tabItem) return;
@@ -288,34 +387,68 @@ if (typeof window !== 'undefined') {
         const targetUrl = new URL(targetHref, window.location.href);
         const targetPath = targetUrl.pathname.replace(/\/index\.html$/, '/');
 
-        /* If tapping the currently active tab, smooth scroll to top */
-        if (currentPath === targetPath) {
-            e.preventDefault();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            return;
-        }
+        if (currentPath === targetPath) return;
+
+        /* Instantly extinguish active tab on physical touchdown */
+        updateMobileNavState(tabId);
+        showActivityIndicator(document.body);
+        prefetchUrl(targetHref);
+    }, { passive: true });
+
+    /* Click on tab bar: trigger clean navigation */
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth > 768) return;
+        const tabItem = e.target.closest('#apple-tab-bar .tab-item');
+        if (!tabItem) return;
+
+        const tabId = tabItem.getAttribute('data-tab-id');
+        const targetHref = (tabId && CANONICAL_TAB_ROUTES[tabId])
+            ? resolveSiteUrl(CANONICAL_TAB_ROUTES[tabId])
+            : tabItem.getAttribute('href');
+
+        if (!targetHref || targetHref.startsWith('#') || targetHref.startsWith('javascript:')) return;
 
         e.preventDefault();
-        if (isMobileNavigating) return;
-        isMobileNavigating = true;
+        navigateMobile(targetHref, tabId);
+    }, false);
 
-        /* 1. Immediately switch tab active state and top nav header to target tab */
-        updateMobileNavState(tabId);
+    /* Click on any internal anchor or banner: extinguish current tab and navigate */
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth > 768) return;
+        const targetLink = e.target.closest('a, [role="link"]');
+        if (!targetLink || targetLink.closest('#apple-tab-bar')) return;
 
-        /* 2. Immediately display authentic Apple activity indicator */
-        showActivityIndicator(document.body);
+        let href = targetLink.getAttribute('href') || targetLink.getAttribute('data-href');
+        if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
 
-        /* 3. Allow browser engine to render the updated frame before full navigation */
-        requestAnimationFrame(() => {
-            setTimeout(() => {
-                window.location.href = targetHref;
-            }, 50);
-        });
+        try {
+            const targetUrl = new URL(href, window.location.href);
+            if (targetUrl.origin !== window.location.origin) return;
+
+            const currentPath = window.location.pathname.replace(/\/index\.html$/, '/');
+            const targetPath = targetUrl.pathname.replace(/\/index\.html$/, '/');
+            if (currentPath === targetPath) return;
+
+            /* Map target URL to tab ID */
+            const matchedTab = getTabFromUrl(targetUrl.href);
+            let targetTab = 'library';
+            if (matchedTab === 'home' || matchedTab === 'announcement' || matchedTab === 'settings' || matchedTab === 'library') {
+                targetTab = matchedTab;
+            } else if (matchedTab) {
+                targetTab = matchedTab;
+            }
+
+            e.preventDefault();
+            navigateMobile(targetUrl.href, targetTab);
+        } catch (err) {
+            /* Fallback to default browser handling */
+        }
     }, false);
 
     /* Restore pristine state on page restore (bfcache) */
     window.addEventListener('pageshow', () => {
         isMobileNavigating = false;
+        document.body.classList.remove('tab-navigating');
         hideActivityIndicator(document.body);
 
         /* Re-sync active tab and top nav according to the restored page's true URL */
@@ -327,37 +460,4 @@ if (typeof window !== 'undefined') {
         else if (path.includes('index.html') || path.endsWith('/') || path.endsWith('/sys-memorial/')) currentTab = 'home';
         updateMobileNavState(currentTab);
     });
-
-    /* Non-tab internal anchors in standalone PWA mode */
-    document.addEventListener('click', (e) => {
-        if (window.innerWidth > 768) return;
-        const anchor = e.target.closest('a');
-        if (!anchor || anchor.closest('#apple-tab-bar')) return;
-
-        const isIOSStandalone = ('standalone' in window.navigator) && window.navigator.standalone;
-        const isPWAStandalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
-        if (isIOSStandalone || isPWAStandalone) {
-            if (anchor.href && anchor.href.startsWith(window.location.origin)) {
-                if (!anchor.getAttribute('target') && !anchor.hasAttribute('download')) {
-                    const currentFullPath = window.location.pathname + window.location.search;
-                    const targetUrl = new URL(anchor.href);
-                    const targetFullPath = targetUrl.pathname + targetUrl.search;
-
-                    const normCurrent = currentFullPath.replace(/\/index\.html$/, '/');
-                    const normTarget = targetFullPath.replace(/\/index\.html$/, '/');
-
-                    if (normCurrent === normTarget) {
-                        e.preventDefault();
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                        return;
-                    }
-
-                    if (!anchor.href.includes('javascript:')) {
-                        e.preventDefault();
-                        window.location.href = anchor.href;
-                    }
-                }
-            }
-        }
-    }, false);
 }

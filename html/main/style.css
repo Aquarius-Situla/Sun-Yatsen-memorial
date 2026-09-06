@@ -625,7 +625,9 @@ body.banner-active .dropdown-nav-bar {
 
     .memorial-banner:not(.hidden)~.top-hover-trigger .mobile-arrow-hint,
     .status-banner.show~.top-hover-trigger .mobile-arrow-hint,
-    .dropdown-nav-bar.force-show+.mobile-arrow-hint {
+    .dropdown-nav-bar.force-show+.mobile-arrow-hint,
+    body.tab-navigating .mobile-arrow-hint,
+    .mobile-arrow-hint.nav-hidden {
         display: block !important;
         opacity: 0 !important;
         visibility: hidden !important;

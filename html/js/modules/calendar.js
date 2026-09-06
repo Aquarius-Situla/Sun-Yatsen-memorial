@@ -77,10 +77,22 @@ export function initFestivalBanner(navBannerEl, onFestivalTrigger) {
             navBannerEl.setAttribute('role',       'link');
             navBannerEl.setAttribute('tabindex',   '0');
             navBannerEl.setAttribute('aria-label', `${bannerText}——點擊了解更多`);
-            navBannerEl.addEventListener('click',   () => { window.location.href = festivalPage; });
+            navBannerEl.setAttribute('data-href', festivalPage);
+            navBannerEl.addEventListener('click',   (e) => {
+                if (window.innerWidth <= 768 && typeof window.__triggerMobileNav === 'function') {
+                    e.preventDefault();
+                    window.__triggerMobileNav(festivalPage, 'library');
+                    return;
+                }
+                window.location.href = festivalPage;
+            });
             navBannerEl.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
+                    if (window.innerWidth <= 768 && typeof window.__triggerMobileNav === 'function') {
+                        window.__triggerMobileNav(festivalPage, 'library');
+                        return;
+                    }
                     window.location.href = festivalPage;
                 }
             });

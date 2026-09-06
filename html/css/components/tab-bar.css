@@ -42,7 +42,7 @@
         -webkit-transform: translate3d(0, 0, 0);
         transform: translate3d(0, 0, 0);
         border-bottom: 0.5px solid rgba(255, 255, 255, 0.15);
-        z-index: 9999;
+        z-index: 25000;
         box-sizing: border-box;
         user-select: none;
         -webkit-user-select: none;
@@ -51,6 +51,21 @@
 
     .apple-top-nav.nav-hidden {
         display: none !important;
+    }
+
+    /* Cleanly unload and hide Home page dropdown navigation bar and arrow hint */
+    body.tab-navigating .top-hover-trigger,
+    body.tab-navigating .mobile-arrow-hint,
+    body.tab-navigating .dropdown-nav-bar,
+    body.tab-navigating .memorial-banner,
+    body.tab-navigating .status-banner,
+    .top-hover-trigger.nav-hidden,
+    .mobile-arrow-hint.nav-hidden,
+    .dropdown-nav-bar.nav-hidden {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
     }
 
     .apple-top-nav .nav-title {
