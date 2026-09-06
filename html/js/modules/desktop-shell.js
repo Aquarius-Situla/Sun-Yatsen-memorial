@@ -410,7 +410,14 @@ export async function navigateDesktopStage(targetHref, pushState = true) {
     stage.classList.add('stage-fading');
 
     try {
-        const res = await fetch(targetUrl.href);
+        const fetchCtrl = new AbortController();
+        const timeoutId = setTimeout(() => fetchCtrl.abort(), 5000);
+        let res;
+        try {
+            res = await fetch(targetUrl.href, { signal: fetchCtrl.signal });
+        } finally {
+            clearTimeout(timeoutId);
+        }
         if (!res.ok) {
             window.location.href = targetUrl.href;
             return;
@@ -561,6 +568,16 @@ export function initDesktopShell(options = {}) {
 
     /* Add layout helper class to body for wide desktop viewports */
     document.body.classList.add('has-desktop-sidebar');
+
+    /* Ensure favicon links in head are absolute to prevent 404 on pushState navigation */
+    const favicons = document.querySelectorAll('link[rel*="icon"]');
+    const slashSlash = String.fromCharCode(47, 47);
+    favicons.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && !href.includes(slashSlash) && !href.startsWith('/')) {
+            link.href = resolveSiteUrl(href);
+        }
+    });
 
     /* Check if sidebar already exists */
     let sidebarEl = document.getElementById('desktop-sidebar');

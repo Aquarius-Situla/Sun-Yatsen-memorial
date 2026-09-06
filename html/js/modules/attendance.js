@@ -10,29 +10,37 @@
 /* ============================================================================
  * Browser Fingerprinting
  * ============================================================================
- * Generates an anonymous hash based on Canvas rendering quirks and screen metrics.
+ * Generates an anonymous random UUID stored in localStorage.
+ * Avoids intrusive canvas fingerprinting methods that trigger ad blocker flags.
  * ============================================================================ */
 export function generateBrowserFingerprint() {
     return new Promise((resolve) => {
-        const canvas = document.createElement('canvas');
-        const ctx    = canvas.getContext('2d');
-        canvas.width  = 200;
-        canvas.height = 40;
-
-        ctx.textBaseline = 'top';
-        ctx.font         = "14px 'Arial'";
-        ctx.fillStyle    = '#f60';
-        ctx.fillRect(10, 10, 50, 20);
-        ctx.fillStyle = '#069';
-        ctx.fillText('SysMemorial, minguo', 2, 2);
-
-        const raw = canvas.toDataURL() + navigator.userAgent + screen.width + navigator.language;
-        let hash  = 0;
-        for (let i = 0; i < raw.length; i++) {
-            hash = (hash << 5) - hash + raw.charCodeAt(i);
-            hash |= 0;
+        let fp = null;
+        try {
+            fp = localStorage.getItem('sys_visitor_fp');
+        } catch (e) {
+            /* Storage inaccessible */
         }
-        resolve(Math.abs(hash).toString(16));
+
+        if (fp && fp.length >= 8) {
+            resolve(fp);
+            return;
+        }
+
+        /* Generate clean cryptographic or pseudo-random identifier */
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+            fp = crypto.randomUUID().replace(/-/g, '').slice(0, 16);
+        } else {
+            fp = Math.random().toString(36).substring(2, 10) + Date.now().toString(36).slice(-6);
+        }
+
+        try {
+            localStorage.setItem('sys_visitor_fp', fp);
+        } catch (e) {
+            /* Storage fallback */
+        }
+
+        resolve(fp);
     });
 }
 
@@ -40,19 +48,53 @@ export function generateBrowserFingerprint() {
  * Attendance Registration Engine
  * ============================================================================ */
 export async function registerAttendance(apiUrl, attendanceCountEl, onMilestone) {
-    if (!apiUrl) return;
+    if (!apiUrl) return 0;
+
+    /* Session-level deduplication: avoid redundant network POST on split-view tab return */
+    try {
+        const isRegistered = sessionStorage.getItem('sys_attendance_registered');
+        if (isRegistered) {
+            const cachedCount = sessionStorage.getItem('sys_attendance_count');
+            if (cachedCount && attendanceCountEl) {
+                attendanceCountEl.innerText = cachedCount;
+            }
+            return cachedCount ? parseInt(cachedCount, 10) : 0;
+        }
+    } catch (e) {
+        /* Session storage fallback */
+    }
 
     try {
         const fingerprint = await generateBrowserFingerprint();
-        const response    = await fetch(apiUrl, {
-            method:  'POST',
+        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timeoutId = controller ? setTimeout(() => controller.abort(), 3500) : null;
+
+        const response = await fetch(apiUrl, {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ fp: fingerprint })
+            body: JSON.stringify({ fp: fingerprint }),
+            signal: controller ? controller.signal : undefined
         });
 
-        const count = response.ok ? ((await response.json()).count || 0) : 0;
-        if (attendanceCountEl) {
-            attendanceCountEl.innerText = count || '0';
+        if (timeoutId) clearTimeout(timeoutId);
+
+        let count = 0;
+        if (response.ok) {
+            const data = await response.json();
+            count = data.count || 0;
+        }
+
+        if (attendanceCountEl && count > 0) {
+            attendanceCountEl.innerText = String(count);
+        }
+
+        if (count > 0) {
+            try {
+                sessionStorage.setItem('sys_attendance_registered', 'true');
+                sessionStorage.setItem('sys_attendance_count', String(count));
+            } catch (e) {
+                /* Storage fallback */
+            }
         }
 
         /* 100-visitor milestone trigger */
@@ -61,7 +103,8 @@ export async function registerAttendance(apiUrl, attendanceCountEl, onMilestone)
         }
         return count;
     } catch (e) {
-        if (attendanceCountEl) {
+        /* Silently recover from ad-blocker or network refusal */
+        if (attendanceCountEl && !attendanceCountEl.innerText) {
             attendanceCountEl.innerText = '0';
         }
         return 0;

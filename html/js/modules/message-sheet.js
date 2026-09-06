@@ -21,16 +21,22 @@ let mySentMessages = JSON.parse(localStorage.getItem('mySentMessages')) || [];
  * Banned Words Loader
  * ============================================================================ */
 export function loadBannedWords(apiUrl) {
-    if (!apiUrl) return;
-    fetch(apiUrl + '/danmaku?action=get_banned_words')
+    if (!apiUrl || bannedWordsList.length > 0) return;
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timeoutId = controller ? setTimeout(() => controller.abort(), 3500) : null;
+
+    fetch(apiUrl + '/danmaku?action=get_banned_words', {
+        signal: controller ? controller.signal : undefined
+    })
         .then(res => res.json())
         .then(data => {
+            if (timeoutId) clearTimeout(timeoutId);
             if (Array.isArray(data)) {
                 bannedWordsList = data;
             }
         })
-        .catch(err => {
-            console.debug('Failed to load dynamic banned words:', err);
+        .catch(() => {
+            if (timeoutId) clearTimeout(timeoutId);
         });
 }
 

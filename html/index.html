@@ -50,18 +50,6 @@
     <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" href="webapp/splash/splash-828x1792.png">
     <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" href="webapp/splash/splash-1242x2208.png">
     <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="webapp/splash/splash-750x1334.png">
-
-    <!-- Preload/Prefetch for Bottom Navigation Pages to prevent navigation stalls -->
-    <link rel="prefetch" href="pages/announcement/announcement.html">
-    <link rel="prefetch" href="pages/announcement/status_tc.md" as="fetch" crossorigin="anonymous">
-    <link rel="prefetch" href="pages/library/library.html">
-    <link rel="prefetch" href="pages/biography/biography.html">
-    <link rel="prefetch" href="pages/biography/biography_tc.md" as="fetch" crossorigin="anonymous">
-    <link rel="prefetch" href="pages/about/about.html">
-    <link rel="prefetch" href="pages/about/about_tc.md" as="fetch" crossorigin="anonymous">
-    <link rel="prefetch" href="pages/thanks/thanks.html">
-    <link rel="prefetch" href="pages/thanks/thanks_tc.md" as="fetch" crossorigin="anonymous">
-
     <script>
         /* Dynamically preload the iOS splash screen for the current device to prevent animation loss when added to the home screen */
         (function() {
@@ -202,8 +190,11 @@
         </div>
     </div>
 
-    <audio id="bg-music" src="./main/sanmin/sanmin.flac"></audio>
+    <audio id="bg-music" preload="none">
+        <source src="main/sanmin/sanmin.mp3" type="audio/mpeg">
+        <source src="main/sanmin/sanmin.flac" type="audio/flac">
+    </audio>
     <script src="api/env.js"></script>
-    <script type="module" src="js/app.js?v=20260906g"></script>
+    <script type="module" src="js/app.js?v=20260906h"></script>
 </body>
 </html>

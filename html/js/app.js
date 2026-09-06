@@ -18,7 +18,7 @@ import { loadAndTriggerFireworks } from './modules/fireworks.js';
 import { syncTabBarLabels } from './modules/i18n.js?v=2025';
 import { syncStandaloneTabBar } from './modules/tab-bar.js?v=2025';
 import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=2025';
-import { initDesktopShell } from './modules/desktop-shell.js?v=20260906g';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260906h';
 
 /* Expose fireworks loader globally for legacy triggers */
 window.loadAndTriggerFireworks = loadAndTriggerFireworks;
@@ -28,6 +28,63 @@ window.loadAndTriggerFireworks = loadAndTriggerFireworks;
  * ============================================================================ */
 export function initApp() {
     window.initApp = initApp;
+
+    if (window.__appInitialized) {
+        /* Re-bind stage elements on split-view return without re-fetching */
+        const portraitBtn       = document.getElementById('portrait-btn');
+        const testamentBox      = document.querySelector('.testament-box');
+        const attendanceCountEl = document.getElementById('attendanceCount');
+        const woodFrame         = document.querySelector('.wood-frame');
+        const desktopMsgCard    = document.getElementById('desktop-open-msg-card');
+        const openMessageBtn    = document.getElementById('open-message-btn');
+        const messageModal      = document.getElementById('message-modal');
+        const messageInput      = document.getElementById('message-input');
+
+        if (attendanceCountEl) {
+            const cached = sessionStorage.getItem('sys_attendance_count');
+            if (cached) attendanceCountEl.innerText = cached;
+        }
+        if (portraitBtn && window.handlePortraitClick) {
+            portraitBtn.setAttribute('role', 'button');
+            portraitBtn.setAttribute('tabindex', '0');
+            portraitBtn.style.cursor = 'pointer';
+            portraitBtn.addEventListener('click', window.handlePortraitClick);
+        }
+        if (testamentBox && window.openDanmakuModal) {
+            testamentBox.style.cursor = 'pointer';
+            testamentBox.setAttribute('role', 'button');
+            testamentBox.setAttribute('tabindex', '0');
+            testamentBox.setAttribute('aria-label', '點擊開啟發送彈幕視窗');
+            testamentBox.addEventListener('click', window.openDanmakuModal);
+            testamentBox.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    window.openDanmakuModal(e);
+                }
+            });
+        }
+        if (woodFrame) {
+            try {
+                initDesktopParallax(woodFrame);
+                initGyroscopeLighting(woodFrame);
+            } catch (err) {
+                /* Motion re-bind ignore */
+            }
+        }
+        if (desktopMsgCard) {
+            desktopMsgCard.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (openMessageBtn) {
+                    openMessageBtn.click();
+                } else if (messageModal) {
+                    messageModal.classList.add('active');
+                    if (messageInput) setTimeout(() => messageInput.focus(), 150);
+                }
+            });
+        }
+        return;
+    }
+    window.__appInitialized = true;
+
     setupDiagnosticTrigger();
     const WORKER_API = window.ENV ? window.ENV.WORKER_API : '';
 
