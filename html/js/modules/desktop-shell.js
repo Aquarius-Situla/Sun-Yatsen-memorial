@@ -258,7 +258,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(homeLink);
         }
     }
-    homeLink.href = resolveSiteUrl('main/style.css?v=20260906k');
+    homeLink.href = resolveSiteUrl('main/style.css?v=20260906m');
 
     let subpageLink = document.getElementById('sys-style-subpage');
     if (!subpageLink) {
@@ -272,7 +272,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(subpageLink);
         }
     }
-    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260906k');
+    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260906m');
 
     let varLink = document.getElementById('sys-style-variables');
     if (!varLink) {
@@ -286,7 +286,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.insertBefore(varLink, document.head.firstChild);
         }
     }
-    varLink.href = resolveSiteUrl('css/variables.css?v=20260906k');
+    varLink.href = resolveSiteUrl('css/variables.css?v=20260906m');
 
     let baseLink = document.getElementById('sys-style-base');
     if (!baseLink) {
@@ -300,7 +300,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.insertBefore(baseLink, document.head.firstChild);
         }
     }
-    baseLink.href = resolveSiteUrl('css/base.css?v=20260906k');
+    baseLink.href = resolveSiteUrl('css/base.css?v=20260906m');
 
     let indLink = document.getElementById('sys-style-activity');
     if (!indLink) {
@@ -314,7 +314,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(indLink);
         }
     }
-    indLink.href = resolveSiteUrl('css/components/activity-indicator.css?v=20260906k');
+    indLink.href = resolveSiteUrl('css/components/activity-indicator.css?v=20260906m');
 
     if (isHome) {
         homeLink.disabled = false;

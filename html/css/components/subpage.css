@@ -351,8 +351,7 @@ body {
     border: 0.5px solid var(--sys-border, rgba(255, 255, 255, 0.12));
     box-sizing: border-box;
     opacity: 1;
-    margin-top: 10px;
-    margin-bottom: 25px;
+    margin: 10px auto 25px auto;
 }
 
 .charts-container {

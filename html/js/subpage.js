@@ -108,6 +108,9 @@ export function initSubpage(options) {
     /* Synchronize standalone viewport to eliminate chin gap on short subpages */
     syncStandaloneTabBar();
 
+    /* Dismiss any full-page activity indicator from prior mobile navigation */
+    hideActivityIndicator(document.body);
+
     const langBtn = document.getElementById('lang-btn');
     const mdViewer = document.getElementById('md-viewer');
     const container = document.querySelector('.markdown-container');

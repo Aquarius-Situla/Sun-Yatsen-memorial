@@ -556,7 +556,8 @@
  * ============================================================================ */
 @media (min-width: 769px) {
     body {
-        padding-left: 240px !important;
+        padding: 0 0 0 240px !important;
+        margin: 0 !important;
         width: 100% !important;
         box-sizing: border-box !important;
     }
@@ -591,10 +592,12 @@
         }
     }
 
+    /* Subpage Settings Container Centered in Right Stage */
     .ios-group-container {
+        width: 100% !important;
         max-width: 680px !important;
-        width: calc(100% - 64px) !important;
-        margin: 60px 32px 48px 32px !important;
+        margin: 20px auto 40px auto !important;
+        box-sizing: border-box !important;
     }
 
     .ios-section-header {
@@ -686,10 +689,28 @@
         }
     }
 
+    /* Centered Festival Hero Header Card */
+    .festival-hero {
+        width: 100% !important;
+        max-width: 800px !important;
+        margin: 0 auto 20px auto !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Centered Markdown Content Article Card */
     .markdown-container {
-        max-width: 820px !important;
-        width: calc(100% - 64px) !important;
-        margin: 60px 32px 48px 32px !important;
+        width: 100% !important;
+        max-width: 800px !important;
+        margin: 0 auto 40px auto !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Centered Charts Container */
+    .charts-container {
+        width: 100% !important;
+        max-width: 800px !important;
+        margin: 0 auto 40px auto !important;
+        box-sizing: border-box !important;
     }
 
     /* ========================================================================
@@ -780,9 +801,15 @@
      * Desktop Split View Dynamic Content Stage Transition
      * ======================================================================== */
     .desktop-stage {
-        width: 100%;
-        min-height: 100vh;
-        position: relative;
+        width: 100% !important;
+        min-height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        box-sizing: border-box !important;
+        padding: 40px 24px 60px 24px !important;
+        position: relative !important;
         transition: opacity 0.18s cubic-bezier(0.25, 1, 0.5, 1);
         will-change: opacity;
     }
