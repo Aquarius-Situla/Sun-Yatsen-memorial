@@ -41,7 +41,7 @@ body {
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
     border-bottom: 0.5px solid rgba(255, 255, 255, 0.15);
-    z-index: 9998;
+    z-index: 25000 !important;
     box-sizing: border-box;
     user-select: none;
     -webkit-user-select: none;
@@ -54,40 +54,50 @@ body {
     color: #ffffff;
     font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Microsoft JhengHei", sans-serif;
     margin: 0;
-    padding: 0;
+    padding: 0 76px;
     height: 44px;
     line-height: 44px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    text-align: center;
     pointer-events: none;
+    max-width: calc(100% - 152px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Apple Native Blue Back Button (Image 2 Specification) */
 .apple-top-nav .nav-back-link {
     position: absolute;
     left: 0;
+    top: env(safe-area-inset-top, 0px);
     bottom: 0;
     height: 44px;
-    padding-left: 12px;
+    padding-left: calc(12px + env(safe-area-inset-left, 0px));
     padding-right: 18px;
-    display: flex;
+    display: flex !important;
     align-items: center;
     gap: 3px;
-    color: #0a84ff;
+    color: #0a84ff !important;
     text-decoration: none;
     font-size: 17px;
     font-weight: 400;
     font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", sans-serif;
     -webkit-tap-highlight-color: transparent;
     cursor: pointer;
-    z-index: 10;
+    z-index: 25005 !important;
     touch-action: manipulation;
+    pointer-events: auto !important;
+    visibility: visible !important;
+    opacity: 1;
 }
 
 .apple-top-nav .nav-back-link svg {
     width: 20px;
     height: 20px;
-    stroke: #0a84ff;
+    stroke: #0a84ff !important;
     stroke-width: 2.5;
     fill: none;
     stroke-linecap: round;
@@ -266,7 +276,7 @@ body {
 }
 
 .apple-top-nav {
-    z-index: 9999 !important;
+    z-index: 25000 !important;
 }
 
 /* ============================================================================
@@ -715,6 +725,22 @@ body {
         box-sizing: border-box;
     }
 
+    /* Subpage Bottom Bar Hiding: completely hide tab bar on all subpages */
+    body.is-subpage .apple-tab-bar,
+    body.is-subpage #apple-tab-bar,
+    body:has(.nav-back-link) .apple-tab-bar,
+    body:has(.nav-back-link) #apple-tab-bar {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+
+    /* Subpage Bottom Padding: reduce dead space when tab bar is hidden */
+    body.is-subpage,
+    body:has(.nav-back-link) {
+        padding-bottom: calc(20px + env(safe-area-inset-bottom, 16px)) !important;
+    }
+
     @media all and (display-mode: standalone) {
         html,
         body {
@@ -733,12 +759,22 @@ body {
 
     /* Activate Apple Native Frosted Glass Navigation Bar */
     .apple-top-nav {
-        display: flex;
+        display: flex !important;
         width: 100%;
+        z-index: 25000 !important;
     }
 
     .apple-top-nav.nav-hidden {
         display: none !important;
+    }
+
+    /* Ensure back link is visible and clickable on subpages */
+    .apple-top-nav .nav-back-link {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        z-index: 25005 !important;
     }
 
     /* Completely hide top back button on mobile */
@@ -806,11 +842,11 @@ body {
     }
 
     .apple-top-nav .nav-back-link {
-        color: #007aff;
+        color: #007aff !important;
     }
 
     .apple-top-nav .nav-back-link svg {
-        stroke: #007aff;
+        stroke: #007aff !important;
     }
 
     .festival-hero h1 {

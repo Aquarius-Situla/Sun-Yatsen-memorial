@@ -70,12 +70,12 @@ function getMarkdownStyles(isLight) {
     }
 }
 
-import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=20260906r';
-import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=20260906r';
-import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260906r';
-import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260906r';
-import { initDesktopShell } from './modules/desktop-shell.js?v=20260906r';
-import { showActivityIndicator, hideActivityIndicator } from './modules/activity-indicator.js?v=20260906r';
+import { getCurrentLang, setGlobalLang } from './modules/i18n.js?v=20260906s';
+import { initTabBar, syncStandaloneTabBar } from './modules/tab-bar.js?v=20260906s';
+import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260906s';
+import { initIOSNavTransition } from './modules/ios-nav-transition.js?v=20260906s';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260906s';
+import { showActivityIndicator, hideActivityIndicator } from './modules/activity-indicator.js?v=20260906s';
 
 /* ============================================================================
  * Subpage Initialization Engine
@@ -107,6 +107,43 @@ export function initSubpage(options) {
 
     /* Synchronize standalone viewport to eliminate chin gap on short subpages */
     syncStandaloneTabBar();
+
+    /* Distinguish between menu hub pages and actual subpages */
+    const isMenuHubPage = document.body.classList.contains('page-announcement-menu') ||
+                          document.body.classList.contains('page-settings-menu') ||
+                          document.body.classList.contains('page-library-menu') ||
+                          !document.querySelector('.apple-top-nav .nav-back-link');
+
+    if (!isMenuHubPage) {
+        /* Mark body as subpage and hide Apple Native Bottom Tab Bar on mobile */
+        document.body.classList.add('is-subpage');
+        const tabBarEl = document.getElementById('apple-tab-bar');
+        if (tabBarEl && window.innerWidth <= 768) {
+            tabBarEl.style.setProperty('display', 'none', 'important');
+        }
+    } else {
+        /* Ensure menu hub page restores the bottom tab bar */
+        document.body.classList.remove('is-subpage');
+        const tabBarEl = document.getElementById('apple-tab-bar');
+        if (tabBarEl) {
+            tabBarEl.style.removeProperty('display');
+        }
+    }
+
+    /* Guarantee Apple Native Top Navigation Bar and Back Link are visible and interactable */
+    const topNav = document.querySelector('.apple-top-nav');
+    if (topNav) {
+        topNav.classList.remove('nav-hidden');
+        topNav.style.removeProperty('display');
+        topNav.style.setProperty('display', 'flex', 'important');
+    }
+    const navBackLink = document.querySelector('.apple-top-nav .nav-back-link');
+    if (navBackLink) {
+        navBackLink.style.setProperty('display', 'flex', 'important');
+        navBackLink.style.setProperty('visibility', 'visible', 'important');
+        navBackLink.style.setProperty('opacity', '1', 'important');
+        navBackLink.style.setProperty('pointer-events', 'auto', 'important');
+    }
 
     /* Dismiss any full-page activity indicator from prior mobile navigation */
     hideActivityIndicator(document.body);

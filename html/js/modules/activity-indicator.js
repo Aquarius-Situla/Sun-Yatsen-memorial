@@ -7,7 +7,7 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang } from './i18n.js?v=20260906r';
+import { getCurrentLang } from './i18n.js?v=20260906s';
 
 /* ============================================================================
  * Section 1: Factory & Mounting Methods

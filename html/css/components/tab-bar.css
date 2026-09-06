@@ -107,6 +107,21 @@
         -webkit-user-select: none;
     }
 
+    /* Subpage Bottom Bar Hiding: completely hide tab bar when pushing into any subpage */
+    body.is-subpage .apple-tab-bar,
+    body.is-subpage #apple-tab-bar,
+    body:has(.nav-back-link) .apple-tab-bar,
+    body:has(.nav-back-link) #apple-tab-bar {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+
+    body.is-subpage,
+    body:has(.nav-back-link) {
+        padding-bottom: calc(20px + env(safe-area-inset-bottom, 16px)) !important;
+    }
+
     /* Standalone WebApp CSS: Anchor cleanly to device bottom */
     @media all and (display-mode: standalone) {
         .apple-tab-bar {

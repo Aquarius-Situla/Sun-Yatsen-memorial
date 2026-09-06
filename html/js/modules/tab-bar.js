@@ -7,9 +7,9 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906r';
-import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906r';
-import { resolveSiteUrl, getTabFromUrl } from './desktop-shell.js?v=20260906r';
+import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260906s';
+import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260906s';
+import { resolveSiteUrl, getTabFromUrl } from './desktop-shell.js?v=20260906s';
 
 /* ============================================================================
  * Authentic Apple SF Symbols Vector Icons (24x24 Pixel-Perfect Fill Glyphs)
@@ -111,7 +111,39 @@ export function initTabBar(options = {}) {
     /* Synchronize standalone positioning immediately after mounting or binding */
     syncStandaloneTabBar();
 
+    /* If on a subpage, mark body and hide tab bar on mobile */
+    if (isSubpageRoute()) {
+        document.body.classList.add('is-subpage');
+        if (tabBarEl && window.innerWidth <= 768) {
+            tabBarEl.style.setProperty('display', 'none', 'important');
+        }
+    }
+
     return tabBarEl;
+}
+
+/* ============================================================================
+ * Subpage Route Detection Helper
+ * ============================================================================ */
+export function isSubpageRoute(pathname) {
+    const p = (pathname || (typeof window !== 'undefined' ? window.location.pathname : '')).toLowerCase();
+    if (p.includes('/detail.html') ||
+        p.includes('/biography/') ||
+        p.includes('/events/') ||
+        p.includes('/about/') ||
+        p.includes('/thanks/') ||
+        p.includes('/language.html')) {
+        return true;
+    }
+    if (typeof document !== 'undefined') {
+        if (document.body && (document.body.classList.contains('is-subpage') || document.body.classList.contains('page-subpage'))) {
+            return true;
+        }
+        if (document.querySelector('.nav-back-link')) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /* ============================================================================
@@ -227,6 +259,24 @@ const MOBILE_TOP_TITLES = {
 
 /* Synchronize Tab Bar and Top Nav on Navigation */
 export function updateMobileNavState(targetTabId) {
+    const onSubpage = isSubpageRoute();
+
+    /* If currently on a subpage, keep bottom tab bar hidden and top nav visible */
+    if (onSubpage) {
+        document.body.classList.add('is-subpage');
+        const tabBar = document.getElementById('apple-tab-bar');
+        if (tabBar && window.innerWidth <= 768) {
+            tabBar.style.setProperty('display', 'none', 'important');
+        }
+        const topNav = document.querySelector('.apple-top-nav');
+        if (topNav) {
+            topNav.classList.remove('nav-hidden');
+            topNav.style.removeProperty('display');
+            topNav.style.setProperty('display', 'flex', 'important');
+        }
+        return;
+    }
+
     /* Map subpage pseudo-tabs to canonical bottom tabs */
     let activeBottomTabId = targetTabId;
     if (targetTabId === 'biography' || targetTabId === 'xinhai' || targetTabId === 'whampoa' || targetTabId === 'mayfourth' || targetTabId === 'militaries') {
@@ -461,6 +511,28 @@ if (typeof window !== 'undefined') {
         isMobileNavigating = false;
         document.body.classList.remove('tab-navigating');
         hideActivityIndicator(document.body);
+
+        /* Subpages: ensure bottom tab bar is hidden and top nav is visible */
+        if (isSubpageRoute()) {
+            document.body.classList.add('is-subpage');
+            const topNav = document.querySelector('.apple-top-nav');
+            if (topNav) {
+                topNav.classList.remove('nav-hidden');
+                topNav.style.removeProperty('display');
+                topNav.style.setProperty('display', 'flex', 'important');
+            }
+            const tabBar = document.getElementById('apple-tab-bar');
+            if (tabBar && window.innerWidth <= 768) {
+                tabBar.style.setProperty('display', 'none', 'important');
+            }
+            return;
+        }
+
+        /* Hub menu pages: restore bottom tab bar */
+        const tabBar = document.getElementById('apple-tab-bar');
+        if (tabBar) {
+            tabBar.style.removeProperty('display');
+        }
 
         /* Re-sync active tab and top nav according to the restored page's true URL */
         const path = window.location.pathname.toLowerCase();
