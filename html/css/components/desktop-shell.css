@@ -888,6 +888,8 @@
         max-width: 800px !important;
         margin: 0 auto 40px auto !important;
         box-sizing: border-box !important;
+        flex-shrink: 0 !important;
+        height: auto !important;
     }
 
     /* Centered Charts Container */
@@ -896,6 +898,8 @@
         max-width: 800px !important;
         margin: 0 auto 40px auto !important;
         box-sizing: border-box !important;
+        flex-shrink: 0 !important;
+        height: auto !important;
     }
 
     /* ========================================================================
@@ -997,6 +1001,11 @@
         position: relative !important;
         transition: opacity 0.18s cubic-bezier(0.25, 1, 0.5, 1);
         will-change: opacity;
+    }
+
+    /* Guarantee stage children never shrink to crush content cards */
+    .desktop-stage > * {
+        flex-shrink: 0 !important;
     }
 
     /* When a top-back-btn is visible (nav-from-content), shift content down

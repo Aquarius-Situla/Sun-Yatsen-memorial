@@ -356,6 +356,8 @@ body {
     width: 100%;
     max-width: 800px;
     min-height: 280px;
+    height: auto !important;
+    flex-shrink: 0 !important;
     background-color: var(--sys-card-bg, #1c1c1e);
     padding: 35px 32px;
     border-radius: 14px;
@@ -364,6 +366,12 @@ body {
     box-sizing: border-box;
     opacity: 1;
     margin: 10px auto 25px auto;
+}
+
+zero-md {
+    display: block !important;
+    width: 100% !important;
+    min-height: 100% !important;
 }
 
 .markdown-container:not(.loaded) zero-md {
