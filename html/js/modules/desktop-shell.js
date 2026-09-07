@@ -7,11 +7,11 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260907e';
-import { TAB_ICONS } from './tab-bar.js?v=20260907e';
-import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260907e';
-import { getVisitorUuid, generateIdenticonSvg } from './identicon.js?v=20260907e';
-import { isMobileLayout, isDesktopLayout } from './device-detect.js?v=20260907e';
+import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260907f';
+import { TAB_ICONS } from './tab-bar.js?v=20260907f';
+import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260907f';
+import { getVisitorUuid, generateIdenticonSvg } from './identicon.js?v=20260907f';
+import { isMobileLayout, isDesktopLayout } from './device-detect.js?v=20260907f';
 
 /* ============================================================================
  * Global Search Index (Covers all memorial topics, exhibits, and settings)
@@ -266,7 +266,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(homeLink);
         }
     }
-    homeLink.href = resolveSiteUrl('main/style.css?v=20260907e');
+    homeLink.href = resolveSiteUrl('main/style.css?v=20260907f');
 
     let subpageLink = document.getElementById('sys-style-subpage');
     if (!subpageLink) {
@@ -280,7 +280,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(subpageLink);
         }
     }
-    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260907e');
+    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260907f');
 
     let varLink = document.getElementById('sys-style-variables');
     if (!varLink) {
@@ -294,7 +294,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.insertBefore(varLink, document.head.firstChild);
         }
     }
-    varLink.href = resolveSiteUrl('css/variables.css?v=20260907e');
+    varLink.href = resolveSiteUrl('css/variables.css?v=20260907f');
 
     let baseLink = document.getElementById('sys-style-base');
     if (!baseLink) {
@@ -308,7 +308,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.insertBefore(baseLink, document.head.firstChild);
         }
     }
-    baseLink.href = resolveSiteUrl('css/base.css?v=20260907e');
+    baseLink.href = resolveSiteUrl('css/base.css?v=20260907f');
 
     let indLink = document.getElementById('sys-style-activity');
     if (!indLink) {
@@ -322,7 +322,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(indLink);
         }
     }
-    indLink.href = resolveSiteUrl('css/components/activity-indicator.css?v=20260907e');
+    indLink.href = resolveSiteUrl('css/components/activity-indicator.css?v=20260907f');
 
     let shellLink = document.getElementById('sys-style-desktop-shell');
     if (!shellLink) {
@@ -336,7 +336,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(shellLink);
         }
     }
-    shellLink.href = resolveSiteUrl('css/components/desktop-shell.css?v=20260907e');
+    shellLink.href = resolveSiteUrl('css/components/desktop-shell.css?v=20260907f');
 
     if (isHome) {
         homeLink.disabled = false;
@@ -899,7 +899,7 @@ function createSidebarElement(activeTab, basePath) {
         </div>
 
         <!-- Sidebar Footer Visitor Profile (Apple Music Profile Style with Identicon) -->
-        <div class="desktop-sidebar-bottom" style="overflow: hidden !important; min-width: 0 !important;">
+        <div class="desktop-sidebar-bottom" style="border-top: 0.5px solid rgba(255, 255, 255, 0.08); padding-top: 10px; margin: 8px -12px 0 -12px; padding-left: 12px; padding-right: 12px; overflow: hidden !important; min-width: 0 !important; flex-shrink: 0;">
             <div class="desktop-profile-card" id="desktop-profile-card" tabindex="0" role="button" aria-label="${str.visitorLabel}" style="display: flex !important; align-items: center !important; gap: 8px !important; height: 24px !important; padding: 0 6px !important; min-width: 0 !important; overflow: hidden !important; width: 100% !important; box-sizing: border-box !important;">
                 <div class="desktop-profile-avatar" id="desktop-profile-avatar" style="width: 16px !important; height: 16px !important; border-radius: 50% !important; overflow: hidden !important; flex-shrink: 0 !important;"></div>
                 <span class="desktop-profile-uuid" id="desktop-profile-uuid" style="font-size: 11px !important; font-weight: 500 !important; font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, monospace !important; letter-spacing: -0.2px !important; line-height: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; min-width: 0 !important; flex: 1 !important; display: block !important;"></span>

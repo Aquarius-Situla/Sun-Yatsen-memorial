@@ -7,7 +7,7 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { isDesktopLayout } from './device-detect.js?v=20260907e';
+import { isDesktopLayout } from './device-detect.js?v=20260907f';
 
 export function initIOSNavTransition(options = {}) {
     /* Desktop isolation guard: desktop split router handles desktop navigation */

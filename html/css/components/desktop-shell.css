@@ -423,8 +423,18 @@ body.device-mobile {
     .desktop-sidebar-bottom {
         display: flex;
         flex-direction: column;
-        padding: 4px 6px 8px 6px;
+        padding-top: 10px;
+        margin: 8px -12px 0 -12px;
+        padding-left: 12px;
+        padding-right: 12px;
+        border-top: 0.5px solid rgba(255, 255, 255, 0.08);
         flex-shrink: 0;
+    }
+
+    @media (prefers-color-scheme: light) {
+        .desktop-sidebar-bottom {
+            border-top: 0.5px solid rgba(0, 0, 0, 0.08);
+        }
     }
 
     /* Sidebar Footer Profile (Apple Music Profile Style with Identicon) */

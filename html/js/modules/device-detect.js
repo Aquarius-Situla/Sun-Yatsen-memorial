@@ -7,7 +7,7 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang } from './i18n.js?v=20260907e';
+import { getCurrentLang } from './i18n.js?v=20260907f';
 
 /* ============================================================================
  * Device Fingerprint Analysis

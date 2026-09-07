@@ -15,12 +15,12 @@ import { initDesktopParallax, initGyroscopeLighting } from './modules/motion.js'
 import { toggleDanmaku } from './modules/danmaku.js';
 import { setupMessageSheet } from './modules/message-sheet.js';
 import { loadAndTriggerFireworks } from './modules/fireworks.js';
-import { syncTabBarLabels, getCurrentLang } from './modules/i18n.js?v=20260907e';
-import { syncStandaloneTabBar } from './modules/tab-bar.js?v=20260907e';
-import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260907e';
-import { initDesktopShell } from './modules/desktop-shell.js?v=20260907e';
-import { hideActivityIndicator } from './modules/activity-indicator.js?v=20260907e';
-import { initDeviceLayout, initOrientationGuard, isMobileLayout, isDesktopLayout } from './modules/device-detect.js?v=20260907e';
+import { syncTabBarLabels, getCurrentLang } from './modules/i18n.js?v=20260907f';
+import { syncStandaloneTabBar } from './modules/tab-bar.js?v=20260907f';
+import { setupDiagnosticTrigger } from './modules/debug-panel.js?v=20260907f';
+import { initDesktopShell } from './modules/desktop-shell.js?v=20260907f';
+import { hideActivityIndicator } from './modules/activity-indicator.js?v=20260907f';
+import { initDeviceLayout, initOrientationGuard, isMobileLayout, isDesktopLayout } from './modules/device-detect.js?v=20260907f';
 
 /* Expose fireworks loader globally for legacy triggers */
 window.loadAndTriggerFireworks = loadAndTriggerFireworks;

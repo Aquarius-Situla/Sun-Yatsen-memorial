@@ -7,8 +7,8 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import tcLocale from './i18n/locales/tc.js?v=20260907e';
-import scLocale from './i18n/locales/sc.js?v=20260907e';
+import tcLocale from './i18n/locales/tc.js?v=20260907f';
+import scLocale from './i18n/locales/sc.js?v=20260907f';
 
 export const STORAGE_KEY = 'sys_memorial_lang';
 export const DEFAULT_LANG = 'tc';
