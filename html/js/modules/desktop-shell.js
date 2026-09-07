@@ -7,11 +7,11 @@
  * 3. All prose is written in English.
  * ============================================================================ */
 
-import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260907c';
-import { TAB_ICONS } from './tab-bar.js?v=20260907c';
-import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260907c';
-import { getVisitorUuid, generateIdenticonSvg } from './identicon.js?v=20260907c';
-import { isMobileLayout, isDesktopLayout } from './device-detect.js?v=20260907c';
+import { getCurrentLang, TAB_DEFINITIONS, syncTabBarLabels } from './i18n.js?v=20260907d';
+import { TAB_ICONS } from './tab-bar.js?v=20260907d';
+import { showActivityIndicator, hideActivityIndicator } from './activity-indicator.js?v=20260907d';
+import { getVisitorUuid, generateIdenticonSvg } from './identicon.js?v=20260907d';
+import { isMobileLayout, isDesktopLayout } from './device-detect.js?v=20260907d';
 
 /* ============================================================================
  * Global Search Index (Covers all memorial topics, exhibits, and settings)
@@ -179,10 +179,8 @@ const SIDEBAR_STRINGS = {
         statusAttendance: '總參典：',
         unitAttendance: '人次',
         noResults: '無相符搜尋結果',
-        visitorLabel: '訪客身分憑證',
-        popoverTitle: '訪客專屬識別碼 (UUID)',
-        copyHint: '點擊卡片可複製完整代碼',
-        copiedHint: '已複製 UUID 至剪貼簿！'
+        visitorLabel: '訪客識別碼',
+        copiedHint: '已複製！'
     },
     sc: {
         brand: '私立中山纪念堂',
@@ -200,10 +198,8 @@ const SIDEBAR_STRINGS = {
         statusAttendance: '总参典：',
         unitAttendance: '人次',
         noResults: '无相符搜索结果',
-        visitorLabel: '访客身份凭证',
-        popoverTitle: '访客专属识别码 (UUID)',
-        copyHint: '点击卡片可复制完整代码',
-        copiedHint: '已复制 UUID 至剪贴板！'
+        visitorLabel: '访客识别码',
+        copiedHint: '已复制！'
     }
 };
 
@@ -270,7 +266,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(homeLink);
         }
     }
-    homeLink.href = resolveSiteUrl('main/style.css?v=20260907c');
+    homeLink.href = resolveSiteUrl('main/style.css?v=20260907d');
 
     let subpageLink = document.getElementById('sys-style-subpage');
     if (!subpageLink) {
@@ -284,7 +280,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(subpageLink);
         }
     }
-    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260907c');
+    subpageLink.href = resolveSiteUrl('css/components/subpage.css?v=20260907d');
 
     let varLink = document.getElementById('sys-style-variables');
     if (!varLink) {
@@ -298,7 +294,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.insertBefore(varLink, document.head.firstChild);
         }
     }
-    varLink.href = resolveSiteUrl('css/variables.css?v=20260907c');
+    varLink.href = resolveSiteUrl('css/variables.css?v=20260907d');
 
     let baseLink = document.getElementById('sys-style-base');
     if (!baseLink) {
@@ -312,7 +308,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.insertBefore(baseLink, document.head.firstChild);
         }
     }
-    baseLink.href = resolveSiteUrl('css/base.css?v=20260907c');
+    baseLink.href = resolveSiteUrl('css/base.css?v=20260907d');
 
     let indLink = document.getElementById('sys-style-activity');
     if (!indLink) {
@@ -326,7 +322,7 @@ export function ensurePageStylesheets(isHome) {
             document.head.appendChild(indLink);
         }
     }
-    indLink.href = resolveSiteUrl('css/components/activity-indicator.css?v=20260907c');
+    indLink.href = resolveSiteUrl('css/components/activity-indicator.css?v=20260907d');
 
     if (isHome) {
         homeLink.disabled = false;
@@ -892,15 +888,7 @@ function createSidebarElement(activeTab, basePath) {
         <div class="desktop-sidebar-bottom">
             <div class="desktop-profile-card" id="desktop-profile-card" tabindex="0" role="button" aria-label="${str.visitorLabel}">
                 <div class="desktop-profile-avatar" id="desktop-profile-avatar"></div>
-                <div class="desktop-profile-info">
-                    <div class="desktop-profile-name" id="desktop-profile-name">${str.visitorLabel}</div>
-                    <div class="desktop-profile-status" id="desktop-profile-uuid"></div>
-                </div>
-                <div class="desktop-profile-popover" id="desktop-profile-popover">
-                    <div class="desktop-popover-title" id="desktop-popover-title">${str.popoverTitle}</div>
-                    <div class="desktop-popover-uuid" id="desktop-popover-uuid"></div>
-                    <div class="desktop-popover-hint" id="desktop-popover-hint">${str.copyHint}</div>
-                </div>
+                <span class="desktop-profile-uuid" id="desktop-profile-uuid"></span>
             </div>
         </div>
     `;
@@ -1027,16 +1015,6 @@ function syncSidebarLabels(sidebarEl) {
     const exMay = sidebarEl.querySelector('#label-exhibit-mayfourth');
     if (exMay) exMay.textContent = str.exhibitMayfourth;
 
-    const profileName = sidebarEl.querySelector('#desktop-profile-name');
-    if (profileName) profileName.textContent = str.visitorLabel;
-
-    const popoverTitle = sidebarEl.querySelector('#desktop-popover-title');
-    if (popoverTitle) popoverTitle.textContent = str.popoverTitle;
-
-    const popoverHint = sidebarEl.querySelector('#desktop-popover-hint');
-    if (popoverHint && !popoverHint.classList.contains('copied')) {
-        popoverHint.textContent = str.copyHint;
-    }
 }
 
 /* ============================================================================
@@ -1048,14 +1026,12 @@ function syncSidebarProfile(sidebarEl) {
     const card = sidebarEl.querySelector('#desktop-profile-card');
     const avatarEl = sidebarEl.querySelector('#desktop-profile-avatar');
     const uuidEl = sidebarEl.querySelector('#desktop-profile-uuid');
-    const popoverUuid = sidebarEl.querySelector('#desktop-popover-uuid');
-    const popoverHint = sidebarEl.querySelector('#desktop-popover-hint');
 
     const uuid = getVisitorUuid();
 
     /* Render 5x5 symmetrical SVG Identicon avatar */
     if (avatarEl && !avatarEl.querySelector('svg')) {
-        avatarEl.innerHTML = generateIdenticonSvg(uuid, 32);
+        avatarEl.innerHTML = generateIdenticonSvg(uuid, 16);
     }
 
     /* Set truncated UUID text with native browser tooltip */
@@ -1066,58 +1042,59 @@ function syncSidebarProfile(sidebarEl) {
     if (card) {
         card.setAttribute('title', uuid);
     }
-    if (popoverUuid) {
-        popoverUuid.textContent = uuid;
-    }
 
-    /* Interactive click-to-copy handler with fluid Apple UI feedback */
+    /* Interactive click-to-copy handler with fluid Apple UI inline feedback */
     if (card && !card.dataset.copyBound) {
         card.dataset.copyBound = 'true';
+        let resetTimer = null;
+
         card.addEventListener('click', async (e) => {
             e.stopPropagation();
-            /* Explicitly blur card so moving mouse away hides the popover */
-            card.blur();
 
             const currentLang = getCurrentLang();
             const str = SIDEBAR_STRINGS[currentLang] || SIDEBAR_STRINGS.tc;
+
+            let copied = false;
             try {
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     await navigator.clipboard.writeText(uuid);
-                } else {
+                    copied = true;
+                }
+            } catch (err) {
+                /* Clipboard write failed or permissions error */
+            }
+
+            if (!copied) {
+                try {
                     const ta = document.createElement('textarea');
                     ta.value = uuid;
                     ta.style.position = 'fixed';
+                    ta.style.top = '-9999px';
                     ta.style.opacity = '0';
                     document.body.appendChild(ta);
+                    ta.focus();
                     ta.select();
                     document.execCommand('copy');
                     document.body.removeChild(ta);
+                } catch (err) {
+                    /* Fallback copy failure ignored */
                 }
+            }
 
-                if (popoverHint) {
-                    const originalText = popoverHint.textContent;
-                    popoverHint.textContent = '✓ ' + str.copiedHint;
-                    popoverHint.classList.add('copied');
-                    setTimeout(() => {
-                        popoverHint.textContent = originalText;
-                        popoverHint.classList.remove('copied');
-                    }, 2000);
-                }
-            } catch (err) {
-                /* Copy failure ignored */
+            if (uuidEl) {
+                if (resetTimer) clearTimeout(resetTimer);
+                uuidEl.textContent = '✓ ' + (str.copiedHint || '已複製！');
+                uuidEl.classList.add('copied');
+                resetTimer = setTimeout(() => {
+                    uuidEl.textContent = uuid;
+                    uuidEl.classList.remove('copied');
+                }, 1500);
             }
         });
 
-        /* Reset focus state when mouse leaves to guarantee popover closes */
-        card.addEventListener('mouseleave', () => {
-            card.blur();
-        });
-
-        /* Accessible keyboard activation and dismiss */
+        /* Accessible keyboard activation */
         card.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                card.blur();
-            } else if (e.key === 'Enter' || e.key === ' ') {
+            if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 card.click();
             }

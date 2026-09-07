@@ -423,36 +423,27 @@ body.device-mobile {
     .desktop-sidebar-bottom {
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        padding: 12px 6px 0 6px;
-        border-top: 0.5px solid rgba(255, 255, 255, 0.06);
+        padding: 4px 6px 8px 6px;
         flex-shrink: 0;
-        overflow: visible !important;
-        position: relative;
-        z-index: 30001 !important;
     }
 
-    @media (prefers-color-scheme: light) {
-        .desktop-sidebar-bottom {
-            border-top: 0.5px solid rgba(0, 0, 0, 0.06);
-        }
-    }
-
-    /* Sidebar Footer Profile (Apple Music Profile Style) */
+    /* Sidebar Footer Profile (Apple Music Profile Style with Identicon) */
     .desktop-profile-card {
-        position: relative;
-        z-index: 30001 !important;
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 6px 8px;
-        border-radius: 8px;
+        gap: 8px;
+        height: 24px;
+        padding: 0 6px;
+        border-radius: 5px;
         text-decoration: none;
         color: #ffffff;
         cursor: pointer;
         user-select: none;
         -webkit-user-select: none;
         transition: background-color 0.15s ease, transform 0.15s ease;
+        min-width: 0;
+        overflow: hidden;
+        box-sizing: border-box;
     }
 
     .desktop-profile-card:hover {
@@ -479,15 +470,15 @@ body.device-mobile {
     }
 
     .desktop-profile-avatar {
-        width: 32px;
-        height: 32px;
+        width: 16px;
+        height: 16px;
         border-radius: 50%;
         overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
         border: 0.5px solid rgba(255, 255, 255, 0.15);
         background: rgba(255, 255, 255, 0.05);
     }
@@ -495,7 +486,7 @@ body.device-mobile {
     @media (prefers-color-scheme: light) {
         .desktop-profile-avatar {
             border: 0.5px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
             background: rgba(0, 0, 0, 0.03);
         }
     }
@@ -506,155 +497,30 @@ body.device-mobile {
         display: block;
     }
 
-    .desktop-profile-info {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
+    .desktop-profile-uuid {
+        font-size: 11px;
+        font-weight: 500;
+        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
+        letter-spacing: -0.2px;
+        line-height: 1;
+        white-space: nowrap;
         overflow: hidden;
+        text-overflow: ellipsis;
         min-width: 0;
         flex: 1;
-    }
-
-    .desktop-profile-name {
-        font-size: 12px;
-        font-weight: 600;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        color: #ffffff;
-    }
-
-    @media (prefers-color-scheme: light) {
-        .desktop-profile-name {
-            color: #1c1c1e;
-        }
-    }
-
-    .desktop-profile-status {
-        font-size: 11px;
-        color: rgba(255, 255, 255, 0.45);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
-        letter-spacing: -0.3px;
-        line-height: 1.2;
-    }
-
-    @media (prefers-color-scheme: light) {
-        .desktop-profile-status {
-            color: rgba(0, 0, 0, 0.45);
-        }
-    }
-
-    /* Floating Apple macOS Ventura Hover Popover */
-    .desktop-profile-popover {
-        position: absolute;
-        bottom: calc(100% + 10px);
-        left: 0;
-        width: 280px;
-        background: rgba(28, 28, 30, 0.95);
-        backdrop-filter: blur(25px) saturate(190%);
-        -webkit-backdrop-filter: blur(25px) saturate(190%);
-        border: 0.5px solid rgba(255, 255, 255, 0.15);
-        border-radius: 10px;
-        padding: 10px 12px;
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(6px);
-        transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-                    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-                    visibility 0.2s;
-        pointer-events: none;
-        z-index: 10000;
-        box-sizing: border-box;
-    }
-
-    .desktop-profile-card:hover .desktop-profile-popover,
-    .desktop-profile-card:focus-visible .desktop-profile-popover {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-        pointer-events: auto;
-    }
-
-    /* Invisible hover bridge to prevent mouse leave gap */
-    .desktop-profile-popover::before {
-        content: "";
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        height: 12px;
-        background: transparent;
-    }
-
-    /* Popover Arrow */
-    .desktop-profile-popover::after {
-        content: "";
-        position: absolute;
-        top: 100%;
-        left: 20px;
-        border-width: 6px;
-        border-style: solid;
-        border-color: rgba(28, 28, 30, 0.95) transparent transparent transparent;
-    }
-
-    .desktop-popover-title {
-        font-size: 10px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: rgba(255, 255, 255, 0.45);
-        margin-bottom: 6px;
-    }
-
-    .desktop-popover-uuid {
-        font-size: 11px;
-        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
-        color: #ffffff;
-        word-break: break-all;
-        user-select: all;
-        -webkit-user-select: all;
-        line-height: 1.45;
-        background: rgba(255, 255, 255, 0.07);
-        border: 0.5px solid rgba(255, 255, 255, 0.08);
-        padding: 6px 8px;
-        border-radius: 6px;
-    }
-
-    .desktop-popover-hint {
-        font-size: 11px;
-        color: #fa586a;
-        margin-top: 6px;
-        font-weight: 500;
+        color: rgba(255, 255, 255, 0.85);
         transition: color 0.15s ease;
     }
 
-    .desktop-popover-hint.copied {
+    .desktop-profile-uuid.copied {
         color: #34c759 !important;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "PingFang TC", sans-serif;
+        font-weight: 600;
     }
 
     @media (prefers-color-scheme: light) {
-        .desktop-profile-popover {
-            background: rgba(255, 255, 255, 0.96);
-            border: 0.5px solid rgba(0, 0, 0, 0.12);
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-        }
-
-        .desktop-profile-popover::after {
-            border-color: rgba(255, 255, 255, 0.96) transparent transparent transparent;
-        }
-
-        .desktop-popover-title {
-            color: rgba(0, 0, 0, 0.45);
-        }
-
-        .desktop-popover-uuid {
-            color: #1c1c1e;
-            background: rgba(0, 0, 0, 0.04);
-            border: 0.5px solid rgba(0, 0, 0, 0.06);
+        .desktop-profile-uuid {
+            color: rgba(0, 0, 0, 0.82);
         }
     }
 }

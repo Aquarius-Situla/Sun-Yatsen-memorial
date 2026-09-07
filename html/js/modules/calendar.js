@@ -8,7 +8,7 @@
  * ============================================================================ */
 
 import { SPECIAL_MEMORIAL_DAYS } from './audio-player.js';
-import { isMobileLayout } from './device-detect.js?v=20260907c';
+import { isMobileLayout } from './device-detect.js?v=20260907d';
 
 /* ============================================================================
  * Republic of China Calendar Formatting
