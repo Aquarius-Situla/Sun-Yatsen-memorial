@@ -503,11 +503,12 @@ body.device-mobile {
         font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
         letter-spacing: -0.2px;
         line-height: 1;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        min-width: 0;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        min-width: 0 !important;
         flex: 1;
+        display: block !important;
         color: rgba(255, 255, 255, 0.85);
         transition: color 0.15s ease;
     }
