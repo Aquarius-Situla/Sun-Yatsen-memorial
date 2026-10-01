@@ -25,31 +25,38 @@ A client-side memorial web application for Dr. Sun Yat-sen and the pioneers of t
 
 ```
 sys-memorial/
-├── html/
+├── frontend/                   # [Submodule] Web application frontend (Cloudflare Pages)
 │   ├── index.html              # Application entry point
 │   ├── api/                    # Runtime environment configuration (env.js)
-│   ├── archive/                # Assets not in active use
 │   ├── events/                 # Memorial event pages
-│   │   ├── whampoa/            # Whampoa Military Academy founding anniversary
-│   │   ├── militaries/         # Victory of the War of Resistance anniversary
-│   │   └── yatsen/             # Sun Yat-sen birth / death anniversaries
-│   ├── main/                   # Core stylesheet, scripts, and primary assets
-│   │   ├── style.css
-│   │   ├── script.js
-│   │   ├── portrait.jpg
-│   │   ├── anthem/             # Default music and album cover
-│   │   └── favicon/            # SVG and ICO favicons
-│   ├── pages/                  # Secondary pages
-│   │   ├── announcement/       # Site status and memorial announcements
-│   │   ├── biography/          # Sun Yat-sen biographical timeline
-│   │   ├── about/              # About and legal statement
-│   │   └── thanks/             # Credits
-│   └── webapp/                 # PWA manifest, icons, and iOS splash screens
-├── docker-compose.yml
-├── temp/                       # Temporary files generated during agent development
-├── bugfix/                     # Archive of epic bug post-mortems and lessons learned
-├── workers.js                  # Cloudflare Worker source
+│   ├── js/                     # Modular client scripts
+│   ├── main/                   # Core stylesheet, portrait, music, and favicons
+│   ├── pages/                  # Secondary pages and Admin Dashboard
+│   ├── webapp/                 # PWA manifest, icons, and iOS splash screens
+│   ├── tools/                  # Captcha builder utilities
+│   └── LICENSE                 # AGPL-3.0 License
+├── backend/                    # [Submodule] Serverless Worker backend (Cloudflare Workers)
+│   ├── workers.js              # Cloudflare Worker source
+│   ├── wrangler.toml           # Cloudflare Wrangler configuration
+│   └── LICENSE                 # AGPL-3.0 License
+├── docker-compose.yml          # Local/NPM Docker orchestration (mounts ./frontend)
+├── bugfix/                     # Archive of bug post-mortems
+├── docs/                       # Project documentation
 └── README.md
+```
+
+## Clone & Submodules
+
+When cloning this repository, initialize and update submodules recursively:
+
+```bash
+git clone --recurse-submodules git@github.com:Aquarius-Situla/Sun-Yatsen-memorial.git
+```
+
+For existing local clones:
+
+```bash
+git submodule update --init --recursive
 ```
 
 ## Deployment
@@ -60,14 +67,13 @@ sys-memorial/
 docker-compose up -d
 ```
 
-The compose file mounts `./html` as a read-only volume served by Nginx.
+The compose file mounts `./frontend` as a read-only volume served by Nginx.
 
-### Cloudflare Worker
+### Cloudflare Serverless (Pages & Workers)
 
-1. Create a new Worker in the Cloudflare dashboard.
-2. Bind a KV namespace with the binding name `MEMORIAL_KV`.
-3. Deploy `workers.js` to the Worker.
-4. Copy `html/api/env.example.js` to `html/api/env.js` and set `WORKER_API` to your Worker URL.
+1. **Frontend**: Connect the submodule repo [`Sun-Yatsen-memorial-frontend`](https://github.com/Aquarius-Situla/Sun-Yatsen-memorial-frontend) to Cloudflare Pages (Build command: empty, output directory: `/`).
+2. **Backend**: Deploy [`Sun-Yatsen-memorial-backend`](https://github.com/Aquarius-Situla/Sun-Yatsen-memorial-backend) via Wrangler (`npx wrangler deploy`) or Cloudflare Workers Dashboard, binding the KV namespace `MEMORIAL_KV`.
+3. **Connect Frontend to Backend**: In `frontend/api/env.js`, set `WORKER_API` to your deployed Worker URL.
 
 ## Admin Dashboard
 

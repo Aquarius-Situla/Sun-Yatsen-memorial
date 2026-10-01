@@ -9,9 +9,9 @@
 # ============================================================================
 # Runtime Environments & Secrets
 # ============================================================================
-html/api/env.js
-html/env.js
-html/api/prohibited_words/private.json
+frontend/api/env.js
+frontend/env.js
+frontend/api/prohibited_words/private.json
 .env
 .env.*
 !.env.example
