@@ -10,7 +10,7 @@ This project is structured as an integration repository combining two independen
 
 ```mermaid
 flowchart TB
-    Root["Sun-Yatsen-memorial (Integration Repo)<br/>Docker Compose · Submodules · Situla Auth SSO · Standards"]
+    Root["Sun-Yatsen-memorial (Integration Repo)<br/>Docker Compose · Submodules · Project Standards"]
     FE["Sun-Yatsen-memorial-frontend (Submodule: frontend/)<br/>Vanilla HTML5 / CSS3 / ESM · PWA · Cloudflare Pages"]
     BE["Sun-Yatsen-memorial-backend (Submodule: backend/)<br/>Cloudflare Workers + KV · Danmaku · Attendance · AI Moderation"]
     Root -->|submodule| FE
@@ -20,7 +20,7 @@ flowchart TB
 
 | Repository | Role | Hosting Target | README |
 |---|---|---|---|
-| [Sun-Yatsen-memorial](https://github.com/Aquarius-Situla/Sun-Yatsen-memorial) | Integration, Docker/Nginx orchestration, SSO config, project standards | Docker / Self-hosted | This file |
+| [Sun-Yatsen-memorial](https://github.com/Aquarius-Situla/Sun-Yatsen-memorial) | Integration, Docker/Nginx orchestration, project standards | Docker / Self-hosted | This file |
 | [Sun-Yatsen-memorial-frontend](https://github.com/Aquarius-Situla/Sun-Yatsen-memorial-frontend) | Pure static client application & Admin Dashboard | Cloudflare Pages / Nginx / Static host | [frontend/README.md](frontend/README.md) |
 | [Sun-Yatsen-memorial-backend](https://github.com/Aquarius-Situla/Sun-Yatsen-memorial-backend) | Serverless API for Danmaku, attendance, filtering & AI matrix | Cloudflare Workers + KV | [backend/README.md](backend/README.md) |
 
@@ -39,7 +39,7 @@ flowchart TB
 |---|---|
 | Frontend | HTML5 / Vanilla CSS3 / Vanilla JavaScript (ES Modules) |
 | Backend | Cloudflare Workers + Cloudflare Workers KV |
-| Self-Hosted Orchestration | Docker (`nginx:alpine`) + Nginx Proxy Manager + Situla Auth |
+| Self-Hosted Orchestration | Docker (`nginx:alpine`) + Nginx |
 
 ---
 
@@ -148,99 +148,6 @@ See [docker-compose.ghcr.yml](docker-compose.ghcr.yml) for port mappings and per
 
 1. **Backend**: Deploy `backend/` via GitHub Actions, Wrangler CLI, or the Cloudflare Dashboard, bind the `MEMORIAL_KV` namespace, and configure the required `ADMIN_SECRET` secret. See [backend/README.md](backend/README.md).
 2. **Frontend**: Connect `Sun-Yatsen-memorial-frontend` to Cloudflare Pages (empty build command, output directory `/`) and configure `frontend/api/env.js` with your Worker URL. See [frontend/README.md](frontend/README.md).
-
----
-
-## Situla Auth SSO Integration
-
-To protect the Admin Dashboard (`/#admin` or `/pages/admin/index.html`) or the entire self-hosted site with Single Sign-On, integrate [Situla Auth](https://github.com/Aquarius-Situla/Situla-auth) via Nginx Proxy Manager (NPM).
-
-This setup uses **Zero-File SSO Injection**: NPM injects `/api/sso_key` only for authenticated sessions on your protected domain, allowing public static mirrors (e.g., Cloudflare Pages or GitHub Pages) to remain secret-free and gracefully fall back to the standard password prompt.
-
-### Protecting Only the Admin Dashboard
-
-Add the following to your site's **Advanced** configuration tab in Nginx Proxy Manager:
-
-```nginx
-# 1. Define Situla Auth verification endpoint
-location /_auth {
-    internal;
-    proxy_pass http://situla-auth:3000/verify;
-    proxy_pass_request_body off;
-    proxy_set_header Content-Length "";
-    proxy_set_header X-Original-URI $request_uri;
-}
-
-# 2. Redirect unauthenticated users to login
-error_page 401 = @error401;
-location @error401 {
-    # Replace with your actual Situla Auth domain
-    return 302 https://auth.example.com/?rd=https://$http_host$request_uri;
-}
-
-# 3. Virtual SSO Injection (Replace YOUR_PASSWORD with the actual ADMIN_SECRET)
-location = /api/sso_key {
-    auth_request /_auth;
-    default_type application/json;
-    return 200 '{"key": "YOUR_PASSWORD"}';
-}
-
-# 4. Protect the admin dashboard files
-location /pages/admin/ {
-    auth_request /_auth;
-    proxy_pass $forward_scheme://$server:$port;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-}
-
-# 5. Quick Shortcut: Redirect /admin to /pages/admin/
-location = /admin {
-    return 301 /pages/admin/;
-}
-```
-
-### Protecting the Entire Site (with PWA / Icon Whitelist)
-
-To protect the entire memorial site while allowing iOS and browsers to fetch `manifest.json`, `apple-touch-icon`, and splash screens without auth redirects, use this configuration instead:
-
-```nginx
-# 1. Define Situla Auth verification endpoint
-location /_auth {
-    internal;
-    proxy_pass http://situla-auth:3000/verify;
-    proxy_pass_request_body off;
-    proxy_set_header Content-Length "";
-    proxy_set_header X-Original-URI $request_uri;
-}
-
-# 2. Redirect unauthenticated users to login
-error_page 401 = @error401;
-location @error401 {
-    # Replace with your actual Situla Auth domain
-    return 302 https://auth.example.com/?rd=$scheme://$http_host$request_uri;
-}
-
-# 3. Whitelist Apple icons, splash screens, and WebApp Manifest
-location ~* ^/(webapp/|main/favicon/|favicon\.ico) {
-    proxy_pass $forward_scheme://$server:$port;
-    proxy_set_header Host $host;
-}
-
-# 4. Protect the rest of the site
-location / {
-    auth_request /_auth;
-    proxy_pass $forward_scheme://$server:$port;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-}
-```
-
-> [!NOTE]
-> Situla Auth currently uses Zero-File SSO Injection via Nginx Proxy Manager headers. Standard OIDC (OpenID Connect) support is planned for future releases.
 
 ---
 
