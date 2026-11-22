@@ -1,101 +1,168 @@
-# 私立中山紀念堂
+# 私立中山紀念堂 (Private Sun Yat-sen Memorial Hall)
 
-A client-side memorial web application for Dr. Sun Yat-sen and the pioneers of the Chinese Republican revolution. The project serves as both a commemorative platform and a technical exploration of multimedia playback, immersive interaction, and responsive design without framework dependencies.
+A commemorative web application honoring Dr. Sun Yat-sen and the pioneers of the Chinese Republican revolution. The project serves as both a solemn digital memorial and a technical exploration of framework-free multimedia playback, immersive interaction, responsive Apple-style UI, and serverless moderation.
 
 ---
 
-## Features
+## Repository Architecture
 
-- **Ritual interaction** — Ceremony prompt guiding visitors to bow before the presidential portrait, with sequential music playback tied to the interaction.
-- **Contextual audio** — Background music automatically switches based on the current date or active memorial event page.
-- **Republican calendar** — Displays the current date in the Republic of China (Minguo) era in the navigation bar.
-- **PWA support** — Full Web App Manifest, iOS splash screens, and `apple-touch-icon` for a native-like experience on mobile and desktop.
-- **Historical content** — Includes Sun Yat-sen's last will, biographical timelines, and dedicated memorial event pages with associated music.
-- **Danmaku commentary** — Live bullet-comment overlay backed by Cloudflare Workers KV with rate limiting and backend content filtering.
+This project is structured as an integration repository combining two independent Git submodules:
 
-## Tech Stack
+```mermaid
+flowchart TB
+    Root["Sun-Yatsen-memorial (Integration Repo)<br/>Docker Compose · Submodules · Situla Auth SSO · Standards"]
+    FE["Sun-Yatsen-memorial-frontend (Submodule: frontend/)<br/>Vanilla HTML5 / CSS3 / ESM · PWA · Cloudflare Pages"]
+    BE["Sun-Yatsen-memorial-backend (Submodule: backend/)<br/>Cloudflare Workers + KV · Danmaku · Attendance · AI Moderation"]
+    Root -->|submodule| FE
+    Root -->|submodule| BE
+    FE -->|window.ENV.WORKER_API| BE
+```
+
+| Repository | Role | Hosting Target | README |
+|---|---|---|---|
+| [Sun-Yatsen-memorial](https://github.com/Aquarius-Situla/Sun-Yatsen-memorial) | Integration, Docker/Nginx orchestration, SSO config, project standards | Docker / Self-hosted | This file |
+| [Sun-Yatsen-memorial-frontend](https://github.com/Aquarius-Situla/Sun-Yatsen-memorial-frontend) | Pure static client application & Admin Dashboard | Cloudflare Pages / Nginx / Static host | [frontend/README.md](frontend/README.md) |
+| [Sun-Yatsen-memorial-backend](https://github.com/Aquarius-Situla/Sun-Yatsen-memorial-backend) | Serverless API for Danmaku, attendance, filtering & AI matrix | Cloudflare Workers + KV | [backend/README.md](backend/README.md) |
+
+---
+
+## Features & Tech Stack
+
+- **Ritual Interaction** — Interactive three-bow ceremony before the presidential portrait, paired with sequential memorial music playback.
+- **Contextual Audio** — Background music automatically switches based on the current date or active historical event page.
+- **Republican Calendar & i18n** — Displays the current date in the Republic of China (Minguo) era with Traditional/Simplified Chinese support.
+- **PWA & Responsive Shell** — Web App Manifest, iOS splash screens, `apple-touch-icon`, mobile tab bar, and desktop parallax shell.
+- **Historical Archive** — Includes Dr. Sun Yat-sen's last will, biographical timeline, library hub, and dedicated commemorative event pages.
+- **Danmaku, Attendance & AI Moderation** — Live bullet comments and daily visitor attendance backed by Cloudflare Workers KV, multi-layer word filtering, PlayCaptcha human verification, and async LLM moderation.
 
 | Layer | Technology |
 |---|---|
-| Frontend | HTML5 / Vanilla CSS3 / Vanilla JavaScript |
-| Backend | Cloudflare Workers + KV |
-| Deployment | Docker + Nginx |
+| Frontend | HTML5 / Vanilla CSS3 / Vanilla JavaScript (ES Modules) |
+| Backend | Cloudflare Workers + Cloudflare Workers KV |
+| Self-Hosted Orchestration | Docker (`nginx:alpine`) + Nginx Proxy Manager + Situla Auth |
+
+---
 
 ## Directory Structure
 
-```
+```text
 sys-memorial/
-├── frontend/                   # [Submodule] Web application frontend (Cloudflare Pages)
+├── frontend/                   # [Submodule] Static web application (Cloudflare Pages / Nginx)
+│   ├── .github/workflows/      # Multi-arch GHCR Docker image CI
 │   ├── index.html              # Application entry point
-│   ├── api/                    # Runtime environment configuration (env.js)
-│   ├── events/                 # Memorial event pages
-│   ├── js/                     # Modular client scripts
-│   ├── main/                   # Core stylesheet, portrait, music, and favicons
-│   ├── pages/                  # Secondary pages and Admin Dashboard
+│   ├── api/                    # Runtime env config (env.example.js) & word list archives
+│   ├── captcha/                # Isolated PlayCaptcha iframe bundle
+│   ├── css/                    # Base, variables, markdown, and component stylesheets
+│   ├── docker/                 # Nginx config & runtime env.js entrypoint script
+│   ├── events/                 # Commemorative event pages & celebration triggers
+│   ├── js/                     # App orchestrators and modular ES modules
+│   ├── main/                   # Core styles, portrait, audio tracks, and favicons
+│   ├── pages/                  # Subpages (about, admin, announcement, biography, library, settings, thanks)
+│   ├── tools/                  # Bundled PlayCaptcha builder source
 │   ├── webapp/                 # PWA manifest, icons, and iOS splash screens
-│   ├── tools/                  # Captcha builder utilities
+│   ├── Dockerfile              # Nginx Alpine container build
 │   └── LICENSE                 # AGPL-3.0 License
-├── backend/                    # [Submodule] Serverless Worker backend (Cloudflare Workers)
-│   ├── workers.js              # Cloudflare Worker source
-│   ├── wrangler.toml           # Cloudflare Wrangler configuration
+├── backend/                    # [Submodule] Serverless API (Cloudflare Workers / Docker)
+│   ├── .github/workflows/      # GHCR Docker image CI & Cloudflare Workers deploy CI
+│   ├── workers.js              # ES Module Worker router, KV logic, auth, and AI moderation
+│   ├── server.mjs              # Node.js HTTP & file-backed KV adapter for Docker
+│   ├── wrangler.toml           # Wrangler deployment configuration
+│   ├── Dockerfile              # Node 22 Alpine container build
 │   └── LICENSE                 # AGPL-3.0 License
-├── docker-compose.yml          # Local/NPM Docker orchestration (mounts ./frontend)
+├── tools/                      # Standalone PlayCaptcha builder workspace
+│   └── captcha_builder/
+├── docs/                       # Supplementary component documentation
 ├── bugfix/                     # Archive of bug post-mortems
-├── docs/                       # Project documentation
+├── docker-compose.yml          # Local Docker Compose config mounting ./frontend into Nginx
+├── docker-compose.ghcr.yml     # Full-stack Compose using prebuilt GHCR frontend & backend images
+├── .gitmodules                 # Submodule mappings for frontend/ and backend/
+├── LICENSE                     # AGPL-3.0 License
 └── README.md
 ```
 
-## Clone & Submodules
+---
 
-When cloning this repository, initialize and update submodules recursively:
+## Clone & Submodule Workflow
+
+### Cloning with Submodules
+
+Clone the repository together with `frontend/` and `backend/`:
 
 ```bash
 git clone --recurse-submodules git@github.com:Aquarius-Situla/Sun-Yatsen-memorial.git
 ```
 
-For existing local clones:
+If you already cloned without `--recurse-submodules`:
 
 ```bash
 git submodule update --init --recursive
 ```
 
-## Deployment
+### Committing Changes Across Repositories
 
-### Docker (Nginx)
+Because `frontend/` and `backend/` are independent Git repositories, commit and push changes inside the respective submodule **before** updating the submodule pointer in the integration repository:
+
+1. Commit and push inside `frontend/` or `backend/`:
+   ```bash
+   cd frontend   # or cd backend
+   git add .
+   git commit -m "your commit message"
+   git push origin main
+   ```
+2. Update the submodule reference in the root repository:
+   ```bash
+   cd ..
+   git add frontend backend
+   git commit -m "chore: update submodule pointers"
+   git push origin main
+   ```
+
+---
+
+## Deployment Overview
+
+### Option A: Docker Compose (Prebuilt GHCR Images — Full Stack)
+
+Prebuilt multi-architecture (`linux/amd64`, `linux/arm64`) frontend and backend images are published to GitHub Container Registry (`ghcr.io`) via GitHub Actions inside each submodule.
 
 ```bash
-docker-compose up -d
+export ADMIN_SECRET="your-strong-admin-passphrase"
+export WORKER_API="http://localhost:8787"
+docker compose -f docker-compose.ghcr.yml up -d
 ```
 
-The compose file mounts `./frontend` as a read-only volume served by Nginx.
+See [docker-compose.ghcr.yml](docker-compose.ghcr.yml) for port mappings and persistent `/data` KV storage configuration.
 
-### Cloudflare Serverless (Pages & Workers)
+### Option B: Docker + Nginx (Local `./frontend` Mount)
 
-1. **Frontend**: Connect the submodule repo [`Sun-Yatsen-memorial-frontend`](https://github.com/Aquarius-Situla/Sun-Yatsen-memorial-frontend) to Cloudflare Pages (Build command: empty, output directory: `/`).
-2. **Backend**: Deploy [`Sun-Yatsen-memorial-backend`](https://github.com/Aquarius-Situla/Sun-Yatsen-memorial-backend) via Wrangler (`npx wrangler deploy`) or Cloudflare Workers Dashboard, binding the KV namespace `MEMORIAL_KV`.
-3. **Connect Frontend to Backend**: In `frontend/api/env.js`, set `WORKER_API` to your deployed Worker URL.
+1. Configure the frontend API endpoint by copying `frontend/api/env.example.js` to `frontend/api/env.js` and setting `WORKER_API` to your deployed backend URL.
+2. Ensure the external Docker network `npm_default` exists (created by Nginx Proxy Manager), or uncomment `ports` in [docker-compose.yml](docker-compose.yml) for direct local access.
+3. Start the container:
+   ```bash
+   docker-compose up -d
+   ```
 
-## Admin Dashboard
+[docker-compose.yml](docker-compose.yml) mounts `./frontend` as a read-only volume (`/usr/share/nginx/html:ro`) into `nginx:alpine`.
 
-The project includes a centralized Admin Dashboard for managing platform data, moderation, and AI settings. It features an iOS/macOS-inspired frosted glass aesthetic with deep dark mode support.
+### Option C: Cloudflare Serverless (Pages & Workers)
 
-- **URL Path**: `/#admin` (Shortcut) or `/pages/admin/index.html` (Full path)
-- **Authentication**: Secured by a client-side SHA-256 hashed `admin_key` matching the backend environment variable. Also protected by PlayCaptcha to prevent brute-force attacks.
-- **Key Features**:
-  - **Danmaku Management**: View, delete, and filter all live comments. Upload and sync `public.json` and `private.json` prohibited word lists directly to the Cloudflare KV store.
-  - **AI Matrix Management**: Configure, edit, and delete backend AI personalities.
-  - **Platform Settings**: Toggle site-wide announcements, maintenance modes, and other configuration flags.
+1. **Backend**: Deploy `backend/` via GitHub Actions, Wrangler CLI, or the Cloudflare Dashboard, bind the `MEMORIAL_KV` namespace, and configure the required `ADMIN_SECRET` secret. See [backend/README.md](backend/README.md).
+2. **Frontend**: Connect `Sun-Yatsen-memorial-frontend` to Cloudflare Pages (empty build command, output directory `/`) and configure `frontend/api/env.js` with your Worker URL. See [frontend/README.md](frontend/README.md).
+
+---
 
 ## Situla Auth SSO Integration
 
-To protect the Admin Dashboard from unauthorized access and enable Single Sign-On (SSO), you can integrate this project with [Situla Auth](https://github.com/Aquarius-Situla/Situla-auth) via Nginx Proxy Manager (NPM).
+To protect the Admin Dashboard (`/#admin` or `/pages/admin/index.html`) or the entire self-hosted site with Single Sign-On, integrate [Situla Auth](https://github.com/Aquarius-Situla/Situla-auth) via Nginx Proxy Manager (NPM).
 
-This setup uses a **Zero-File SSO Injection** technique. The password is injected directly through Nginx Proxy Manager on your protected domain, allowing you to safely deploy public mirrors (e.g., on Vercel or GitHub Pages) without exposing the password. Mirror sites will gracefully fall back to the standard password input screen.
+This setup uses **Zero-File SSO Injection**: NPM injects `/api/sso_key` only for authenticated sessions on your protected domain, allowing public static mirrors (e.g., Cloudflare Pages or GitHub Pages) to remain secret-free and gracefully fall back to the standard password prompt.
 
-In your Nginx Proxy Manager **Advanced** configuration tab for this site, insert the following:
+### Protecting Only the Admin Dashboard
+
+Add the following to your site's **Advanced** configuration tab in Nginx Proxy Manager:
 
 ```nginx
-# 1. Define Situla Auth endpoint
+# 1. Define Situla Auth verification endpoint
 location /_auth {
     internal;
     proxy_pass http://situla-auth:3000/verify;
@@ -111,7 +178,7 @@ location @error401 {
     return 302 https://auth.example.com/?rd=https://$http_host$request_uri;
 }
 
-# 3. Virtual SSO Injection (Replace YOUR_PASSWORD with the actual admin password)
+# 3. Virtual SSO Injection (Replace YOUR_PASSWORD with the actual ADMIN_SECRET)
 location = /api/sso_key {
     auth_request /_auth;
     default_type application/json;
@@ -134,14 +201,12 @@ location = /admin {
 }
 ```
 
-Once configured, accessing `/admin` will automatically redirect you to Situla Auth for verification. After logging in, the frontend will transparently fetch the injected SSO key and log you in instantly.
+### Protecting the Entire Site (with PWA / Icon Whitelist)
 
-### Protecting the Entire Site (with PWA/Icon Whitelist)
-
-If you want to protect the **entire memorial site** with SSO but ensure iOS devices and browsers can still load the `apple-touch-icon`, splash screens, and `manifest.json` (so the app can be added to the home screen without being blocked), use this configuration in NPM's Advanced tab instead:
+To protect the entire memorial site while allowing iOS and browsers to fetch `manifest.json`, `apple-touch-icon`, and splash screens without auth redirects, use this configuration instead:
 
 ```nginx
-# 1. Define Situla Auth endpoint
+# 1. Define Situla Auth verification endpoint
 location /_auth {
     internal;
     proxy_pass http://situla-auth:3000/verify;
@@ -153,17 +218,17 @@ location /_auth {
 # 2. Redirect unauthenticated users to login
 error_page 401 = @error401;
 location @error401 {
-    # Replace auth.aquarius2009.me with your Situla Auth domain
-    return 302 https://auth.aquarius2009.me/?rd=$scheme://$http_host$request_uri;
+    # Replace with your actual Situla Auth domain
+    return 302 https://auth.example.com/?rd=$scheme://$http_host$request_uri;
 }
 
-# 3. Whitelist Apple icons, splash screens, and WebApp Manifest (Bypass Auth)
+# 3. Whitelist Apple icons, splash screens, and WebApp Manifest
 location ~* ^/(webapp/|main/favicon/|favicon\.ico) {
     proxy_pass $forward_scheme://$server:$port;
     proxy_set_header Host $host;
 }
 
-# 4. Protect the rest of the entire site
+# 4. Protect the rest of the site
 location / {
     auth_request /_auth;
     proxy_pass $forward_scheme://$server:$port;
@@ -175,99 +240,47 @@ location / {
 ```
 
 > [!NOTE]
-> Currently, Situla Auth relies on Zero-File SSO Injection via Nginx Proxy Manager headers. Future updates to Situla Auth will include native **OIDC (OpenID Connect)** support, offering an alternative standards-based integration method.
+> Situla Auth currently uses Zero-File SSO Injection via Nginx Proxy Manager headers. Standard OIDC (OpenID Connect) support is planned for future releases.
 
-## PlayCaptcha Integration
+---
 
-The project uses a heavily customized version of `playcaptcha` to prevent spam and automated attacks (e.g., Danmaku abuse, brute-force logins). It has been tailored for optimal responsive display and features a highly specific deep dark mode overlay that respects system settings even within restricted WebViews.
-
-To ensure maximum stability and avoid script loading conflicts, the Captcha must be integrated using the **isolated iframe method**. 
-
-To add the Captcha to any new page, follow these steps:
-
-### 1. HTML Structure
-Insert the following modal wrapper at the bottom of the `<body>`. Ensure the `src` path correctly points to the `html/captcha/index.html` file relative to your page.
-
-```html
-<div id="captcha-modal-overlay" class="modal-overlay" style="display: none; align-items: center; justify-content: center; z-index: 9999;">
-    <div class="captcha-modal-content" style="background: transparent; width: 440px; height: 620px; display: flex; justify-content: center; align-items: center;">
-        <iframe id="captcha-iframe" src="../../captcha/index.html" style="border: none; width: 100%; height: 100%; border-radius: 14px; background: transparent;" allowtransparency="true"></iframe>
-    </div>
-</div>
-```
-
-### 2. Invocation & Event Listener
-In your page's JavaScript, you do not need to dynamically load any React scripts. Simply show the overlay, reload the iframe (to reset the game state), and listen for the `CAPTCHA_SUCCESS` message.
-
-```javascript
-let captchaSuccessCallback = null;
-
-// 1. Listen for the success signal from the iframe
-window.addEventListener('message', (event) => {
-    if (event.data && event.data.type === 'CAPTCHA_SUCCESS') {
-        const overlay = document.getElementById('captcha-modal-overlay');
-        if (overlay) overlay.style.display = 'none';
-        
-        // Execute callback
-        if (captchaSuccessCallback) {
-            const cb = captchaSuccessCallback;
-            captchaSuccessCallback = null;
-            setTimeout(cb, 300);
-        }
-    }
-});
-
-// 2. Trigger the Captcha
-function showCaptcha(onSuccess) {
-    const overlay = document.getElementById('captcha-modal-overlay');
-    const iframe = document.getElementById('captcha-iframe');
-    if (!overlay || !iframe) return;
-    
-    captchaSuccessCallback = onSuccess;
-    
-    // Reload the iframe to ensure a fresh Captcha session
-    iframe.src = iframe.src;
-    overlay.style.display = 'flex';
-}
-```
-
-## Danmaku Filter (Prohibited Words)
-
-The Danmaku system uses a robust backend filter to prevent inappropriate content. The prohibited words are managed via two JSON files: `public.json` and `private.json`.
+## Prohibited Words Synchronization
 
 > [!WARNING]
-> Placing or modifying these `.json` files inside the local `/html/api/prohibited_words/` directory **has no effect on the live system**. The local directory is strictly for archival and reference purposes.
+> Placing or editing `.json` files inside `frontend/api/prohibited_words/` (`public.json` or the gitignored `private.json`) **has no effect on the live production filter**. Those files serve strictly as local archives/templates.
 
-To enforce the prohibited words filter, the lists must be synchronized with the Cloudflare Worker KV store. You must manually upload these files via the Admin Dashboard:
-1. Log into the Memorial Admin Dashboard.
-2. Navigate to the **Danmaku Management** (彈幕管理) section.
-3. Use the upload interface to upload your latest `public.json` and `private.json` files to the backend KV namespace.
+To enforce prohibited word lists in production, log into the **Admin Dashboard** (`/#admin` or `/pages/admin/index.html`) and upload `public.json` / `private.json` under **Danmaku Management** to sync them into the backend `MEMORIAL_KV` store.
 
-## AI Agent Instructions
+---
 
-When maintaining this project, AI assistants and agents **must** adhere to the following rules:
-- **English Comments Only**: All comments, notes, and documentation inside source code files (`.html`, `.js`, `.css`) must be written exclusively in English. Do not write Chinese comments.
-- **Block Comments Only**: The use of inline/single-line comments (like `//`) is strictly prohibited. You must use standard block comments (`/* ... */` for JavaScript/CSS and `<!-- ... -->` for HTML).
-- **Format Integrity**: Do not translate or alter any strings intended for user display (e.g. Traditional Chinese UI text, banners, toasts) unless explicitly instructed to do so.
-- **No Temporary Notes**: Do not commit debugging notes, temporary workarounds, or informal remarks into the codebase. Keep comments professional, focusing on architecture and module boundaries.
-- **Temporary Files Management**: Whenever an agent generates temporary files (such as test scripts, data extraction scripts, or debugging outputs), these files MUST be placed under `/temp/[feature_name]/` to keep the root directory clean and manageable.
-- **Captcha Integration (CRITICAL)**: **NEVER** attempt to dynamically inject React/ReactDOM UMD scripts to render the Captcha on a page, as it causes severe dependency conflicts, styling bugs, and race conditions. **ALWAYS** use the isolated `iframe` method exactly as documented in the `PlayCaptcha Integration` section above. Do not alter the `captcha/index.html` file unless specifically requested.
+## AI Agent & Maintainer Guidelines
 
+When contributing to or maintaining any repository in this project, AI assistants and developers **must** adhere to these rules:
+
+- **English Comments Only**: All code comments, headers, and developer notes inside `.html`, `.js`, `.css`, `.yml`, and `.toml` source files must be written in English.
+- **Block Comments Only**: Single-line comments (`//`) are strictly prohibited in JS/CSS/HTML source files. Use block comments (`/* ... */` for JS/CSS, `<!-- ... -->` for HTML, full-line `#` for YAML/TOML).
+- **Display String Integrity**: Do not alter or translate user-facing Traditional/Simplified Chinese UI copy, banners, or toasts unless explicitly requested.
+- **No Temporary Notes**: Never commit debugging remarks or temporary workarounds. Place any scratch/test scripts under `/temp/[feature_name]/` (gitignored).
+- **PlayCaptcha Isolation (CRITICAL)**: **NEVER** dynamically inject React/ReactDOM UMD scripts into host pages. Always use the isolated `iframe` wrapper pointing to `frontend/captcha/index.html` and trigger via `showCaptchaModal` in [frontend/js/modules/captcha.js](frontend/js/modules/captcha.js). See [frontend/README.md](frontend/README.md) for integration details.
+
+---
 
 ## Open Source Acknowledgements
 
-This project utilizes the following open-source libraries licensed under the MIT License:
+This project builds on the following MIT-licensed open-source components:
 
-- **zero-md**: Sub-page Markdown rendering engine. Copyright (c) 2018 Jason Lee.
-- **github-markdown-css**: Elegant and readable Markdown stylesheet. Copyright (c) Sindre Sorhus.
-- **playcaptcha**: Interactive claw machine captcha component. Copyright (c) 2026 iisac.
+- **zero-md** — Client-side Markdown renderer. Copyright (c) 2018 Jason Lee.
+- **github-markdown-css** — Markdown typography stylesheet. Copyright (c) Sindre Sorhus.
+- **playcaptcha** — Interactive claw-machine captcha component. Copyright (c) 2026 iisac.
+
+---
 
 ## Licensing
 
 This project uses a dual-license model:
 
-- **Source code** — Released under the [GNU Affero General Public License v3.0 (AGPLv3)](LICENSE).
-- **Audiovisual assets** — Music, portraits, and other media remain the property of their respective rights holders. Unauthorized commercial or inappropriate use is strictly prohibited. See [html/pages/about/about_tc.md](html/pages/about/about_tc.md) for the full statement (Traditional Chinese) or [html/pages/about/about_sc.md](html/pages/about/about_sc.md) (Simplified Chinese).
+- **Source code** — Released under the [GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE).
+- **Audiovisual assets** — Portraits, musical recordings, and historical media remain the property of their respective copyright holders and are **not** covered by AGPL-3.0. Unauthorized commercial or improper reuse is prohibited. See [frontend/pages/about/about_tc.md](frontend/pages/about/about_tc.md) (Traditional Chinese) or [frontend/pages/about/about_sc.md](frontend/pages/about/about_sc.md) (Simplified Chinese).
 
 ---
 
