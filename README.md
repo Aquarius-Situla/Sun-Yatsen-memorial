@@ -147,7 +147,7 @@ See [docker-compose.ghcr.yml](docker-compose.ghcr.yml) for port mappings and per
 ### Option C: Cloudflare Serverless (Pages & Workers)
 
 1. **Backend**: Deploy `backend/` via GitHub Actions, Wrangler CLI, or the Cloudflare Dashboard, bind the `MEMORIAL_KV` namespace, and configure the required `ADMIN_SECRET` secret. See [backend/README.md](backend/README.md).
-2. **Frontend**: Connect `Sun-Yatsen-memorial-frontend` to Cloudflare Pages (empty build command, output directory `/`) and configure `frontend/api/env.js` with your Worker URL. See [frontend/README.md](frontend/README.md).
+2. **Frontend**: Connect `Sun-Yatsen-memorial-frontend` to Cloudflare Pages (`Build command: sh scripts/build-pages.sh`, `Build output directory: dist`) and set the `WORKER_API` environment variable to your Worker URL. See [frontend/README.md](frontend/README.md).
 
 ---
 
